@@ -231,3 +231,13 @@ _Pvt_Extensions
 
 # FAKE - F# Make
 .fake/
+
+# Atmel Studio
+
+
+# KiCad temporary and backup files
+Hardware/Schematics/**/_autosave-*.kicad_pcb
+Hardware/Schematics/**/*.bak
+Hardware/Schematics/**/*-cache.lib
+Hardware/Schematics/**/*.kicad_pcb-bak
+
