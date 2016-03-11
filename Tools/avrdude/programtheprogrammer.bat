@@ -1,0 +1,1 @@
+avrdude.exe avrdude -c usbasp -p atmega8 -U flash:w:usbasp.atmega8.2011-05-28.hex

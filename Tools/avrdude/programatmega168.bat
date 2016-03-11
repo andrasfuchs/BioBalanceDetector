@@ -1,0 +1,1 @@
+avrdude.exe -c usbasp -p atmega168 -U flash:w:emptygccapp.hex %1 %2 %3 %4 %5 %6

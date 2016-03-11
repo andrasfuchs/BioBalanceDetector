@@ -3,12 +3,12 @@
  * main.cpp
  *
  * Created:		2015-12-12
- * Author:		Andras Fuchs
+ * Author:		Andras Fuchs (andras.fuchs@gmail.com)
  * Controller:	Atmel ATtiny85
  * Pinout:		1 - NC						8 - Vcc
- *				2 - LED red					7 - sensor (ADC input)
- *				3 - LED green				6 - LED blue
- *				4 - GND						8 - LED power
+ *				2 - PB3 - LED red			7 - ADC1 - sensor (ADC input)
+ *				3 - PB4 - LED green			6 - PB1 - LED blue
+ *				4 - GND						8 - PB0 - LED power
  * Description:
  *				The device detects the changes in the electro-magnetic field in the environment and changes the color of the LED accordingly.
  *				After startup it waits a few seconds (LED continuous red), and then it starts to sample the environment (LED blinking red).
@@ -19,7 +19,7 @@
  * Changelog:
  */ 
 
-#define F_CPU 1000000 // running at 1.0 Mhz?? The clock should run at 8 Mhz, but the 1 Mhz setting produces proper delay times
+#define F_CPU 1000000 // ATtiny85's internal clock runs at 1.0 Mhz
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
