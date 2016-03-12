@@ -1,24 +1,24 @@
 /*
- * BBD Proto #2 - EM Field Color Led and Antenna Tester with Power LEDs (2016-01-20 - 2016-03-11)
+ * BBD Proto #2 - EM Field Color Led and Antenna Tester with Power LEDs (2016-01-20 - 2016-03-12)
  *
  * Created: 2016-01-20
  * Author : Andras Fuchs (andras.fuchs@gmail.com)
  *
  * Controller:	Atmel ATmega168A
- * Pinout:		1 - Reset button				28 - PC5 - Heartbeat
- *				2 - PD0 - Power level 8 LED		27 - NC
- *				3 - PD1 - Power level 7 LED		26 - NC
- *				4 - PD2 - Power level 6 LED		25 - NC
- *				5 - PD3 - Power level 5 LED		24 - ADC1 - antenna B
- *				6 - PD4 - Power level 4 LED		23 - NC
- *				7 - Vcc							22 - GND
- *				8 - GND							21 - NC
- *				9 - NC							20 - NC
- *				10 - NC							19 - NC
- *				11 - PD5 - Power level 3 LED	18 - PB4 - LED green
- *				12 - PD6 - Power level 2 LED	17 - PB3 - LED red
- *				13 - PD7 - Power level 1 LED	16 - PB2 - LED blue
- *				14 - PB0 - LED power			15 - NC
+ * Pinout:		1 - Reset - button / Programmer yellow	28 - PC5 - Heartbeat
+ *				2 - PD0 - Power level 8 LED				27 - PC4 - LED red
+ *				3 - PD1 - Power level 7 LED				26 - PC3 - LED green
+ *				4 - PD2 - Power level 6 LED				25 - NC
+ *				5 - PD3 - Power level 5 LED				24 - NC
+ *				6 - PD4 - Power level 4 LED				23 - ADC0 - antenna
+ *				7 - Vcc									22 - GND
+ *				8 - GND									21 - ARef - Battery 3.3V
+ *				9 - NC									20 - AVcc = Vcc
+ *				10 - NC									19 - SCK - Programmer green
+ *				11 - PD5 - Power level 3 LED			18 - MISO - Programmer blue
+ *				12 - PD6 - Power level 2 LED			17 - MOSI - Programmer orange
+ *				13 - PD7 - Power level 1 LED			16 - PB2 - LED blue
+ *				14 - PB0 - LED power					15 - NC
  * Description:
  *				The device detects the changes in the electro-magnetic field in the environment and changes the color of the LED accordingly.
  *				After startup it waits a few seconds (LED continuous red), and then it starts to sample the environment (LED blinking red).
@@ -27,6 +27,10 @@
  *				If the value is smaller (negative delta) than the initial value the LED is blue
  *				If the value is higher (positive delta) than the initial value the LED is red
  * Changelog:
+ * 2016-03-12
+ *  + added potmeter to ARef and changed the ADC's reference to ARef
+ *  = changed the RGB LED pins
+ *  - fixed the 55-second-freeze bug
  * 2016-03-11
  *  + 8 power leds on port Ds
  * 2016-03-10
@@ -47,12 +51,14 @@
 #include <avr/io.h>
 #include <avr/sleep.h>
 #include <avr/interrupt.h>
+#include <avr/wdt.h>
 #include <util/delay.h>
 
 void changePrescaler(void);
 double arrayAvg(double array[], int count);
 void setLedPorts(int counter, int ledPower, int ledR, int ledG, int ledB);
-int  set_PORTB_bit(int position, int value);
+int set_PORTB_bit(int position, int value);
+int set_PORTC_bit(int position, int value);
 void set_power_leds(int level);
 void spectral_color(double &r,double &g,double &b,double l);
 void adc_init(uint8_t ch);
@@ -81,18 +87,27 @@ int main(void)
 {
 	changePrescaler();
 
+	wdt_disable();
+	wdt_enable(WDTO_8S);
+
 	int counter = 0;
 	
 	// Set Port Bs as outputs (binary 1) or as inputs (binary 0)
-	// PORTB bit 0 = physical pin #5 on the ATTINY85 - LED POWER
-	// PORTB bit 1 = physical pin #6 on the ATTINY85 - LED BLUE
-	// PORTB bit 3 = physical pin #2 on the ATTINY85 - LED RED
-	// PORTB bit 4 = physical pin #3 on the ATTINY85 - LED GREEN
-	DDRB = 0b00011111;
+	// PORTB bit 0 = physical pin #14 on the ATmega168A - LED Power
+	// PORTB bit 1 = physical pin #16 on the ATmega168A - LED Blue
+	// PORTB bit 3 = physical pin #17 on the ATmega168A - LED RED
+	// PORTB bit 4 = physical pin #18 on the ATmega168A - LED GREEN
+	DDRB = 0b00000101;
 
 	// Set Port Cs as outputs (binary 1) or as inputs (binary 0)
+	// PORTC bit 3 = physical pin #26 on the ATmega168 - LED Green
+	// PORTC bit 4 = physical pin #27 on the ATmega168 - LED Red
 	// PORTC bit 5 = physical pin #28 on the ATmega168 - Heartbeat LED
-	DDRC = 0b00100000;
+	DDRC = 0b00111000;
+
+	// Set Port Ds as outputs (binary 1) or as inputs (binary 0)
+	// PORTDs are the power level LEDs
+	DDRD = 0b11111111;
 
 	double r, g, b;
 	double l = 400.0;
@@ -106,7 +121,7 @@ int main(void)
 		
 	sei(); // enable global interrupts
 		
-	adc_init(1);
+	adc_init(0);
 
 	// Set up a forever loop
     while (1) 
@@ -125,8 +140,8 @@ int main(void)
 
 		if ((counter%256) == 0)
 		{
-			adc_read_async();
-			sleep_cpu();		
+			//adc_read_async();
+			sleep_cpu(); // this method automatically call the ADC interrupt method (so the adc_read_async() call is not neccessary)
 		}
 		
 		if (i <= avgSamplesCountLong)
@@ -136,6 +151,8 @@ int main(void)
 		{
 			setLedPorts(counter, ledPower, ledR, ledG, ledB);
 		}
+
+		wdt_reset();
 	}
 	
 	return 1;
@@ -182,21 +199,21 @@ void setLedPorts(int counter, int ledPower, int ledR, int ledG, int ledB)
 	if (counter >= ledR)
 	{
 		// turn RED led off
-		set_PORTB_bit(3,1);
+		set_PORTC_bit(4,1);
 	}
 	else
 	{
 		// turn RED led on
-		set_PORTB_bit(3,0);
+		set_PORTC_bit(4,0);
 	}
 
 	if (counter >= ledG)
 	{
-		set_PORTB_bit(4,1);
+		set_PORTC_bit(3,1);
 	}
 	else
 	{
-		set_PORTB_bit(4,0);
+		set_PORTC_bit(3,0);
 	}
 
 	if (counter >= ledB)
@@ -222,6 +239,24 @@ int set_PORTB_bit(int position, int value)
 	else
 	{
 		PORTB |= (1 << position);       // Set high, leave others alone
+	}
+
+	return 1;
+}
+
+int set_PORTC_bit(int position, int value)
+{
+	// Sets or clears the bit in position 'position'
+	// either high or low (1 or 0) to match 'value'.
+	// Leaves all other bits in PORTC unchanged.
+	
+	if (value == 0)
+	{
+		PORTC &= ~(1 << position);      // Set bit position low
+	}
+	else
+	{
+		PORTC |= (1 << position);       // Set high, leave others alone
 	}
 
 	return 1;
@@ -286,11 +321,14 @@ void spectral_color(double &r,double &g,double &b,double l) // RGB <0,1> <- lamb
 
 void adc_init(uint8_t ch)
 {
-	// A: VCC used as Voltage Reference, disconnected from #21 (AREF).
+	// A: AREF, internal Vref turned off
 	int ref = (0<<REFS1)|(0<<REFS0);
 	
-	// B: 1.1V is used as Voltage Reference, disconnected from #21 (AREF).
-	//int ref =  (0<<REFS2)|(1<<REFS1)|(0<<REFS0);
+	// B: AVcc as Voltage Reference with external capacitor at AREF pin (#21).
+	//int ref = (0<<REFS1)|(1<<REFS0);
+
+	// C: Internal 1.1V Voltage Reference with external capacitor at AREF pin (#21).
+	//int ref = (1<<REFS1)|(1<<REFS0);
 
 	// select the corresponding channel 0~7
 	// ANDing with ’7? will always keep the value
@@ -299,7 +337,7 @@ void adc_init(uint8_t ch)
 	ADMUX = (ref & 0xF8)|ch; // clears the bottom 3 bits before ORing
 	
 	// ADC Enable, do not start conversion, enable ADC interrupt, prescaler of 128
-	// 10.0 Mhz/128 = 625kHz (48kSPS)
+	// 20.0 Mhz/128 = 1'250kHz (96kSPS)
 	ADCSRA = (1<<ADEN)|(0<<ADSC)|(1 << ADIE)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0);
 }
 
@@ -327,6 +365,15 @@ void adc_read_async()
 ISR(ADC_vect)
 {
 	i = (i+1);
+	if (i >= (120*256))
+	{
+		i = i - (120*256);
+		if (i < avgSamplesCountLong)
+		{
+			i = avgSamplesCountLong;
+		}
+	}
+
 	
 	double adcValue = ((double)ADC) / 1024.0;
 	
@@ -334,7 +381,7 @@ ISR(ADC_vect)
 	adcValuesShort[i % avgSamplesCountShort] = adcValue;
 	double adcValueAvgShort = arrayAvg(adcValuesShort, avgSamplesCountShort);
 
-	set_power_leds((int)(adcValueAvgShort*8));
+	set_power_leds((int)(adcValueAvgShort*9));
 	
 	// long average
 	if (i <= avgSamplesCountLong)
