@@ -1,0 +1,33 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP CD74HC4067
+D Texas Instruments CD74HC4067: High-Speed CMOS Logic 16-Channel Analog Multiplexer/Demultiplexer
+K Texas Instruments, 16-channel analog multiplexer/demultiplexer
+F http://www.ti.com/lit/ds/symlink/cd74hc4067.pdf
+$ENDCMP
+#
+$CMP LTC1864
+D Linear Technologies LTC1864: µPower, 16-Bit, 250ksps 1-channel ADC in SO/MSOP
+K Linear Technology,ADC,16-bit,250ksps,1-channel,SPI,Microwire
+F http://www.linear.com/docs/4062
+$ENDCMP
+#
+$CMP LTC3407
+D Linear Technology LTC3407: Dual Synchronous, 600mA, 1.5MHz Step-Down DC/DC Regulator
+K Linear Technology,Regulator,600mA
+F http://www.linear.com/docs/1858
+$ENDCMP
+#
+$CMP MCP4161
+D Microship Technologies MCP4161: 7/8-Bit Single/Dual SPI Digital POT with Non-Volatile Memory
+K Microchip Technology,8-bit,digital,potmeter,SPI
+F http://ww1.microchip.com/downloads/en/DeviceDoc/22059b.pdf
+$ENDCMP
+#
+$CMP ATTINY861-20SU
+D Atmel ATtiny861-20SU: SO20, 20Mhz, 2k Flash, 128B SRAM, 128B EEPROM
+K AVR 8bit Microcontroller tinyAVR
+F http://www.atmel.com/images/atmel-2588-8-bit-avr-microcontrollers-tinyavr-attiny261-attiny461-attiny861_datasheet.pdf
+$ENDCMP
+#
+#End Doc Library
