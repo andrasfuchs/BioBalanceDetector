@@ -325,10 +325,10 @@ void adc_init(uint8_t ch)
 	int ref = (0<<REFS1)|(0<<REFS0);
 	
 	// B: AVcc as Voltage Reference with external capacitor at AREF pin (#21).
-	//int ref = (0<<REFS1)|(1<<REFS0);
+	// int ref = (0<<REFS1)|(1<<REFS0);
 
 	// C: Internal 1.1V Voltage Reference with external capacitor at AREF pin (#21).
-	//int ref = (1<<REFS1)|(1<<REFS0);
+	// int ref = (1<<REFS1)|(1<<REFS0);
 
 	// select the corresponding channel 0~7
 	// ANDing with ’7? will always keep the value
