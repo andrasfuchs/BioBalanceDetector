@@ -1,0 +1,1 @@
+"c:\Program Files\Java\jdk1.8.0_77\bin\javac.exe" -cp ".\;javaws.jar;jh.jar" .\gui\MainApplication.java
