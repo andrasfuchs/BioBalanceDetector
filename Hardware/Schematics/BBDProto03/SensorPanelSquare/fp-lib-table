@@ -1,0 +1,3 @@
+(fp_lib_table
+  (lib (name Arduino_Uno)(type KiCad)(uri c:\Work\BioBalanceDetector\Hardware\Schematics\BBDProto03\SensorPanelSquare\Socket_Arduino_Uno.pretty)(options "")(descr ""))
+)

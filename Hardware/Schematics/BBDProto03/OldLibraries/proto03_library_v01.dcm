@@ -1,9 +1,0 @@
-EESchema-DOCLIB  Version 2.0
-#
-$CMP LTC1864
-D µPower, 16-Bit, 250ksps 1-channel ADC in SO/MSOP
-K Linear Technology,ADC,16-bit,250ksps,1-channel,SPI,Microwire
-F http://www.linear.com/docs/4062
-$ENDCMP
-#
-#End Doc Library
