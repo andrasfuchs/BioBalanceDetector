@@ -11,7 +11,7 @@
     (via_costs 50)
     (plane_via_costs 5)
     (start_ripup_costs 100)
-    (start_pass_no 1173)
+    (start_pass_no 15587)
     (layer_rule F.Cu
       (active on)
       (preferred_direction horizontal)
@@ -73,20 +73,21 @@
     "Net-(P12-Pad11)" "Net-(P12-Pad12)" "Net-(P12-Pad13)" "Net-(P12-Pad14)" "Net-(P12-Pad15)" "Net-(P12-Pad16)" "Net-(P13-Pad1)" "Net-(P13-Pad2)"
     "Net-(P13-Pad3)" "Net-(P13-Pad4)" "Net-(P13-Pad5)" "Net-(P13-Pad6)" "Net-(P13-Pad7)" "Net-(P13-Pad8)" "Net-(P13-Pad9)" "Net-(P13-Pad10)"
     "Net-(P13-Pad11)" "Net-(P13-Pad12)" "Net-(P13-Pad13)" "Net-(P13-Pad14)" "Net-(P13-Pad15)" "Net-(P13-Pad16)" "Net-(U1-Pad11)" "Net-(U1-Pad12)"
-    "Net-(U1-Pad13)" "Net-(U1-Pad14)" "Net-(U1-Pad17)" "Net-(U1-Pad18)" "Net-(U1-Pad19)" "Net-(U1-Pad20)" "Net-(U10-Pad1)" "Net-(U10-Pad2)"
-    "Net-(U10-Pad3)" "Net-(U10-Pad4)" "Net-(U10-Pad5)" "Net-(U10-Pad6)" "Net-(U10-Pad7)" "Net-(U10-Pad8)" "Net-(U10-Pad9)" "Net-(U10-Pad16)"
-    "Net-(U10-Pad17)" "Net-(U10-Pad18)" "Net-(U10-Pad19)" "Net-(U10-Pad20)" "Net-(U10-Pad21)" "Net-(U10-Pad22)" "Net-(U10-Pad23)" "Net-(P14-Pad1)"
-    "Net-(P14-Pad2)" "Net-(P14-Pad3)" "Net-(P14-Pad4)" "Net-(P14-Pad5)" "Net-(P14-Pad6)" "Net-(P14-Pad7)" "Net-(P14-Pad8)" "Net-(P14-Pad9)"
-    "Net-(P14-Pad10)" "Net-(P14-Pad11)" "Net-(P14-Pad12)" "Net-(P14-Pad13)" "Net-(P14-Pad14)" "Net-(P14-Pad15)" "Net-(P14-Pad16)" "Net-(U1-Pad16)"
-    "Net-(U1-Pad7)" "Net-(U1-Pad9)" "Net-(U3-Pad6)" "Net-(P9-Pad4)" "Net-(P9-Pad6)" "Net-(P15-Pad1)" "Net-(P15-Pad2)" "Net-(P15-Pad3)"
-    "Net-(P15-Pad4)" "Net-(P15-Pad5)" "Net-(P15-Pad6)" "Net-(P15-Pad7)" "Net-(P15-Pad8)" "Net-(P15-Pad9)" "Net-(P15-Pad10)" "Net-(P15-Pad11)"
-    "Net-(P15-Pad12)" "Net-(P15-Pad13)" "Net-(P15-Pad14)" "Net-(P15-Pad15)" "Net-(P15-Pad16)" "Net-(P16-Pad1)" "Net-(P16-Pad2)" "Net-(P16-Pad3)"
-    "Net-(P16-Pad4)" "Net-(P16-Pad5)" "Net-(P16-Pad6)" "Net-(P16-Pad7)" "Net-(P16-Pad8)" "Net-(P16-Pad9)" "Net-(P16-Pad10)" "Net-(P16-Pad11)"
-    "Net-(P16-Pad12)" "Net-(P16-Pad13)" "Net-(P16-Pad14)" "Net-(P16-Pad15)" "Net-(P16-Pad16)" "Net-(P17-Pad1)" "Net-(P17-Pad2)" "Net-(P17-Pad3)"
-    "Net-(P17-Pad4)" "Net-(P17-Pad5)" "Net-(P17-Pad6)" "Net-(P17-Pad7)" "Net-(P17-Pad8)" "Net-(P17-Pad9)" "Net-(P17-Pad10)" "Net-(P17-Pad11)"
-    "Net-(P17-Pad12)" "Net-(P17-Pad13)" "Net-(P17-Pad14)" "Net-(P17-Pad15)" "Net-(P17-Pad16)" "Net-(P18-Pad1)" "Net-(P18-Pad2)" "Net-(P18-Pad3)"
-    "Net-(P18-Pad4)" "Net-(P18-Pad5)" "Net-(P18-Pad6)" "Net-(P18-Pad7)" "Net-(P18-Pad8)" "Net-(P18-Pad9)" "Net-(P18-Pad10)" "Net-(P18-Pad11)"
-    "Net-(P18-Pad12)" "Net-(P18-Pad13)" "Net-(P18-Pad14)" "Net-(P18-Pad15)" "Net-(P18-Pad16)" "Net-(U11-Pad24)" "Net-(U15-Pad24)"
+    "Net-(U1-Pad13)" "Net-(U1-Pad14)" "Net-(U1-Pad17)" "Net-(U1-Pad18)" "Net-(U1-Pad19)" "Net-(U1-Pad20)" "Net-(U10-Pad2)" "Net-(U10-Pad3)"
+    "Net-(U10-Pad4)" "Net-(U10-Pad5)" "Net-(U10-Pad6)" "Net-(U10-Pad7)" "Net-(U10-Pad8)" "Net-(U10-Pad9)" "Net-(U10-Pad16)" "Net-(U10-Pad17)"
+    "Net-(U10-Pad18)" "Net-(U10-Pad19)" "Net-(U10-Pad20)" "Net-(U10-Pad21)" "Net-(U10-Pad22)" "Net-(U10-Pad23)" "Net-(P14-Pad1)" "Net-(P14-Pad2)"
+    "Net-(P14-Pad3)" "Net-(P14-Pad4)" "Net-(P14-Pad5)" "Net-(P14-Pad6)" "Net-(P14-Pad7)" "Net-(P14-Pad8)" "Net-(P14-Pad9)" "Net-(P14-Pad10)"
+    "Net-(P14-Pad11)" "Net-(P14-Pad12)" "Net-(P14-Pad13)" "Net-(P14-Pad14)" "Net-(P14-Pad15)" "Net-(P14-Pad16)" "Net-(U3-Pad6)" "Net-(P9-Pad4)"
+    "Net-(P9-Pad6)" "Net-(P15-Pad1)" "Net-(P15-Pad2)" "Net-(P15-Pad3)" "Net-(P15-Pad4)" "Net-(P15-Pad5)" "Net-(P15-Pad6)" "Net-(P15-Pad7)"
+    "Net-(P15-Pad8)" "Net-(P15-Pad9)" "Net-(P15-Pad10)" "Net-(P15-Pad11)" "Net-(P15-Pad12)" "Net-(P15-Pad13)" "Net-(P15-Pad14)" "Net-(P15-Pad15)"
+    "Net-(P15-Pad16)" "Net-(P16-Pad1)" "Net-(P16-Pad2)" "Net-(P16-Pad3)" "Net-(P16-Pad4)" "Net-(P16-Pad5)" "Net-(P16-Pad6)" "Net-(P16-Pad7)"
+    "Net-(P16-Pad8)" "Net-(P16-Pad9)" "Net-(P16-Pad10)" "Net-(P16-Pad11)" "Net-(P16-Pad12)" "Net-(P16-Pad13)" "Net-(P16-Pad14)" "Net-(P16-Pad15)"
+    "Net-(P16-Pad16)" "Net-(P17-Pad1)" "Net-(P17-Pad2)" "Net-(P17-Pad3)" "Net-(P17-Pad4)" "Net-(P17-Pad5)" "Net-(P17-Pad6)" "Net-(P17-Pad7)"
+    "Net-(P17-Pad8)" "Net-(P17-Pad9)" "Net-(P17-Pad10)" "Net-(P17-Pad11)" "Net-(P17-Pad12)" "Net-(P17-Pad13)" "Net-(P17-Pad14)" "Net-(P17-Pad15)"
+    "Net-(P17-Pad16)" "Net-(P18-Pad1)" "Net-(P18-Pad2)" "Net-(P18-Pad3)" "Net-(P18-Pad4)" "Net-(P18-Pad5)" "Net-(P18-Pad6)" "Net-(P18-Pad7)"
+    "Net-(P18-Pad8)" "Net-(P18-Pad9)" "Net-(P18-Pad10)" "Net-(P18-Pad11)" "Net-(P18-Pad12)" "Net-(P18-Pad13)" "Net-(P18-Pad14)" "Net-(P18-Pad15)"
+    "Net-(P18-Pad16)" "Net-(U11-Pad24)" "Net-(U15-Pad24)" "Net-(D1-Pad2)" "Net-(D1-Pad1)" "Net-(Q1-Pad1)" "Net-(Q1-Pad3)" "Net-(R1-Pad1)"
+    "Net-(R2-Pad2)"
     (clearance_class "kicad_default")
     (via_rule kicad_default)
     (rule
