@@ -3,7 +3,7 @@
   (general
     (links 246)
     (no_connects 246)
-    (area 28.372999 39.929999 119.963001 146.760001)
+    (area 12.828001 24.455 197.182286 159.545001)
     (thickness 1.6)
     (drawings 41)
     (tracks 1705)
@@ -92,11 +92,11 @@
       (plotinvisibletext false)
       (padsonsilk false)
       (subtractmaskfromsilk false)
-      (outputformat 4)
+      (outputformat 1)
       (mirror false)
       (drillshape 0)
       (scaleselection 1)
-      (outputdirectory ../../../Manufacturing/))
+      (outputdirectory ../../../Fabrication/BBDProto03/ArduinoShield/))
   )
 
   (net 0 "")
