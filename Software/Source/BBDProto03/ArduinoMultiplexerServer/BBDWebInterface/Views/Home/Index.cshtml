@@ -1,0 +1,17 @@
+﻿@section SPAViews {
+    @Html.Partial("_Home")
+}
+@section Scripts{
+    @Scripts.Render("~/bundles/knockout")
+    @Scripts.Render("~/bundles/app")
+
+    <script type="text/javascript">
+        var urlListSessionIds = 'http://localhost:8080/api/channels/listsessions';
+        var urlChannelGetValues = 'http://localhost:8080/api/channels/getvalues/{sessionId}/0/00:00:02.0';
+    </script>
+
+    <script runat="server" type="text/javascript" src="~/Scripts/Home/Index.js"></script>
+}
+
+<canvas id="myChart" width="400" height="200"></canvas>
+<div id="results"/>

@@ -1,4 +1,6 @@
 /*
+ * AVRMultiplexer.cpp
+ *
  * BBD Proto #3 - Multiplexer Arduino Shield Controller (2016-04-14 - 2016-04-15)
  *
  * Created: 2016-04-04
@@ -24,20 +26,12 @@
  *
  */
 
-
-/*
- * AVRMultiplexer.cpp
- *
- * Created: 2016-04-14 11:46:58
- * Author : Andras Fuchs
- */ 
-
 #define F_CPU 9000000 // ATtiny861's internal clock runs at 9.0 Mhz with CKDIV8 set (effective 1.125 Mhz), but changePrescaler speeds it up to 9 Mhz
 
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
-#include <avr/wdt.h>
+//#include <avr/wdt.h>
 #include <util/delay.h>
 
 void changePrescaler(void);
@@ -45,6 +39,9 @@ void changePrescaler(void);
 int main(void)
 {
 	changePrescaler();
+
+	PCMSK0 = 0b00000000;
+	PCMSK1 = 0b00000000;
 
 	//wdt_disable();
 	//wdt_enable(WDTO_8S);
@@ -70,9 +67,16 @@ int main(void)
 	// PORTB bit 7 = physical pin #10 on the ATtiny861 - ^RESET
 	DDRB = 0b00010010;
 
-
 	// select the 19th input on the multiplexers
 	PORTA = 0b11111111;
+
+	PORTB = 0b00000000;
+	 
+	 // USICR: USI Control Register | USISIE - Start Condition Interrupt Enable, USIWM0 - SPI Mode 1, USICS0-USICS1-USICLK - Clock to External negative edge (slave mode)
+	 USICR = (1 << USIOIE) | (1 << USIWM0) | (1 << USICS0) | (1 << USICS1) | (0 << USICLK);
+		
+	/* Enable Global Interrupts */
+	//sei();
 
 
     while (1) 
@@ -86,8 +90,8 @@ int main(void)
 
 void changePrescaler(void) 
 {
-	cli();
+	//cli();
 	CLKPR = 1 << CLKPCE;		// Set the prescaler change enable bit to 1
 	CLKPR = 0;					// Set the prescaler value to 1 and set the prescaler change enable bit to 0
-	sei();
+	//sei();
 }

@@ -1,0 +1,10 @@
+(megnevezés) | (tokozás) | (pozíció) | (db/panel)
+Q_NPN_BCE | SOT-23 | Q1 | 1
+1k | 0603 | R1, R2 | 2
+ATTINY861 | SOIC-20 | U1 | 1
+LTC1864 | SOIC-8 | U2 | 1
+MCP4822 | SOIC-8 | U3 | 1
+CD74HC4067 | SOIC-24 | U10, U11, U12, U13, U14, U15, U16, U17, U18 | 9 
+CONN_02X08 | Socket Strip 2x08 | P11, P12, P13, P14, P15, P16, P17, P18 | 9
+USBASP | Socket Strip 2x05 | P9 | 1
+Led | 0603 | D1 | 1

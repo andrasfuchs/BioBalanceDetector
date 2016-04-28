@@ -2,7 +2,7 @@
 
   (general
     (links 246)
-    (no_connects 246)
+    (no_connects 0)
     (area 12.828001 24.455 197.182286 159.545001)
     (thickness 1.6)
     (drawings 41)
@@ -24,10 +24,10 @@
   (layers
     (0 F.Cu signal)
     (31 B.Cu signal)
-    (32 B.Adhes user)
-    (33 F.Adhes user)
-    (34 B.Paste user)
-    (35 F.Paste user)
+    (32 B.Adhes user hide)
+    (33 F.Adhes user hide)
+    (34 B.Paste user hide)
+    (35 F.Paste user hide)
     (36 B.SilkS user)
     (37 F.SilkS user)
     (38 B.Mask user)
@@ -73,7 +73,7 @@
     (grid_origin 110.998 126.365)
     (visible_elements 7FFFFFFF)
     (pcbplotparams
-      (layerselection 0x00030_80000001)
+      (layerselection 0x000e0_80000001)
       (usegerberextensions false)
       (excludeedgelayer true)
       (linewidth 0.100000)
