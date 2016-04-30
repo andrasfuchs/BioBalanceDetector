@@ -6,10 +6,46 @@ K AVR 8bit Microcontroller tinyAVR
 F http://www.atmel.com/images/atmel-2588-8-bit-avr-microcontrollers-tinyavr-attiny261-attiny461-attiny861_datasheet.pdf
 $ENDCMP
 #
+$CMP ATXMEGA128A4U-AU
+D Atmel ATxmega128A4U-AU: TQFP44, 32Mhz, 128k+8k Flash, 8k SRAM, 2k EEPROM
+K 8/16-bit Atmel XMEGA Microcontroller
+F http://www.atmel.com/images/Atmel-8387-8-and16-bit-AVR-Microcontroller-XMEGA-A4U_Datasheet.pdf
+$ENDCMP
+#
 $CMP CD74HC4067
 D Texas Instruments CD74HC4067: High-Speed CMOS Logic 16-Channel Analog Multiplexer/Demultiplexer
 K Texas Instruments, 16-channel analog multiplexer/demultiplexer
 F http://www.ti.com/lit/ds/symlink/cd74hc4067.pdf
+$ENDCMP
+#
+$CMP LD1117AS33TR
+D 1200mA Fixed Low Drop Positive Voltage Regulator, Fixed Output 3.3V, SOT223
+K REGULATOR LDO 3.3V
+F http://www.st.com/st-web-ui/static/active/en/resource/technical/document/datasheet/CD00000544.pdf
+$ENDCMP
+#
+$CMP LD1117S12TR
+D 800mA Fixed Low Drop Positive Voltage Regulator, Fixed Output 1.2V, SOT223
+K REGULATOR LDO 1.2V
+F http://www.st.com/st-web-ui/static/active/en/resource/technical/document/datasheet/CD00000544.pdf
+$ENDCMP
+#
+$CMP LD1117S18TR
+D 800mA Fixed Low Drop Positive Voltage Regulator, Fixed Output 1.8V, SOT223
+K REGULATOR LDO 1.8V
+F http://www.st.com/st-web-ui/static/active/en/resource/technical/document/datasheet/CD00000544.pdf
+$ENDCMP
+#
+$CMP LD1117S25TR
+D 800mA Fixed Low Drop Positive Voltage Regulator, Fixed Output 2.5V, SOT223
+K REGULATOR LDO 2.5V
+F http://www.st.com/st-web-ui/static/active/en/resource/technical/document/datasheet/CD00000544.pdf
+$ENDCMP
+#
+$CMP LD1117S50TR
+D 800mA Fixed Low Drop Positive Voltage Regulator, Fixed Output 5.0V, SOT223
+K REGULATOR LDO 5.0V
+F http://www.st.com/st-web-ui/static/active/en/resource/technical/document/datasheet/CD00000544.pdf
 $ENDCMP
 #
 $CMP LTC1864
@@ -34,6 +70,10 @@ $CMP MCP4822
 D Microchip Technology MCP4822: 12-Bit Dual Voltage Output Digital-to-Analog Converter
 K Microchip Technology
 F http://ww1.microchip.com/downloads/en/DeviceDoc/20002249B.pdf
+$ENDCMP
+#
+$CMP TP
+D Testing point
 $ENDCMP
 #
 #End Doc Library
