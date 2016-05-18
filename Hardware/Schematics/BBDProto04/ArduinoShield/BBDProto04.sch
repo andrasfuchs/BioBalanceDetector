@@ -36,7 +36,7 @@ $Descr A1 33110 23386
 encoding utf-8
 Sheet 1 1
 Title "Bio Balance Detector - Proto #4"
-Date "2016-04-29"
+Date "2016-05-18"
 Rev "A"
 Comp "Andras Fuchs (andras.fuchs@gmail.com)"
 Comment1 "pin 6: SPI-MISO | pin 7: SPI-MOSI | pin 8: DAC-SS | pin 9: ADC-SS | pin 10: uC-SS"
@@ -547,7 +547,7 @@ U 1 1 5723A1C5
 P 800 9650
 F 0 "P10" H 1000 9450 50  0000 C CNN
 F 1 "USB_B" H 750 9850 50  0000 C CNN
-F 2 "Connect:USB_B" V 750 9550 50  0001 C CNN
+F 2 "Connect:USB_Micro-B" V 750 9550 50  0001 C CNN
 F 3 "" V 750 9550 50  0000 C CNN
 	1    800  9650
 	0    -1   -1   0   
@@ -631,7 +631,7 @@ U 1 1 5728E2AA
 P 2200 8300
 F 0 "Y1" H 2200 8450 50  0000 C CNN
 F 1 "Crystal" H 2200 8150 50  0000 C CNN
-F 2 "" H 2200 8300 50  0001 C CNN
+F 2 "Crystals:crystal_FA238-TSX3225" H 2200 8300 50  0001 C CNN
 F 3 "" H 2200 8300 50  0000 C CNN
 	1    2200 8300
 	0    -1   -1   0   
@@ -1062,11 +1062,6 @@ Wire Wire Line
 	750  13150 1600 13150
 Wire Wire Line
 	750  12550 750  13150
-Connection ~ 2700 13650
-Wire Wire Line
-	2700 13650 1150 13650
-Wire Wire Line
-	1150 13650 1150 13050
 Wire Wire Line
 	1150 13050 1600 13050
 Connection ~ 2700 13350
@@ -1243,15 +1238,6 @@ Wire Wire Line
 Wire Wire Line
 	7050 2050 10650 2050
 Connection ~ 6900 3400
-Connection ~ 3650 4250
-Wire Wire Line
-	3650 4800 3650 4250
-Wire Wire Line
-	5450 4800 3650 4800
-Wire Wire Line
-	5450 3950 5450 4800
-Wire Wire Line
-	5300 3950 5450 3950
 Wire Wire Line
 	5650 4050 5300 4050
 Wire Wire Line
@@ -1260,8 +1246,6 @@ Wire Wire Line
 	5300 4150 6200 4150
 Wire Wire Line
 	5300 4250 6100 4250
-Wire Wire Line
-	3250 4250 3900 4250
 Connection ~ 6300 6600
 Wire Wire Line
 	1200 6600 8650 6600
@@ -1270,8 +1254,6 @@ Wire Wire Line
 	1200 6700 8550 6700
 Wire Wire Line
 	9850 1200 10650 1200
-Wire Wire Line
-	9850 1100 10650 1100
 Wire Wire Line
 	10650 1000 9850 1000
 Wire Wire Line
@@ -1616,15 +1598,6 @@ Wire Wire Line
 Wire Wire Line
 	5300 5750 5900 5750
 Connection ~ 8850 5450
-Connection ~ 3700 5950
-Wire Wire Line
-	3700 6400 3700 5950
-Wire Wire Line
-	6000 6400 3700 6400
-Wire Wire Line
-	6000 5650 6000 6400
-Wire Wire Line
-	5300 5650 6000 5650
 Wire Wire Line
 	5300 5450 8850 5450
 Wire Wire Line
@@ -1718,8 +1691,6 @@ Wire Wire Line
 Wire Wire Line
 	18600 750  18600 9050
 Wire Wire Line
-	3250 5950 3900 5950
-Wire Wire Line
 	10250 9050 14100 9050
 Wire Wire Line
 	10250 8300 10250 9050
@@ -1778,8 +1749,6 @@ Wire Wire Line
 	2150 6800 1200 6800
 Wire Wire Line
 	1200 6500 8750 6500
-Wire Wire Line
-	1850 6100 1200 6100
 Wire Wire Line
 	1300 6400 1300 7350
 Wire Wire Line
@@ -2393,10 +2362,6 @@ Wire Wire Line
 Connection ~ 10350 5550
 Wire Wire Line
 	9300 5800 9300 4300
-Wire Wire Line
-	14100 9600 13800 9600
-Wire Wire Line
-	13800 9600 13800 9850
 Wire Wire Line
 	5300 3750 8850 3750
 Wire Wire Line
@@ -3837,9 +3802,7 @@ Wire Wire Line
 	9150 8950 7100 8950
 NoConn ~ 7100 9050
 NoConn ~ 700  9350
-NoConn ~ 9850 1100
 NoConn ~ 9850 1200
-NoConn ~ 1850 6100
 NoConn ~ 1850 6200
 NoConn ~ 1850 6300
 $Comp
@@ -3848,7 +3811,7 @@ U 1 1 5724AB9E
 P 1950 10200
 F 0 "U5" H 1950 10450 50  0000 C CNN
 F 1 "LD1117AS33TR" H 1950 10400 50  0000 C CNN
-F 2 "TO_SOT_Packages_SMD:SOT-223" H 1950 10300 50  0000 C CNN
+F 2 "TO_SOT_Packages_SMD:SOT-223" H 1950 10300 50  0001 C CNN
 F 3 "" H 1950 10200 50  0000 C CNN
 	1    1950 10200
 	1    0    0    -1  
@@ -3875,4 +3838,53 @@ Text Label 3100 6800 0    60   ~ 0
 VCC-3.3V
 Text Label 3550 3500 0    60   ~ 0
 VCC-5V
+Wire Wire Line
+	13800 9850 13800 9600
+Wire Wire Line
+	13800 9600 14100 9600
+Wire Wire Line
+	24600 1750 23750 1750
+Connection ~ 23750 1750
+Wire Wire Line
+	18950 1750 18100 1750
+Connection ~ 18100 1750
+Wire Wire Line
+	3250 5950 3900 5950
+Wire Wire Line
+	5300 5650 6000 5650
+Wire Wire Line
+	6000 5650 6000 6400
+Wire Wire Line
+	6000 6400 3700 6400
+Wire Wire Line
+	3700 6400 3700 5950
+Connection ~ 3700 5950
+Wire Wire Line
+	19000 11500 18150 11500
+Connection ~ 18150 11500
+Wire Wire Line
+	24650 11500 23800 11500
+Connection ~ 23800 11500
+Wire Wire Line
+	1200 6100 1850 6100
+NoConn ~ 1850 6100
+Wire Wire Line
+	3650 4250 3650 4700
+Wire Wire Line
+	3650 4700 5750 4700
+Wire Wire Line
+	5750 4700 5750 3950
+Wire Wire Line
+	5750 3950 5300 3950
+Connection ~ 3650 4250
+Wire Wire Line
+	3250 4250 3900 4250
+Wire Wire Line
+	10650 1100 9850 1100
+NoConn ~ 9850 1100
+Connection ~ 2700 13650
+Wire Wire Line
+	1150 13650 1150 13050
+Wire Wire Line
+	2700 13650 1150 13650
 $EndSCHEMATC
