@@ -33,6 +33,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="NAudio, Version=1.7.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NAudio.1.7.3\lib\net35\NAudio.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
@@ -68,9 +72,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\ChannelsController.cs" />
+    <Compile Include="Helpers\HighResolutionTimer.cs" />
     <Compile Include="Models\ADCChannel.cs" />
     <Compile Include="Models\ADCChannelValue.cs" />
+    <Compile Include="Models\IDataChannel.cs" />
+    <Compile Include="Models\MultiChannelInput.cs" />
     <Compile Include="Models\MultiplexerSession.cs" />
+    <Compile Include="Models\RandomChannel.cs" />
     <Compile Include="Models\SessionsCache.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

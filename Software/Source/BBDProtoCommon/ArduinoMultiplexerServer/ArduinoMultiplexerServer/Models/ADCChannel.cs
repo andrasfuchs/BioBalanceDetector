@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ArduinoMultiplexerServer
 {
-    public class ADCChannel
+    public class ADCChannel : IDataChannel
     {
         private List<ADCChannelValue> values;
 
@@ -57,6 +57,11 @@ namespace ArduinoMultiplexerServer
         public override string ToString()
         {
             return "ch" + ADCChannelId;
+        }
+
+        public short Get16BitSignedIntData(Int64 startTime, int duration)
+        {
+            throw new NotImplementedException();
         }
     }
 }
