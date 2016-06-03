@@ -1,0 +1,4 @@
+(fp_lib_table
+  (lib (name ArduinoShield)(type KiCad)(uri "$(KIPRJMOD)")(options "")(descr ""))
+  (lib (name OptoSupply_LEDs)(type KiCad)(uri "$(KIPRJMOD)\\OptoSupply_LEDs.pretty")(options "")(descr ""))
+)
