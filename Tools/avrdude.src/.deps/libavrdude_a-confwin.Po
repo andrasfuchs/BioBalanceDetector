@@ -1,0 +1,182 @@
+libavrdude_a-confwin.o: confwin.c avrdude.h ac_cfg.h \
+ c:\work\tools\mingw\include\windows.h \
+ c:\work\tools\mingw\lib\gcc\mingw32\4.9.3\include\stdarg.h \
+ c:\work\tools\mingw\include\windef.h c:\work\tools\mingw\include\winnt.h \
+ c:\work\tools\mingw\include\winerror.h \
+ c:\work\tools\mingw\include\string.h \
+ c:\work\tools\mingw\include\_mingw.h \
+ c:\work\tools\mingw\lib\gcc\mingw32\4.9.3\include\stddef.h \
+ c:\work\tools\mingw\include\basetsd.h \
+ c:\work\tools\mingw\include\pshpack4.h \
+ c:\work\tools\mingw\include\poppack.h \
+ c:\work\tools\mingw\include\wincon.h \
+ c:\work\tools\mingw\include\winbase.h \
+ c:\work\tools\mingw\include\wingdi.h \
+ c:\work\tools\mingw\include\winuser.h \
+ c:\work\tools\mingw\include\winnls.h \
+ c:\work\tools\mingw\include\winver.h \
+ c:\work\tools\mingw\include\winnetwk.h \
+ c:\work\tools\mingw\include\winreg.h \
+ c:\work\tools\mingw\include\winsvc.h c:\work\tools\mingw\include\cderr.h \
+ c:\work\tools\mingw\include\dde.h c:\work\tools\mingw\include\ddeml.h \
+ c:\work\tools\mingw\include\dlgs.h c:\work\tools\mingw\include\imm.h \
+ c:\work\tools\mingw\include\lzexpand.h \
+ c:\work\tools\mingw\include\mmsystem.h \
+ c:\work\tools\mingw\include\nb30.h c:\work\tools\mingw\include\rpc.h \
+ c:\work\tools\mingw\include\rpcdce.h \
+ c:\work\tools\mingw\include\basetyps.h \
+ c:\work\tools\mingw\include\rpcdcep.h \
+ c:\work\tools\mingw\include\rpcnsi.h \
+ c:\work\tools\mingw\include\rpcnterr.h \
+ c:\work\tools\mingw\include\shellapi.h \
+ c:\work\tools\mingw\include\pshpack2.h \
+ c:\work\tools\mingw\include\winperf.h \
+ c:\work\tools\mingw\include\commdlg.h \
+ c:\work\tools\mingw\include\winspool.h \
+ c:\work\tools\mingw\include\winsock2.h \
+ c:\work\tools\mingw\include\ole2.h c:\work\tools\mingw\include\objbase.h \
+ c:\work\tools\mingw\include\rpcndr.h \
+ c:\work\tools\mingw\include\rpcnsip.h \
+ c:\work\tools\mingw\include\objfwd.h \
+ c:\work\tools\mingw\include\stdlib.h \
+ c:\work\tools\mingw\include\wtypes.h \
+ c:\work\tools\mingw\include\unknwn.h \
+ c:\work\tools\mingw\include\objidl.h c:\work\tools\mingw\include\cguid.h \
+ c:\work\tools\mingw\include\olectlid.h \
+ c:\work\tools\mingw\include\oleauto.h \
+ c:\work\tools\mingw\include\oaidl.h c:\work\tools\mingw\include\oleidl.h \
+ libavrdude.h c:\work\tools\mingw\include\stdio.h \
+ c:\work\tools\mingw\include\sys\types.h \
+ c:\work\tools\mingw\include\parts\time.h \
+ c:\work\tools\mingw\include\limits.h \
+ c:\work\tools\mingw\lib\gcc\mingw32\4.9.3\include\stdbool.h \
+ c:\work\tools\mingw\lib\gcc\mingw32\4.9.3\include\stdint.h \
+ c:\work\tools\mingw\include\stdint.h
+
+avrdude.h:
+
+ac_cfg.h:
+
+c:\work\tools\mingw\include\windows.h:
+
+c:\work\tools\mingw\lib\gcc\mingw32\4.9.3\include\stdarg.h:
+
+c:\work\tools\mingw\include\windef.h:
+
+c:\work\tools\mingw\include\winnt.h:
+
+c:\work\tools\mingw\include\winerror.h:
+
+c:\work\tools\mingw\include\string.h:
+
+c:\work\tools\mingw\include\_mingw.h:
+
+c:\work\tools\mingw\lib\gcc\mingw32\4.9.3\include\stddef.h:
+
+c:\work\tools\mingw\include\basetsd.h:
+
+c:\work\tools\mingw\include\pshpack4.h:
+
+c:\work\tools\mingw\include\poppack.h:
+
+c:\work\tools\mingw\include\wincon.h:
+
+c:\work\tools\mingw\include\winbase.h:
+
+c:\work\tools\mingw\include\wingdi.h:
+
+c:\work\tools\mingw\include\winuser.h:
+
+c:\work\tools\mingw\include\winnls.h:
+
+c:\work\tools\mingw\include\winver.h:
+
+c:\work\tools\mingw\include\winnetwk.h:
+
+c:\work\tools\mingw\include\winreg.h:
+
+c:\work\tools\mingw\include\winsvc.h:
+
+c:\work\tools\mingw\include\cderr.h:
+
+c:\work\tools\mingw\include\dde.h:
+
+c:\work\tools\mingw\include\ddeml.h:
+
+c:\work\tools\mingw\include\dlgs.h:
+
+c:\work\tools\mingw\include\imm.h:
+
+c:\work\tools\mingw\include\lzexpand.h:
+
+c:\work\tools\mingw\include\mmsystem.h:
+
+c:\work\tools\mingw\include\nb30.h:
+
+c:\work\tools\mingw\include\rpc.h:
+
+c:\work\tools\mingw\include\rpcdce.h:
+
+c:\work\tools\mingw\include\basetyps.h:
+
+c:\work\tools\mingw\include\rpcdcep.h:
+
+c:\work\tools\mingw\include\rpcnsi.h:
+
+c:\work\tools\mingw\include\rpcnterr.h:
+
+c:\work\tools\mingw\include\shellapi.h:
+
+c:\work\tools\mingw\include\pshpack2.h:
+
+c:\work\tools\mingw\include\winperf.h:
+
+c:\work\tools\mingw\include\commdlg.h:
+
+c:\work\tools\mingw\include\winspool.h:
+
+c:\work\tools\mingw\include\winsock2.h:
+
+c:\work\tools\mingw\include\ole2.h:
+
+c:\work\tools\mingw\include\objbase.h:
+
+c:\work\tools\mingw\include\rpcndr.h:
+
+c:\work\tools\mingw\include\rpcnsip.h:
+
+c:\work\tools\mingw\include\objfwd.h:
+
+c:\work\tools\mingw\include\stdlib.h:
+
+c:\work\tools\mingw\include\wtypes.h:
+
+c:\work\tools\mingw\include\unknwn.h:
+
+c:\work\tools\mingw\include\objidl.h:
+
+c:\work\tools\mingw\include\cguid.h:
+
+c:\work\tools\mingw\include\olectlid.h:
+
+c:\work\tools\mingw\include\oleauto.h:
+
+c:\work\tools\mingw\include\oaidl.h:
+
+c:\work\tools\mingw\include\oleidl.h:
+
+libavrdude.h:
+
+c:\work\tools\mingw\include\stdio.h:
+
+c:\work\tools\mingw\include\sys\types.h:
+
+c:\work\tools\mingw\include\parts\time.h:
+
+c:\work\tools\mingw\include\limits.h:
+
+c:\work\tools\mingw\lib\gcc\mingw32\4.9.3\include\stdbool.h:
+
+c:\work\tools\mingw\lib\gcc\mingw32\4.9.3\include\stdint.h:
+
+c:\work\tools\mingw\include\stdint.h:

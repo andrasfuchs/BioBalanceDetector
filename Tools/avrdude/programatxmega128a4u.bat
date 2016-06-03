@@ -1,0 +1,1 @@
+avrdude.exe -c usbasp -p x128a4u -U flash:w:MultiplexerShield_ATxmega128A4U.hex:i %1 %2 %3 %4 %5 %6

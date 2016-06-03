@@ -1,0 +1,1 @@
+libavrdude_a-ppi.o: ppi.c

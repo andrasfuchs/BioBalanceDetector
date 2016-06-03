@@ -1,0 +1,1 @@
+libavrdude_la-ser_posix.lo: ser_posix.c

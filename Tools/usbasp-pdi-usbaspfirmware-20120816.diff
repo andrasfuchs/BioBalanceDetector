@@ -1,0 +1,791 @@
+diff '--exclude=.svn' -ur ./firmware/main.c ../../usbasp.2011-05-28/firmware/main.c
+--- ./firmware/main.c	2011-05-28 09:57:49.000000000 +0200
++++ ../../usbasp.2011-05-28/firmware/main.c	2012-08-15 16:30:56.000000000 +0200
+@@ -24,6 +24,10 @@
+ #include "clock.h"
+ #include "tpi.h"
+ #include "tpi_defs.h"
++#include "pdi.h"
++#include <string.h>
++
++#include <util/delay.h> //after clock.h
+ 
+ static uchar replyBuffer[8];
+ 
+@@ -37,6 +41,9 @@
+ static uchar prog_blockflags;
+ static uchar prog_pagecounter;
+ 
++static uchar prog_buf[128];
++static uchar prog_buf_pos;
++
+ uchar usbFunctionSetup(uchar data[8]) {
+ 
+ 	uchar len = 0;
+@@ -178,19 +185,39 @@
+ 		prog_state = PROG_STATE_TPI_READ;
+ 		len = 0xff; /* multiple in */
+ 	
+-	} else if (data[1] == USBASP_FUNC_TPI_WRITEBLOCK) {
+-		prog_address = (data[3] << 8) | data[2];
+-		prog_nbytes = (data[7] << 8) | data[6];
+-		prog_state = PROG_STATE_TPI_WRITE;
+-		len = 0xff; /* multiple out */
+-	
+ 	} else if (data[1] == USBASP_FUNC_GETCAPABILITIES) {
+-		replyBuffer[0] = USBASP_CAP_0_TPI;
++		replyBuffer[0] = USBASP_CAP_0_TPI | USBASP_CAP_0_PDI;
+ 		replyBuffer[1] = 0;
+ 		replyBuffer[2] = 0;
+ 		replyBuffer[3] = 0;
+ 		len = 4;
+-	}
++
++	} else if (data[1] == USBASP_FUNC_PDI_CONNECT)
++		{
++		if ((replyBuffer[0]=pdiInit())==PDI_STATUS_OK)
++			ledRedOn();
++		len=1;
++		}
++	else if (data[1] == USBASP_FUNC_PDI_DISCONNECT)
++		{
++		ledRedOff();
++		pdiCleanup(data[2]);
++		}
++	else if (data[1] == USBASP_FUNC_PDI_SEND)
++		{
++		prog_nbytes = (data[7] << 8) | data[6];
++		prog_blockflags = data[2];
++		prog_state = PROG_STATE_PDI_SEND;
++		prog_buf_pos = 0;
++		len = 0xff;
++		}
++	else if (data[1] == USBASP_FUNC_PDI_READ)
++		{
++		memmove(&prog_address,data+2,4);
++		prog_nbytes = (data[7] << 8) | data[6];
++		prog_state = PROG_STATE_PDI_READ;
++		len = 0xff;
++		}
+ 
+ 	usbMsgPtr = replyBuffer;
+ 
+@@ -201,34 +228,49 @@
+ 
+ 	uchar i;
+ 
+-	/* check if programmer is in correct read state */
+-	if ((prog_state != PROG_STATE_READFLASH) && (prog_state
+-			!= PROG_STATE_READEEPROM) && (prog_state != PROG_STATE_TPI_READ)) {
+-		return 0xff;
+-	}
+-
+-	/* fill packet TPI mode */
+-	if(prog_state == PROG_STATE_TPI_READ)
+-	{
+-		tpi_read_block(prog_address, data, len);
+-		prog_address += len;
+-		return len;
+-	}
+-
+-	/* fill packet ISP mode */
+-	for (i = 0; i < len; i++) {
+-		if (prog_state == PROG_STATE_READFLASH) {
++	switch(prog_state)
++		{
++		case PROG_STATE_TPI_READ:
++			/* fill packet TPI mode */
++			tpi_read_block(prog_address, data, len);
++			prog_address += len;
++			return len;
++
++		case PROG_STATE_PDI_READ:
++			{
++			pdiDisableTimerClock();
++			pdiSendIdle();
++			if (pdi_nvmbusy)
++				pdiWaitNVM();
++			uchar ret=pdiReadBlock(prog_address, data, len);
++			pdiEnableTimerClock();
++			if (ret!=PDI_STATUS_OK)
++				return 0;
++			prog_address += len;
++			return len;
++			}
++			
++		case PROG_STATE_READFLASH:
++		case PROG_STATE_READEEPROM:
++			/* fill packet ISP mode */
++			for (i = 0; i < len; i++) {
++			if (prog_state == PROG_STATE_READFLASH) {
+ 			data[i] = ispReadFlash(prog_address);
+-		} else {
++			} else {
+ 			data[i] = ispReadEEPROM(prog_address);
+-		}
+-		prog_address++;
+-	}
++			}
++			prog_address++;
++			}
++			
++			/* last packet? */
++			if (len < 8) {
++			prog_state = PROG_STATE_IDLE;
++			}
++			break;
+ 
+-	/* last packet? */
+-	if (len < 8) {
+-		prog_state = PROG_STATE_IDLE;
+-	}
++		default: //incorrect read state
++			return 0xff;
++		}
+ 
+ 	return len;
+ }
+@@ -238,25 +280,42 @@
+ 	uchar retVal = 0;
+ 	uchar i;
+ 
+-	/* check if programmer is in correct write state */
+-	if ((prog_state != PROG_STATE_WRITEFLASH) && (prog_state
+-			!= PROG_STATE_WRITEEEPROM) && (prog_state != PROG_STATE_TPI_WRITE)) {
+-		return 0xff;
+-	}
+-
+-	if (prog_state == PROG_STATE_TPI_WRITE)
+-	{
+-		tpi_write_block(prog_address, data, len);
+-		prog_address += len;
+-		prog_nbytes -= len;
+-		if(prog_nbytes <= 0)
++	switch(prog_state)
+ 		{
+-			prog_state = PROG_STATE_IDLE;
+-			return 1;
+-		}
+-		return 0;
+-	}
++		case PROG_STATE_TPI_WRITE:
++			tpi_write_block(prog_address, data, len);
++			prog_address += len;
++			prog_nbytes -= len;
++			if(prog_nbytes <= 0)
++				{
++				prog_state = PROG_STATE_IDLE;
++				return 1;
++				}
++			return 0;
+ 
++		case PROG_STATE_PDI_SEND:
++			{
++			memmove(&prog_buf[prog_buf_pos],data,len);
++			prog_buf_pos += len;
++			prog_nbytes -= len;
++			if (prog_nbytes==0)
++				{
++				pdiDisableTimerClock();
++				pdiSendIdle();
++				if ((prog_blockflags & USBASP_PDI_WAIT_BUSY) && pdi_nvmbusy)
++					pdiWaitNVM();
++				pdiSendBytes(prog_buf,prog_buf_pos);
++				if (prog_blockflags & USBASP_PDI_MARK_BUSY)
++					pdi_nvmbusy=1;
++				pdiEnableTimerClock();
++				prog_state = PROG_STATE_IDLE;
++				return 1;
++				}
++			return 0;
++			}
++
++		case PROG_STATE_WRITEFLASH:
++		case PROG_STATE_WRITEEEPROM:
+ 	for (i = 0; i < len; i++) {
+ 
+ 		if (prog_state == PROG_STATE_WRITEFLASH) {
+@@ -296,6 +355,11 @@
+ 
+ 		prog_address++;
+ 	}
++	break;
++
++		default: //incorrect write state
++			return 0xff;
++		}
+ 
+ 	return retVal;
+ }
+@@ -337,4 +401,3 @@
+ 	}
+ 	return 0;
+ }
+-
+diff '--exclude=.svn' -ur ./firmware/Makefile ../../usbasp.2011-05-28/firmware/Makefile
+--- ./firmware/Makefile	2011-05-28 09:57:49.000000000 +0200
++++ ../../usbasp.2011-05-28/firmware/Makefile	2012-08-12 02:52:43.000000000 +0200
+@@ -39,7 +39,7 @@
+ 
+ COMPILE = avr-gcc -Wall -O2 -Iusbdrv -I. -mmcu=$(TARGET) # -DDEBUG_LEVEL=2
+ 
+-OBJECTS = usbdrv/usbdrv.o usbdrv/usbdrvasm.o usbdrv/oddebug.o isp.o clock.o tpi.o main.o
++OBJECTS = usbdrv/usbdrv.o usbdrv/usbdrvasm.o usbdrv/oddebug.o isp.o clock.o tpi.o main.o pdi.o
+ 
+ .c.o:
+ 	$(COMPILE) -c $< -o $@
+--- ./firmware/pdi.c	2012-08-16 00:55:12.000000000 +0200
++++ ../../usbasp.2011-05-28/firmware/pdi.c	2012-08-15 16:31:21.000000000 +0200
+@@ -0,0 +1,358 @@
++#include "pdi.h"
++#include "usbasp.h"
++#include <avr/io.h>
++#include <avr/pgmspace.h>
++#include <util/parity.h>
++#include "usbconfig.h"
++#include <string.h>
++#include "xmega_pdi.h"
++
++#ifndef F_CPU
++//#define F_CPU (USB_CFG_CLOCK_KHZ*1000)
++#define F_CPU 12000000
++#endif
++#include <util/delay.h>
++
++uchar pdi_nvmbusy=0;
++
++static uchar PROGMEM pdi_key[8]={0xFF,0x88,0xD8,0xCD,0x45,0xAB,0x89,0x12};
++
++static void pdiWaitBit()
++{
++_delay_us(3);
++}
++
++uchar pdiInit()
++{
++//12MHz/256 -> 46k
++TCCR2=(0<<CS22)|(0<CS21)|(1<<CS20)|(0<<COM21)|(0<<COM20)|(1<<WGM21)|(0<<WGM20);
++OCR2=32;
++PORTB |= (1<<3); PORTB &= ~((1<<4)|(1<<5)|(1<<2));
++DDRB |= (1<<3)|(1<<2); DDRB &= ~((1<<4)|(1<<5));
++
++pdiSetClk0();
++pdiSetData0();
++_delay_us(110);
++
++pdiSetData1();
++pdiSetClk1();
++_delay_us(1);
++pdiSendIdle();
++pdiSendIdle();
++
++pdiResetDev(1);
++
++uchar buf[9];
++buf[0]=XNVM_PDI_KEY_INSTR;
++memcpy_P(&buf[1],pdi_key,8);
++pdiSendBytes(buf,9);
++
++pdiSendIdle();
++
++pdiSendByte(XNVM_PDI_STCS_INSTR | XOCD_CTRL_REGISTER_ADDRESS);
++pdiSendByte(3);
++
++pdiSendIdle();
++
++uchar status=pdiWaitNVM();
++if (status==PDI_STATUS_OK)
++	{
++	pdiEnableTimerClock();
++	return PDI_STATUS_OK;
++	}
++
++return status;
++}
++
++void pdiCleanup(uchar keep_reset)
++{
++pdiDisableTimerClock();
++pdiSendIdle();
++pdiResetDev(0);
++
++DDRB &= ~((1<<3)|(1<<5)|(1<<2)|(1<<4));
++PORTB &= ~((1<<3)|(1<<5)|(1<<2)|(1<<4));
++
++switch(keep_reset)
++	{
++	case EXIT_RESET_DISABLED:
++		DDRB |= (1<<3);
++		pdiSetClk0();
++		_delay_ms(1);
++		pdiSetClk1();
++		break;
++
++	case EXIT_RESET_ENABLED:
++		DDRB |= (1<<3);
++		pdiSetClk0();
++		break;
++	}
++}
++
++void pdiEnableTimerClock()
++{
++pdiSetData1();
++TCCR2=(0<<CS22)|(0<CS21)|(1<<CS20)|(0<<COM21)|(1<<COM20)|(1<<WGM21)|(0<<WGM20);
++}
++
++void pdiDisableTimerClock()
++{
++pdiSetData1();
++TCCR2=(0<<CS22)|(0<CS21)|(1<<CS20)|(0<<COM21)|(0<<COM20)|(1<<WGM21)|(0<<WGM20);
++}
++
++uchar pdiTimerClockEnabled()
++{
++return (TCCR2 & (1<<COM20));
++}
++
++void pdiSetClk1()
++{
++PORTB|=(1<<3);
++}
++
++void pdiSetClk0()
++{
++PORTB&=~(1<<3);
++}
++
++void pdiSetData1()
++{
++PORTB|=(1<<5);
++PORTB&=~(1<<2);
++DDRB|=(1<<5)|(1<<2);
++}
++
++void pdiSetData0()
++{
++PORTB&=~((1<<5)|(1<<2));
++DDRB|=(1<<5)|(1<<2);
++}
++
++void pdiSetDataIn()
++{
++PORTB&=~(1<<2);
++DDRB&=~((1<<5)|(1<<2));
++PORTB&=~(1<<5);
++}
++
++uchar pdiGetData()
++{
++return (PINB&(1<<4))?1:0;
++}
++
++void pdiSendIdle()
++{
++pdiSendByteX(255,255);
++}
++
++void pdiSendBreak()
++{
++pdiSendByteX(0,0);
++}
++
++#define PDI_BIT_START 1
++#define PDI_BIT_PARITY 2
++#define PDI_BIT_STOP 4
++
++uchar byteParity(uchar b)
++{
++return parity_even_bit(b);
++}
++
++void pdiSendByte(uchar b)
++{
++uchar extra=PDI_BIT_STOP;
++if (byteParity(b)) extra|=PDI_BIT_PARITY;
++pdiSendByteX(b,extra);
++}
++
++void pdiSendBytes(uchar* ptr,uchar count)
++{
++for(;count>0;count--,ptr++)
++	pdiSendByte(*ptr);
++}
++
++void pdiSendByteX(uchar byte,uchar extra)
++{
++pdiSetClk0();
++if (extra&PDI_BIT_START) pdiSetData1(); else pdiSetData0();
++pdiWaitBit();
++pdiSetClk1();
++pdiWaitBit();
++
++uchar bit;
++for(bit=1;bit;bit<<=1)
++	{
++	pdiSetClk0();
++	if (byte & bit) pdiSetData1(); else pdiSetData0();
++	pdiWaitBit();
++	pdiSetClk1();
++	pdiWaitBit();
++	}
++
++pdiSetClk0();
++if (extra&PDI_BIT_PARITY) pdiSetData1(); else pdiSetData0();
++pdiWaitBit();
++pdiSetClk1();
++pdiWaitBit();
++
++pdiSetClk0();
++if (extra&PDI_BIT_STOP) pdiSetData1(); else pdiSetData0();
++pdiWaitBit();
++pdiSetClk1();
++pdiWaitBit();
++
++pdiSetClk0();
++if (extra&PDI_BIT_STOP) pdiSetData1(); else pdiSetData0();
++pdiWaitBit();
++pdiSetClk1();
++pdiWaitBit();
++}
++
++uchar pdiReadByte(uchar timeout,uchar *result)
++{
++uchar in=PDI_STATUS_TIMEOUT,ret=PDI_STATUS_OK;
++for(;timeout>0;timeout--)
++	{
++pdiSetClk0();
++pdiSetDataIn();
++pdiWaitBit();
++pdiSetClk1();
++in=pdiGetData();
++pdiWaitBit();
++if (in==0) break;
++	}
++if (in) return PDI_STATUS_TIMEOUT;
++
++uchar bit,byte=0,parity;
++for(bit=1;bit;bit<<=1)
++	{
++	pdiSetClk0();
++	pdiWaitBit();
++	pdiSetClk1();
++	if (pdiGetData()) byte|=bit;
++	pdiWaitBit();
++	}
++*result=byte;
++
++pdiSetClk0();
++pdiWaitBit();
++pdiSetClk1();
++parity=pdiGetData();
++pdiWaitBit();
++
++if (parity!=byteParity(byte)) ret=PDI_STATUS_PARITY;
++
++pdiSetClk0();
++pdiWaitBit();
++pdiSetClk1();
++if ((ret==PDI_STATUS_OK)&&(!pdiGetData())) ret=PDI_STATUS_BADSTOP;
++pdiWaitBit();
++
++pdiSetClk0();
++pdiWaitBit();
++pdiSetClk1();
++if ((ret==PDI_STATUS_OK)&&(!pdiGetData())) ret=PDI_STATUS_BADSTOP;
++pdiWaitBit();
++
++return ret;
++}
++
++uchar pdiReadCtrl(uint32_t addr, uchar *value)
++{
++uchar ret;
++uchar buf[5];
++
++buf[0]=XNVM_PDI_LDS_INSTR | XNVM_PDI_LONG_ADDRESS_MASK | XNVM_PDI_BYTE_DATA_MASK;
++memmove(buf+1,&addr,4);
++pdiSendBytes(buf,5);
++ret = pdiReadByte(200,value);
++pdiSendBreak();
++pdiSendIdle();
++pdiSendBreak();
++pdiSendIdle();
++return ret;
++}
++
++uchar pdiWaitNVM()
++{
++uchar retry=100;
++for(;retry>0;retry--)
++	{
++	uchar status;
++	if (pdiReadCtrl(XNVM_CONTROLLER_BASE+XNVM_DATA_BASE
++			+XNVM_CONTROLLER_STATUS_REG_OFFSET, &status)==PDI_STATUS_OK)
++		if ((status & XNVM_NVM_BUSY)==0)
++			{
++			pdi_nvmbusy=0;
++			return PDI_STATUS_OK;
++			}
++	}
++return PDI_STATUS_NVM_TIMEOUT;
++}
++
++uchar pdiWriteCtrl(uint32_t addr,uint8_t value)
++{
++uchar cmd[6];
++cmd[0]= XNVM_PDI_STS_INSTR | XNVM_PDI_LONG_ADDRESS_MASK | XNVM_PDI_BYTE_DATA_MASK;
++memmove(cmd+1,&addr,4);
++cmd[5]=value;
++pdiSendBytes(cmd,6);
++return PDI_STATUS_OK;
++}
++
++uchar pdiResetDev(uchar reset)
++{
++uchar buf[2];
++buf[0]=XNVM_PDI_STCS_INSTR | XOCD_RESET_REGISTER_ADDRESS;
++buf[1]=reset?XOCD_RESET_SIGNATURE:0;
++pdiSendBytes(buf,2);
++return PDI_STATUS_OK;
++}
++
++uchar pdiSetPointer(uint32_t addr)
++{
++uchar cmd[5];
++cmd[0]=XNVM_PDI_ST_INSTR | XNVM_PDI_LD_PTR_ADDRESS_MASK | XNVM_PDI_LONG_DATA_MASK;
++memmove(cmd+1,&addr,4);
++pdiSendBytes(cmd,5);
++return 0;
++}
++
++uchar pdiReadBlock(uint32_t addr,uchar* data,uchar len)
++{
++uchar ret=PDI_STATUS_OK;
++
++uchar retry=20;
++for(;retry>0;retry--)
++	{
++pdiWriteCtrl(XNVM_DATA_BASE+XNVM_CONTROLLER_BASE
++	     +XNVM_CONTROLLER_CMD_REG_OFFSET,XNVM_CMD_READ_NVM_PDI);
++pdiSetPointer(addr);
++
++if (len>1)
++	{
++	pdiSendByte(XNVM_PDI_REPEAT_INSTR | XNVM_PDI_BYTE_DATA_MASK);
++	pdiSendByte(len-1);
++	}
++
++pdiSendByte(XNVM_PDI_LD_INSTR | XNVM_PDI_LD_PTR_STAR_INC_MASK | XNVM_PDI_BYTE_DATA_MASK);
++
++uchar *dst=data;
++uchar i;
++for(i=0;i<len;i++,dst++)
++	{
++	ret=pdiReadByte(200,dst);
++	if (ret!=PDI_STATUS_OK) break;
++	}
++pdiSendBreak();
++pdiSendIdle();
++pdiSendBreak();
++pdiSendIdle();
++
++if (ret==PDI_STATUS_OK) break;
++	}
++
++return ret;
++}
+diff '--exclude=.svn' -ur ./firmware/pdi.h ../../usbasp.2011-05-28/firmware/pdi.h
+--- ./firmware/pdi.h	2012-08-16 00:55:10.000000000 +0200
++++ ../../usbasp.2011-05-28/firmware/pdi.h	2012-08-15 16:30:46.000000000 +0200
+@@ -0,0 +1,46 @@
++#ifndef _PDI_H_
++#define _PDI_H_
++
++#include <stdint.h>
++
++#ifndef uchar
++#define	uchar	unsigned char
++#endif
++
++extern uchar pdi_active;
++extern uchar pdi_interrupted;
++extern uchar pdi_interrupt_count;
++extern uchar pdi_se0_count;
++extern uchar pdi_rx;
++extern uchar pdi_nvmbusy;
++
++#define PDI_STATUS_OK 0
++#define PDI_STATUS_TIMEOUT 1
++#define PDI_STATUS_PARITY 2
++#define PDI_STATUS_BADSTOP 3
++#define PDI_STATUS_NVM_TIMEOUT 4
++#define PDI_STATUS_COLLISION 5
++
++uchar pdiInit();
++void pdiCleanup(uchar keep_reset);
++void pdiEnableTimerClock();
++void pdiDisableTimerClock();
++uchar pdiTimerClockEnabled();
++void pdiSetClk1();
++void pdiSetClk0();
++void pdiSetData1();
++void pdiSetData0();
++void pdiSetDataIn();
++uchar pdiGetData();
++uchar pdiWaitNVM();
++uchar pdiReadBlock(uint32_t addr,uchar* data,uchar len);
++void pdiSendIdle();
++void pdiSendBreak();
++uchar byteParity(uchar b);
++void pdiSendByte(uchar b);
++void pdiSendBytes(uchar* ptr,uchar count);
++void pdiSendByteX(uchar b,uchar extra);
++uchar pdiReadCtrl(uint32_t addr, uchar *value);
++uchar pdiResetDev(uchar reset);
++
++#endif
+diff '--exclude=.svn' -ur ./firmware/usbasp.h ../../usbasp.2011-05-28/firmware/usbasp.h
+--- ./firmware/usbasp.h	2011-05-28 09:57:49.000000000 +0200
++++ ../../usbasp.2011-05-28/firmware/usbasp.h	2012-08-15 16:25:17.000000000 +0200
+@@ -30,8 +30,14 @@
+ #define USBASP_FUNC_TPI_WRITEBLOCK   16
+ #define USBASP_FUNC_GETCAPABILITIES 127
+ 
++#define USBASP_FUNC_PDI_CONNECT    17
++#define USBASP_FUNC_PDI_DISCONNECT 18
++#define USBASP_FUNC_PDI_READ       19
++#define USBASP_FUNC_PDI_SEND       20
++
+ /* USBASP capabilities */
+ #define USBASP_CAP_0_TPI    0x01
++#define USBASP_CAP_0_PDI    0x02
+ 
+ /* programming state */
+ #define PROG_STATE_IDLE         0
+@@ -41,11 +47,20 @@
+ #define PROG_STATE_WRITEEEPROM  4
+ #define PROG_STATE_TPI_READ     5
+ #define PROG_STATE_TPI_WRITE    6
++#define PROG_STATE_PDI_READ     7
++#define PROG_STATE_PDI_SEND     8
++
++#define USBASP_PDI_WAIT_BUSY   1
++#define USBASP_PDI_MARK_BUSY   2
+ 
+ /* Block mode flags */
+ #define PROG_BLOCKFLAG_FIRST    1
+ #define PROG_BLOCKFLAG_LAST     2
+ 
++#define EXIT_RESET_UNSPEC 0
++#define EXIT_RESET_ENABLED 1
++#define EXIT_RESET_DISABLED 2
++
+ /* ISP SCK speed identifiers */
+ #define USBASP_ISP_SCK_AUTO   0
+ #define USBASP_ISP_SCK_0_5    1   /* 500 Hz */
+diff '--exclude=.svn' -ur ./firmware/xmega_pdi.h ../../usbasp.2011-05-28/firmware/xmega_pdi.h
+--- ./firmware/xmega_pdi.h	2012-08-16 00:51:40.000000000 +0200
++++ ../../usbasp.2011-05-28/firmware/xmega_pdi.h	2012-08-16 00:09:19.000000000 +0200
+@@ -0,0 +1,101 @@
++#ifndef _XMEGA_PDI_H_
++#define _XMEGA_PDI_H_
++
++#define XNVM_PDI_LDS_INSTR    0x00 //!< LDS instruction.
++#define XNVM_PDI_STS_INSTR    0x40 //!< STS instruction.
++#define XNVM_PDI_LD_INSTR     0x20 //!< LD instruction.
++#define XNVM_PDI_ST_INSTR     0x60 //!< ST instruction.
++#define XNVM_PDI_LDCS_INSTR   0x80 //!< LDCS instruction.
++#define XNVM_PDI_STCS_INSTR   0xC0 //!< STCS instruction.
++#define XNVM_PDI_REPEAT_INSTR 0xA0 //!< REPEAT instruction.
++#define XNVM_PDI_KEY_INSTR    0xE0 //!< KEY instruction.
++
++/** Byte size address mask for LDS and STS instruction */
++#define XNVM_PDI_BYTE_ADDRESS_MASK 0x00
++/** Word size address mask for LDS and STS instruction */
++#define XNVM_PDI_WORD_ADDRESS_MASK 0x04
++/** 3 bytes size address mask for LDS and STS instruction */
++#define XNVM_PDI_3BYTES_ADDRESS_MASK 0x08
++/** Long size address mask for LDS and STS instruction */
++#define XNVM_PDI_LONG_ADDRESS_MASK 0x0C
++/** Byte size data mask for LDS and STS instruction */
++#define XNVM_PDI_BYTE_DATA_MASK 0x00
++/** Word size data mask for LDS and STS instruction */
++#define XNVM_PDI_WORD_DATA_MASK 0x01
++/** 3 bytes size data mask for LDS and STS instruction */
++#define XNVM_PDI_3BYTES_DATA_MASK 0x02
++/** Long size data mask for LDS and STS instruction */
++#define XNVM_PDI_LONG_DATA_MASK 0x03
++/** Byte size address mask for LDS and STS instruction */
++#define XNVM_PDI_LD_PTR_STAR_MASK 0x00
++/** Word size address mask for LDS and STS instruction */
++#define XNVM_PDI_LD_PTR_STAR_INC_MASK 0x04
++/** 3 bytes size address mask for LDS and STS instruction */
++#define XNVM_PDI_LD_PTR_ADDRESS_MASK 0x08
++
++#define XNVM_CMD_NOP                         0x00 //!< No Operation.
++#define XNVM_CMD_CHIP_ERASE                  0x40 //!< Chip Erase.
++#define XNVM_CMD_READ_NVM_PDI                0x43 //!< Read NVM PDI.
++#define XNVM_CMD_LOAD_FLASH_PAGE_BUFFER      0x23 //!< Load Flash Page Buffer.
++#define XNVM_CMD_ERASE_FLASH_PAGE_BUFFER     0x26 //!< Erase Flash Page Buffer.
++#define XNVM_CMD_ERASE_FLASH_PAGE            0x2B //!< Erase Flash Page.
++#define XNVM_CMD_WRITE_FLASH_PAGE            0x2E //!< Flash Page Write.
++#define XNVM_CMD_ERASE_AND_WRITE_FLASH_PAGE  0x2F //!< Erase & Write Flash Page.
++#define XNVM_CMD_CALC_CRC_ON_FLASH           0x78 //!< Flash CRC.
++
++#define XNVM_CMD_ERASE_APP_SECTION           0x20 //!< Erase Application Section.
++#define XNVM_CMD_ERASE_APP_PAGE              0x22 //!< Erase Application Section.
++#define XNVM_CMD_WRITE_APP_SECTION           0x24 //!< Write Application Section.
++#define XNVM_CMD_ERASE_AND_WRITE_APP_SECTION 0x25 //!< Erase & Write Application Section Page.
++#define XNVM_CMD_CALC_CRC_APP_SECTION        0x38 //!< Application Section CRC.
++
++#define XNVM_CMD_ERASE_BOOT_SECTION          0x68 //!< Erase Boot Section.
++#define XNVM_CMD_ERASE_BOOT_PAGE             0x2A //!< Erase Boot Loader Section Page.
++#define XNVM_CMD_WRITE_BOOT_PAGE             0x2C //!< Write Boot Loader Section Page.
++#define XNVM_CMD_ERASE_AND_WRITE_BOOT_PAGE   0x2D //!< Erase & Write Boot Loader Section Page.
++#define XNVM_CMD_CALC_CRC_BOOT_SECTION       0x39 //!< Boot Loader Section CRC.
++
++#define XNVM_CMD_READ_USER_SIGN              0x03 //!< Read User Signature Row.
++#define XNVM_CMD_ERASE_USER_SIGN             0x18 //!< Erase User Signature Row.
++#define XNVM_CMD_WRITE_USER_SIGN             0x1A //!< Write User Signature Row.
++#define XNVM_CMD_READ_CALIB_ROW              0x02 //!< Read Calibration Row.
++
++#define XNVM_CMD_READ_FUSE                   0x07 //!< Read Fuse.
++#define XNVM_CMD_WRITE_FUSE                  0x4C //!< Write Fuse.
++#define XNVM_CMD_WRITE_LOCK_BITS             0x08 //!< Write Lock Bits.
++
++#define XNVM_CMD_LOAD_EEPROM_PAGE_BUFFER     0x33 //!< Load EEPROM Page Buffer.
++#define XNVM_CMD_ERASE_EEPROM_PAGE_BUFFER    0x36 //!< Erase EEPROM Page Buffer.
++
++#define XNVM_CMD_ERASE_EEPROM                0x30 //!< Erase EEPROM.
++#define XNVM_CMD_ERASE_EEPROM_PAGE           0x32 //!< Erase EEPROM Page.
++#define XNVM_CMD_WRITE_EEPROM_PAGE           0x34 //!< Write EEPROM Page.
++#define XNVM_CMD_ERASE_AND_WRITE_EEPROM      0x35 //!< Erase & Write EEPROM Page.
++#define XNVM_CMD_READ_EEPROM                 0x06 //!< Read EEPROM.
++
++#define XNVM_FLASH_BASE                 0x0800000 //!< Adress where the flash starts.
++#define XNVM_EEPROM_BASE                0x08C0000 //!< Address where eeprom starts.
++#define XNVM_FUSE_BASE                  0x08F0020 //!< Address where fuses start.
++#define XNVM_DATA_BASE                  0x1000000 //!< Address where data region starts.
++#define XNVM_APPL_BASE            XNVM_FLASH_BASE //!< Addres where application section starts.
++#define XNVM_CALIBRATION_BASE          0x008E0200 //!< Address where calibration row starts.
++#define XNVM_SIGNATURE_BASE            0x008E0400 //!< Address where signature bytes start.
++
++#define XNVM_FLASH_PAGE_SIZE			512			//
++
++#define XNVM_CONTROLLER_BASE 0x01C0               //!< NVM Controller register base address.
++#define XNVM_CONTROLLER_CMD_REG_OFFSET 0x0A       //!< NVM Controller Command Register offset.
++#define XNVM_CONTROLLER_STATUS_REG_OFFSET 0x0F    //!< NVM Controller Status Register offset.
++#define XNVM_CONTROLLER_CTRLA_REG_OFFSET 0x0B     //!< NVM Controller Control Register A offset.
++
++#define XNVM_CTRLA_CMDEX (1 << 0)                 //!< CMDEX bit offset.
++#define XNVM_NVMEN (1 << 1)                       //!< NVMEN bit offset.
++#define XNVM_NVM_BUSY (1 << 7)                    //!< NVMBUSY bit offset.
++
++#define XOCD_STATUS_REGISTER_ADDRESS 0x00         //!< PDI status register address.
++#define XOCD_RESET_REGISTER_ADDRESS  0x01         //!< PDI reset register address.
++#define XOCD_RESET_SIGNATURE         0x59         //!< PDI reset Signature.
++#define XOCD_FCMR_ADDRESS 0x05
++#define XOCD_CTRL_REGISTER_ADDRESS  0x02
++
++#endif

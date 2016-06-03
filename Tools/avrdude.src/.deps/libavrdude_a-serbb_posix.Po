@@ -1,0 +1,1 @@
+libavrdude_a-serbb_posix.o: serbb_posix.c

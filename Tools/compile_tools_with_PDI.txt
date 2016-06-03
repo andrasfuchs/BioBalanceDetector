@@ -1,0 +1,78 @@
+http://bit.ly/1sFG8V9
+
+Hi!
+
+Since a few commenters already asked for it, here is how I finally patched and compiled the pdi usbasp firmware and avrdude on Windows 10 x64 after a few days of try and error.
+
+1. Set up the environment
+* Download and install MinGW and MSYS shell
+https://sourceforge.net/projects/mingw/files/Installer/
+Select mingw-developer-toolkit, and mingw32-gcc-g++ packages
+-> This will create a MinGW/MSYS shell for us, so we can compile the sources
+* I downloaded and installed WinAVR from here: 
+https://sourceforge.net/projects/winavr/files/WinAVR/ 
+-> This made the avr-gcc available in the shell
+* I got the USBASP source from here: 
+http://www.fischl.de/usbasp/
+* And the AVRDUDE source from here: 
+http://download.savannah.gnu.org/releases/avrdude/
+* And the patch files to support pdi/xmega
+http://sz.toyspring.com/usbasp-pdi-usbaspfirmware-20120816.diff
+http://bit.ly/1RCouGC
+
+2. Compile USBASP 
+* extract the latest USBASP source into <USBASP source folder>
+* start the MSYS shell (<MinGW installation folder>\msys\1.0\msys.bat)
+* enter 'cd <USBASP source folder>/firmware' (!! use / instead of \ in the path !!)
+* run "make main.hex" -> this command generates the main.hex file, which is binary-identical with the bin\firmware\usbasp.atmega8.2011-05-28.hex file
+
+3. Compile AVRDUDE
+* extract the latest AVRDUDE source into <AVRDUDE source folder>
+* start MSYS shell (<MinGW installation folder>\msys\1.0\msys.bat)
+* enter 'cd <AVRDUDE source folder>' (!! use / instead of \ in the path !!)
+* enter 'configure LDFLAGS="-static" --enable-versioned-doc=no' (this will generate the makefiles)
+! if you get "configure: command not found" -> you did not get the latest version of avrdude's source which includes the 'configure' Bourne shell script
+! if you get "no acceptable C compiler found in $PATH" -> gcc or avr-gcc is not accesible from here. You should check your PATH environment variable in Windows, and make sure that both the <MinGW installation folder>\bin\ and <WinAVR installation folder>\bin\ are there. You can double check that by entering $PATH into the shell.
+! if you get any "DON'T HAVE"s in the Configuration summary, you might want to get those libraries (but they are probably optional, because I could compile without them)
+ - libefl: https://sourceforge.net/projects/elftoolchain/
+ - libusb: https://sourceforge.net/projects/libusb-win32/ (recommended)
+ - libftdi: http://www.intra2net.com/en/developer/libftdi/download.php
+* enter 'make' to start the compilation process
+* you should have a brand new "avrdude.exe"
+
+4. (Optional) Install libusb
+* download the latest from https://sourceforge.net/projects/libusb-win32/
+* copy <libusb extraction folder>\include\lusb0_usb.h into <MinGW installation folder>\include\
+* copy <libusb extraction folder>\lib\gcc\libusb.a into <MinGW installation folder>\lib\
+* re-run AVRDUDE's configure command to make sure you do have libusb now
+
+5. Patch the source files and recompile
+* if both of the above compiled, go ahead and patch them
+* extract and overwrite all files from the _older_ AVRDUDE version (t1092) in the <AVRDUDE source folder>
+* copy usbasp-pdi-usbaspfirmware-20120816.diff into <USBASP source folder>
+* start MSYS shell (<MinGW installation folder>\msys\1.0\msys.bat)
+* enter 'cd <USBASP source folder>' (!! use / instead of \ in the path !!)
+* enter 'patch < usbasp-pdi-usbaspfirmware-20120816.diff' (!! there is a '<' character before the .diff filename !!)
+! if you get that "x of x hunks FAILED" you probably have a line ending problem like I did (.diff file was UNIX format, I needed to convert it to Windows format with Notepad++)
+* extract all files from avrdude_usbasp_pdi_fix.zip into <AVRDUDE source folder>
+* recompile both as described above in 2. and 3.
+
+6. Flash your programmer to support PDI
+I have an USBASP v2.0 from LC Technology and an original USBASP from MSX. I prefer to use the one by LC Technology because it supports 3.3V to the device to be programmed. In order to upgrade its firmware I needed to program the LC Technology with the MSX one.
+In order to do so I needed to:
+* set the jumper POWER on the MSX one
+* solder pins to the JP2, use a jumper on JP2 and another to select 5V as operation voltage on the LC Technology
+* connect them with the 5x2 IDC cable
+* connect MSX to my USB port
+* run avrdude to program the LC Technology: 
+avrdude -c usbasp -p atmega8 -U flash:w:usbasp.atmega8.2011-05-28_with_PDI.hex:i
+
+7. Optional: write an e-mail to 
+* the author of USBASP (Thomas Fischl - tfischl@gmx.de) 
+* the author of AVRDUDE (Kevin Cuzner - kevin@kevincuzner.com) 
+to include these changes in the future releases to save everyone some time
+* me, Andras Fuchs (andras.fuchs@gmail.com) if you have problems or just want to say hi
+
+8. Optional: skip all this and download the compiled binaries from here:
+* USBASP (latest, 2011-05-28) with PDI support - http://bit.ly/22sXp0z
+* AVRDUDE (v6.3, 2016-02-16) with PDI support - http://bit.ly/1NWyksg

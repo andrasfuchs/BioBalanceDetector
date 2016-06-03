@@ -1,0 +1,37 @@
+libavrdude_a-lists.o: lists.c ac_cfg.h \
+ c:\work\tools\mingw\include\stdio.h c:\work\tools\mingw\include\_mingw.h \
+ c:\work\tools\mingw\lib\gcc\mingw32\4.9.3\include\stddef.h \
+ c:\work\tools\mingw\lib\gcc\mingw32\4.9.3\include\stdarg.h \
+ c:\work\tools\mingw\include\sys\types.h \
+ c:\work\tools\mingw\include\parts\time.h \
+ c:\work\tools\mingw\include\stdlib.h libavrdude.h \
+ c:\work\tools\mingw\include\limits.h \
+ c:\work\tools\mingw\lib\gcc\mingw32\4.9.3\include\stdbool.h \
+ c:\work\tools\mingw\lib\gcc\mingw32\4.9.3\include\stdint.h \
+ c:\work\tools\mingw\include\stdint.h
+
+ac_cfg.h:
+
+c:\work\tools\mingw\include\stdio.h:
+
+c:\work\tools\mingw\include\_mingw.h:
+
+c:\work\tools\mingw\lib\gcc\mingw32\4.9.3\include\stddef.h:
+
+c:\work\tools\mingw\lib\gcc\mingw32\4.9.3\include\stdarg.h:
+
+c:\work\tools\mingw\include\sys\types.h:
+
+c:\work\tools\mingw\include\parts\time.h:
+
+c:\work\tools\mingw\include\stdlib.h:
+
+libavrdude.h:
+
+c:\work\tools\mingw\include\limits.h:
+
+c:\work\tools\mingw\lib\gcc\mingw32\4.9.3\include\stdbool.h:
+
+c:\work\tools\mingw\lib\gcc\mingw32\4.9.3\include\stdint.h:
+
+c:\work\tools\mingw\include\stdint.h:
