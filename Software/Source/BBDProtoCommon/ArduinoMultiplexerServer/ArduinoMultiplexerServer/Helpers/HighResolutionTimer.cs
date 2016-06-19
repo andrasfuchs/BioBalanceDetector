@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ArduinoMultiplexerServer
@@ -11,6 +12,7 @@ namespace ArduinoMultiplexerServer
     {
         private bool isPerfCounterSupported = false;
         private Int64 frequency = 0;
+        private long startTime, stopTime;
 
         // Windows CE native library with QueryPerformanceCounter().
         private const string lib = "kernel32.dll";
@@ -21,6 +23,9 @@ namespace ArduinoMultiplexerServer
 
         public HighResolutionTimer()
         {
+            startTime = 0;
+            stopTime = 0;
+
             // Query the high-resolution timer only if it is supported.
             // A returned frequency of 1000 typically indicates that it is not
             // supported and is emulated by the OS using the same value that is
@@ -67,6 +72,30 @@ namespace ArduinoMultiplexerServer
                     // Otherwise, use Environment.TickCount.
                     return (Int64)Environment.TickCount;
                 }
+            }
+        }
+
+        // Start the timer
+        public void Start()
+        {
+            // lets do the waiting threads there work
+            Thread.Sleep(0);
+
+            startTime = this.Value;
+        }
+
+        // Stop the timer
+        public void Stop()
+        {
+            stopTime = this.Value;
+        }
+
+        // Returns the duration of the timer (in seconds)
+        public double Duration
+        {
+            get
+            {
+                return (double)(stopTime - startTime) / (double)frequency;
             }
         }
 

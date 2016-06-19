@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{0BDA842A-45CA-4DDE-B4CA-23C0B82AD99C}</ProjectGuid>
+    <ProjectGuid>{5F493F82-CD31-4C08-ABAB-D7CBC44B9431}</ProjectGuid>
     <RootNamespace>BDDProto03_Arduino</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
@@ -84,6 +84,9 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
+      <ForcedIncludeFiles>C:\Work\BioBalanceDetector\Software\Source\BBDProto04\Arduino\BBDProto04_Arduino\__vm\.BBDProto04_Arduino.vsarduino.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <PreprocessorDefinitions>__AVR_ATmega328p__;__AVR_ATmega328P__;F_CPU=16000000L;ARDUINO=10608;ARDUINO_AVR_UNO;ARDUINO_ARCH_AVR;__cplusplus=201103L;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Program Files (x86)\Arduino\hardware\arduino\avr\cores\arduino;C:\Program Files (x86)\Arduino\hardware\arduino\avr\variants\standard;c:\Work\BioBalanceDetector\Software\Source\BBDProto04\Arduino\BBDProto04_Arduino;C:\Program Files (x86)\Arduino\hardware\arduino\avr\libraries\SPI\src;C:\Program Files (x86)\Arduino\hardware\arduino\avr\libraries\SPI\src\utility;C:\Program Files (x86)\Arduino\libraries;C:\Program Files (x86)\Arduino\hardware\arduino\avr\libraries;C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\Extensions\pkifveg5.zvx\Micro Platforms\default\debuggers;C:\Users\Andras\Documents\Arduino\libraries;C:\Program Files (x86)\Arduino\hardware\tools\avr/avr/include/;C:\Program Files (x86)\Arduino\hardware\tools\avr//avr/include/avr/;C:\Program Files (x86)\Arduino\hardware\tools\avr/lib\gcc\avr\4.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -117,12 +120,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <None Include="BDDProto03_Arduino.ino">
-      <FileType>CppCode</FileType>
-    </None>
+    <None Include="BBDProto04_Arduino.ino" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="__vm\.BDDProto03_Arduino.vsarduino.h" />
+    <ClInclude Include="TimerOne\config\known_16bit_timers.h" />
+    <ClInclude Include="TimerOne\TimerOne.h" />
+    <ClInclude Include="__vm\.BBDProto04_Arduino.vsarduino.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="TimerOne\TimerOne.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

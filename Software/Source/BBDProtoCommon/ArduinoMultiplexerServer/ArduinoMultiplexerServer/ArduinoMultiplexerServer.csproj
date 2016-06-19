@@ -79,6 +79,8 @@
     <Compile Include="Models\MultiChannelInput.cs" />
     <Compile Include="Models\MultiplexerSession.cs" />
     <Compile Include="Models\RandomChannel.cs" />
+    <Compile Include="Models\RandomInput.cs" />
+    <Compile Include="Models\SerialCommand.cs" />
     <Compile Include="Models\SessionsCache.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

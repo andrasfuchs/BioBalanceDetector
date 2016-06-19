@@ -15,11 +15,22 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="BDDProto03_Arduino.ino" />
+    <None Include="BBDProto04_Arduino.ino" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="__vm\.BDDProto03_Arduino.vsarduino.h">
+    <ClInclude Include="__vm\.BBDProto04_Arduino.vsarduino.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="TimerOne\TimerOne.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TimerOne\config\known_16bit_timers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="TimerOne\TimerOne.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

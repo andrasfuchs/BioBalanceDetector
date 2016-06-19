@@ -8,6 +8,6 @@ namespace ArduinoMultiplexerServer
 {
     public interface IDataChannel
     {
-        Int16 Get16BitSignedIntData(Int64 startTime, int duration);
+        short? Get16BitSignedIntData(long startTimeInTicks, long durationInTicks);
     }
 }

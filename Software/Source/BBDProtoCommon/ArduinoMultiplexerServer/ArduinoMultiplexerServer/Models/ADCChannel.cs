@@ -56,10 +56,10 @@ namespace ArduinoMultiplexerServer
 
         public override string ToString()
         {
-            return "ch" + ADCChannelId;
+            return $"ch-{ADCChannelId} ({values.Count} samples)";
         }
 
-        public short Get16BitSignedIntData(Int64 startTime, int duration)
+        public short? Get16BitSignedIntData(long startTimeInTicks, long durationInTicks)
         {
             throw new NotImplementedException();
         }

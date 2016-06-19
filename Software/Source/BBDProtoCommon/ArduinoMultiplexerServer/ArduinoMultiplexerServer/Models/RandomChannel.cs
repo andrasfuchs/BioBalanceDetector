@@ -10,9 +10,9 @@ namespace ArduinoMultiplexerServer
     public class RandomChannel : IDataChannel
     {
         private short lastValue = 0;
-        private RNGCryptoServiceProvider rnd = new RNGCryptoServiceProvider();
+        private static RNGCryptoServiceProvider rnd = new RNGCryptoServiceProvider();
 
-        public short Get16BitSignedIntData(Int64 startTime, int duration)
+        public short? Get16BitSignedIntData(long startTimeInTicks, long durationInTicks)
         {
             byte[] rndValue = new byte[1];
             rnd.GetBytes(rndValue);

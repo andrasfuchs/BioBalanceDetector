@@ -10,35 +10,38 @@ namespace ArduinoMultiplexerServer
 {
     public class MultiChannelInput : IWaveIn
     {
-        private int latencyMs = 5;      // this means 200 fps
-        private Thread inputGeneratorThread;
+        List<byte> buffer = new List<byte>();
+        private Thread inputGeneratorThread;    // this generates the bitstream at the given frequency (e.g. 8000 Hz)
+        private int latencyMs = 40;           // this means that the DataAvailable event will be fired at 20 fps tops
+        private Timer dataAvailableTimer;     // this thread calles the DataAvailable event handler
 
         private HighResolutionTimer timer;
         private bool recordingInProgress = false;
         private Int64 counterAtStart;
         private Int64 previousCounterAtStart;
 
-        private IDataChannel[] channels;
+        protected List<IDataChannel> channels = new List<IDataChannel>();
 
         private WaveFormat waveFormat;
         public WaveFormat WaveFormat
         {
             get { return waveFormat; }
-            set { waveFormat = value; }
+            set { throw new NotSupportedException("WaveFormat can be set only once as a parameter of the MultiChannelInput's constructor!"); }
         }
 
         public event EventHandler<WaveInEventArgs> DataAvailable;
         public event EventHandler<StoppedEventArgs> RecordingStopped;
 
-        public MultiChannelInput(params IDataChannel[] channels)
+        public MultiChannelInput(int channelCount)
         {
-            this.channels = channels;
-            this.WaveFormat = new WaveFormat(8000, 16, channels.Length);
+            this.waveFormat = new WaveFormat(8000, 16, channelCount);
 
             timer = new HighResolutionTimer();
 
             inputGeneratorThread = new Thread(new ThreadStart(InputGeneratorLoop));
             inputGeneratorThread.Start();
+
+            dataAvailableTimer = new Timer(DataAvailableEventFire, this, 0, latencyMs);
         }
 
         public void Dispose()
@@ -69,7 +72,7 @@ namespace ArduinoMultiplexerServer
 
         private void InputGeneratorLoop()
         {
-            List<byte> buffer = new List<byte>();
+            long timeBetweenSamplesInTicks = (long)((1.0 / waveFormat.SampleRate) * timer.Frequency);
 
             while (true)
             {
@@ -80,28 +83,42 @@ namespace ArduinoMultiplexerServer
                 else
                 {
                     // Get counter value when the operation ends.
-                    Int64 counterAtEnd = timer.Value;
+                    long counterAtEnd = timer.Value;
 
                     // Get time elapsed in tenths of a millisecond.
-                    Int64 timeElapsedInTicks = counterAtEnd - counterAtStart;
-                    Int64 timeElapseInTenthsOfMilliseconds = (timeElapsedInTicks * 10000) / timer.Frequency;
+                    long timeElapsedInTicks = counterAtEnd - counterAtStart;
 
-                    if (timeElapseInTenthsOfMilliseconds >= latencyMs)
+                    while (timeElapsedInTicks >= timeBetweenSamplesInTicks)
                     {
                         previousCounterAtStart = counterAtStart;
                         counterAtStart = timer.Value;
 
-                        buffer.Clear();
-                        foreach (IDataChannel channel in channels)
+                        lock (buffer)
                         {
-                            short channelValue = channel.Get16BitSignedIntData(previousCounterAtStart, latencyMs);
-                            buffer.AddRange(BitConverter.GetBytes(channelValue));
+                            foreach (IDataChannel channel in channels)
+                            {
+                                short channelValue = channel.Get16BitSignedIntData(previousCounterAtStart, timeBetweenSamplesInTicks) ?? 0;
+                                buffer.AddRange(BitConverter.GetBytes(channelValue));
+                            }
                         }
-                        DataAvailable?.Invoke(this, new WaveInEventArgs(buffer.ToArray(), buffer.Count));
+
+                        timeElapsedInTicks -= timeBetweenSamplesInTicks;
                     }
                 }
             }
 
+        }
+
+        private void DataAvailableEventFire(object stateInfo)
+        {
+            lock (buffer)
+            {
+                if (buffer.Count == 0) return;
+
+                DataAvailable?.Invoke(this, new WaveInEventArgs(buffer.ToArray(), buffer.Count));
+
+                buffer.Clear();
+            }
         }
     }
 }

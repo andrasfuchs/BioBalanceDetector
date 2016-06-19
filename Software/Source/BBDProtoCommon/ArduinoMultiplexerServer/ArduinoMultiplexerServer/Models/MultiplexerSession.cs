@@ -35,12 +35,12 @@ namespace ArduinoMultiplexerServer
 
         public MultiplexerSession()
         {
-            channelList = new List<ADCChannel>{
-                new ADCChannel { ADCChannelId=1, BitRate=16, SamplesPerSecond=1000 },
-                new ADCChannel { ADCChannelId=2, BitRate=16, SamplesPerSecond=1000 },
-                new ADCChannel { ADCChannelId=3, BitRate=16, SamplesPerSecond=1000 },
-                new ADCChannel { ADCChannelId=4, BitRate=16, SamplesPerSecond=1000 }
-            };
+            channelList = new List<ADCChannel>();
+
+            for (int i=0; i<64; i++)
+            {
+                channelList.Add(new ADCChannel { ADCChannelId = i, BitRate = 16, SamplesPerSecond = 1000 });
+            }
         }
 
         private static string RandomString(int length)

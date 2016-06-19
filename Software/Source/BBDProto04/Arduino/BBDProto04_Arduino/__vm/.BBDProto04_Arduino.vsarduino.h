@@ -12,7 +12,6 @@
 #define _VSARDUINO_H_
 #define __AVR_ATmega328p__
 #define __AVR_ATmega328P__
-#define _VMDEBUG 1
 #define F_CPU 16000000L
 #define ARDUINO 10608
 #define ARDUINO_AVR_UNO
@@ -64,5 +63,8 @@ extern "C" void __cxa_pure_virtual() {;}
 #define portOutputRegister(P)
 #define portInputRegister(P)
 #define portModeRegister(P)
-#include <BDDProto03_Arduino.ino>
+#include <BBDProto04_Arduino.ino>
+#include <TimerOne\TimerOne.cpp>
+#include <TimerOne\TimerOne.h>
+#include <TimerOne\config\known_16bit_timers.h>
 #endif
