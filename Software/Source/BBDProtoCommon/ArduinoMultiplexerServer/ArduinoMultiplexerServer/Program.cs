@@ -23,38 +23,23 @@ namespace ArduinoMultiplexerServer
         private static string selfHostedServerUrl = "http://localhost:8080";
         private static string arduinoPort = "COM3";
 
-        private static SerialPort arduinoCOMPort;
-        private static string dataBuffer = "";
-        private static List<byte> dataBufferBytes = new List<byte>();
-        private static ushort[] valueBuffer = new ushort[655360];
-        private static int valueBufferIndex = 0;
-        private static DateTime? valueBufferStartTime = null;
-        private static double waveformResolutionInSeconds = 1.0 / 30.0; // 25 frames per second
+        //private static ushort[] valueBuffer = new ushort[655360];
         private static string sessionId;
-        private static bool readyToRead = false;
-        private static ADCChannelValue[] recentValues;
+
+        private static double?[] recentValues;
         private static double recentChangesSensitivity = 1.00;
 
         private static DateTime firstActivity;
-        private static long arduinoCOMPortBytesReceived;
-        private static long arduinoLLCommandReceived;
 
         private static HttpClient selfHostedClient;
 
+        private static MultiChannelInput waveSource = null;
         private static WaveFileWriter waveFile = null;
         private static long waveFileBytesWritten = 0;
 
-        private static HighResolutionTimer hrt = new HighResolutionTimer();
 
         static void Main(string[] args)
         {
-
-            // Set up the serial port communication with the Arduino on COM3 at 115200 baud
-            arduinoCOMPort = new SerialPort(arduinoPort) { BaudRate = 115200*16 };
-            //  hook up the event for receiving the data
-            arduinoCOMPort.DataReceived += ArduinoCOMPort_DataReceived;
-
-
             // let's start our self-hosted server
             HttpSelfHostServer server = ConfigureServer(selfHostedServerUrl);
             var serverSession = server.OpenAsync();
@@ -79,26 +64,19 @@ namespace ArduinoMultiplexerServer
 
 
 
-            IWaveIn waveSource = null;
             string waveFilename = GetWaveFilename();
 
             try
             {
-                arduinoCOMPort.Open();
-                //waveSource = WriteWaveFile(waveFilename, new BBDInput(64));
+                waveSource = (BBDInput)WriteWaveFile(waveFilename, new BBDInput(arduinoPort, 64));
             }
             catch (System.IO.IOException)
             {
                 Console.WriteLine(String.Format("Arduino is not connected on port '{0}', creating random signal generator as data-source.", arduinoPort));
 
-                // Arduino is not connected, let create a 64-channel 16bit, 8kHz pseudo-source of data                
-                waveSource = WriteWaveFile(waveFilename, new RandomInput(64));
-
-                firstActivity = DateTime.UtcNow;
+                // Arduino is not connected, let's create a 64-channel 16bit, 8kHz pseudo-source of data                
+                waveSource = (RandomInput)WriteWaveFile(waveFilename, new RandomInput(64));
             }
-
-            readyToRead = true;
-
 
 
 
@@ -114,6 +92,7 @@ namespace ArduinoMultiplexerServer
                 waveSource.StartRecording();
             }
 
+            firstActivity = DateTime.UtcNow;
             Console.WriteLine("Press any key to quit");
             Console.ReadLine();
 
@@ -122,136 +101,11 @@ namespace ArduinoMultiplexerServer
                 waveSource.StopRecording();
                 waveSource.Dispose();
             }
-
-            if (arduinoCOMPort.IsOpen)
-            {
-                arduinoCOMPort.Close();
-            }
         }
 
         private static void PrintMatrixTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
             PrintValueMatrix();
-        }
-
-        private static void ArduinoCOMPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
-        {
-            if (!readyToRead)
-            {
-                return;
-            }
-
-            if (firstActivity == null)
-            {
-                firstActivity = DateTime.UtcNow;
-            }
-
-            int bytesToRead = arduinoCOMPort.BytesToRead;
-
-            byte[] buffer = new byte[bytesToRead];
-            arduinoCOMPortBytesReceived += arduinoCOMPort.Read(buffer, 0, bytesToRead);
-
-            dataBufferBytes.AddRange(buffer);
-            dataBuffer += System.Text.Encoding.ASCII.GetString(buffer);
-
-            int dataBlockStartIndex = dataBuffer.IndexOf("<|");
-            int dataBlockEndIndex = dataBuffer.IndexOf("|>");
-
-            if ((dataBlockStartIndex < 0) || (dataBlockEndIndex < 0)) return;
-
-            List<SerialCommand> commandsReceived = new List<SerialCommand>();
-            while ((dataBlockStartIndex >= 0) && (dataBlockEndIndex >= 0))
-            {
-                if (dataBlockStartIndex + 1 < dataBlockEndIndex)
-                {
-                    SerialCommand sc = new SerialCommand();
-
-                    string dataBlock = dataBuffer.Substring(dataBlockStartIndex + 2, dataBlockEndIndex - dataBlockStartIndex - 2);
-
-                    if (dataBlock.Length > 3)
-                    {
-                        sc.Command = dataBlock.Substring(0, 2);
-                        sc.ParametersRaw = new byte[dataBlock.Length - 3];
-                        dataBufferBytes.CopyTo(dataBlockStartIndex + 2 + 3, sc.ParametersRaw, 0, dataBlock.Length - 3);
-                        sc.Parameters = dataBlock.Substring(3).Split(new char[] { ',' });
-
-                        commandsReceived.Add(sc);
-                    }
-                }
-
-                dataBuffer = dataBuffer.Substring(dataBlockEndIndex + 2);
-                dataBufferBytes = dataBufferBytes.Skip(dataBlockEndIndex + 2).ToList();
-                dataBlockStartIndex = dataBuffer.IndexOf("<|");
-                dataBlockEndIndex = dataBuffer.IndexOf("|>");
-            }
-
-            foreach (SerialCommand sc in commandsReceived)
-            {
-                if (sc.Command == "ch")
-                {
-                    byte channel = 0;
-                    int parsedValue = -1;
-
-                    if ((sc.Parameters.Length < 2) || (!Byte.TryParse(sc.Parameters[0], out channel)) || (!Int32.TryParse(sc.Parameters[1], out parsedValue)))
-                    {
-                        continue;
-                    }
-
-                    ushort value = (ushort)parsedValue;
-
-                    if ((valueBufferStartTime != null) && (waveformResolutionInSeconds <= (DateTime.UtcNow - valueBufferStartTime.Value).TotalSeconds))
-                    {
-                        double sum = 0;
-                        for (int i = 0; i < valueBufferIndex; i++)
-                        {
-                            sum += valueBuffer[i];
-                        }
-                        sum /= valueBufferIndex;
-
-                        selfHostedClient.GetAsync("api/channels/appendvalue/" + sessionId + "/" + channel + "/" + valueBufferStartTime.Value.ToString("o") + "/" + sum);
-                        //Console.WriteLine("api/channels/appendvalue/" + sessionId + "/" + channel + "/" + valueBufferStartTime.Value.ToString("o") + "/" + sum);
-
-                        //HttpResponseMessage response = client.GetAsync("api/channels/appendvalue/" + sessionId + "/" + channel + "/" + valueBufferStartTime.Value.ToString("o") + "/" + sum).Result;
-                        //response.EnsureSuccessStatusCode();
-
-                        valueBufferIndex = 0;
-                    }
-
-                    if (valueBufferIndex == 0)
-                    {
-                        valueBufferStartTime = DateTime.UtcNow;
-                    }
-
-                    valueBuffer[valueBufferIndex] = value;
-                    valueBufferIndex++;
-
-                    if (channel == 0)
-                    {
-                        PrintValueMatrix();
-                    }
-                }
-                else if (sc.Command == "ll")
-                {
-                    for (int i=0; i<sc.ParametersRaw.Length/2; i++)
-                    {
-                        ushort value = (ushort)(sc.ParametersRaw[i*2] * 256 + sc.ParametersRaw[i*2 + 1]);
-
-                        selfHostedClient.GetAsync("api/channels/appendvalue/" + sessionId + "/" + i + "/" + DateTime.UtcNow.ToString("o") + "/" + value);
-                    }
-
-                    arduinoLLCommandReceived++;
-                }
-                else if (sc.Command == "bm")
-                {
-                    hrt.Stop();
-                    Console.WriteLine($"Time elapsed until benchmark point '{sc.Parameters[0]}' - remote: {sc.Parameters[1]} ticks, local: {hrt.Duration.ToString("0.0000")} seconds");
-                    hrt.Start();
-                }
-                else
-                {
-                    Console.WriteLine(sc);
-                }
-            }
         }
 
         static HttpSelfHostServer ConfigureServer(string serverUrl)
@@ -344,12 +198,13 @@ namespace ArduinoMultiplexerServer
         {
             try
             {
-                var response = await selfHostedClient.GetAsync("api/channels/getvalues/" + sessionId + "/" + new TimeSpan(0, 0, 3).ToString());
+                //var response = await selfHostedClient.GetAsync("api/channels/getvalues/" + sessionId + "/" + new TimeSpan(0, 0, 3).ToString());
 
-                var jsonString = response.Content.ReadAsStringAsync();
-                jsonString.Wait();
+                //var jsonString = response.Content.ReadAsStringAsync();
+                //jsonString.Wait();
 
-                ADCChannelValue[] values = JsonConvert.DeserializeObject<ADCChannelValue[]>(jsonString.Result);
+                //ADCChannelValue[] values = JsonConvert.DeserializeObject<ADCChannelValue[]>(jsonString.Result);
+                double?[] values = waveSource.GetValues();
 
                 lock (sessionId)
                 {
@@ -359,7 +214,7 @@ namespace ArduinoMultiplexerServer
 
                         for (int i = 0; i < values.Length; i++)
                         {
-                            if (values[i]?.Value != recentValues[i]?.Value)
+                            if (values[i] != recentValues[i])
                             {
                                 isChanged = true;
                                 break;
@@ -379,10 +234,10 @@ namespace ArduinoMultiplexerServer
                     {
                         for (int j = 0; j < 8; j++)
                         {
-                            ADCChannelValue value = values[i * 8 + j];
+                            double? value = values[i * 8 + j];
 
                             // A, show values
-                            valueStrings[i * 8 + j] = value == null ? "-.---" : (value.Value / 65536).ToString("0.000");
+                            valueStrings[i * 8 + j] = value == null ? "-.---" : value.Value.ToString("0.00");
 
 
                             // B, show changes
@@ -430,7 +285,7 @@ namespace ArduinoMultiplexerServer
                                 }
                             }
 
-                            sum += (value == null ? 0 : (value.Value / 65536));
+                            sum += (value == null ? 0 : value.Value);
                         }
                     }
 
@@ -445,22 +300,33 @@ namespace ArduinoMultiplexerServer
                             );
                     }
 
+
                     double timeElapsed = (DateTime.UtcNow - firstActivity).TotalSeconds;
-                    Console.Title = $"{sessionId} - {sum.ToString("0.000")} - {(arduinoCOMPortBytesReceived / timeElapsed / 1024).ToString("0.00")} kbytes/sec - {((double)arduinoLLCommandReceived / timeElapsed).ToString("0.00")} fps - sensibility {recentChangesSensitivity.ToString("0.0000")} - wav file: {(waveFileBytesWritten / 1024).ToString("#,0")} kbytes";
+                    Console.Title = $"{sessionId} - sum: {sum.ToString("0.000")}";
+                    if (waveSource is BBDInput)
+                    {
+                        BBDInput bbdInput = (BBDInput)waveSource;
+
+                        Console.Title += $" - {(bbdInput.COMPortBytesReceived / timeElapsed / 1024).ToString("0.00")} kbytes/sec - {((double)bbdInput.LLCommandReceived / timeElapsed).ToString("0.00")} fps";
+                    }
+                    if (recentValues != null)
+                    {
+                        Console.Title += $" - sensibility { recentChangesSensitivity.ToString("0.0000")}";
+                    }
+                    Console.Title += $" - wav file: {(waveFileBytesWritten / 1024).ToString("#,0")} kbytes";
 
 
                     // comment this line to disable the feature
                     //recentValues = values;
-                    //if (equalsCount > 60)
-                    //{
-                    //    recentChangesSensitivity /= 2.0;
-                    //}
+                    if (equalsCount > 60)
+                    {
+                        recentChangesSensitivity /= 2.0;
+                    }
 
-                    //if (equalsCount < 4)
-                    //{
-                    //    recentChangesSensitivity *= 2.0;
-                    //}
-
+                    if (equalsCount < 4)
+                    {
+                        recentChangesSensitivity *= 2.0;
+                    }
                 }
             }
             catch (System.Net.Http.HttpRequestException)

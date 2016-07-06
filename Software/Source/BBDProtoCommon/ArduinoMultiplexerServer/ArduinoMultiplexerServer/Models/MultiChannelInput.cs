@@ -15,12 +15,19 @@ namespace ArduinoMultiplexerServer
         private int latencyMs = 40;           // this means that the DataAvailable event will be fired at 20 fps tops
         private Timer dataAvailableTimer;     // this thread calles the DataAvailable event handler
 
-        private HighResolutionTimer timer;
-        private bool recordingInProgress = false;
+        protected HighResolutionTimer timer;
+        protected bool recordingInProgress = false;
         private Int64 counterAtStart;
         private Int64 previousCounterAtStart;
 
-        protected List<IDataChannel> channels = new List<IDataChannel>();
+        protected IDataChannel[] channels;
+        public IDataChannel[] Channels
+        {
+            get
+            {
+                return channels;
+            }
+        }
 
         private WaveFormat waveFormat;
         public WaveFormat WaveFormat
@@ -97,12 +104,13 @@ namespace ArduinoMultiplexerServer
                         {
                             foreach (IDataChannel channel in channels)
                             {
-                                short channelValue = channel.Get16BitSignedIntData(previousCounterAtStart, timeBetweenSamplesInTicks) ?? 0;
-                                buffer.AddRange(BitConverter.GetBytes(channelValue));
+                                double value = channel.GetValue(previousCounterAtStart, timeBetweenSamplesInTicks) ?? channel.GetValue(previousCounterAtStart) ?? 0.0;
+                                buffer.AddRange(BitConverter.GetBytes((short)(value * 32767)));
                             }
                         }
 
                         timeElapsedInTicks -= timeBetweenSamplesInTicks;
+                        previousCounterAtStart += timeBetweenSamplesInTicks;
                     }
                 }
             }
@@ -119,6 +127,11 @@ namespace ArduinoMultiplexerServer
 
                 buffer.Clear();
             }
+        }
+
+        public virtual double?[] GetValues()
+        {
+            return channels.Select(ch => ch.GetValue()).ToArray();
         }
     }
 }

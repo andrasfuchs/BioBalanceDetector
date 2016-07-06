@@ -75,6 +75,7 @@
     <Compile Include="Helpers\HighResolutionTimer.cs" />
     <Compile Include="Models\ADCChannel.cs" />
     <Compile Include="Models\ADCChannelValue.cs" />
+    <Compile Include="Models\BBDInput.cs" />
     <Compile Include="Models\IDataChannel.cs" />
     <Compile Include="Models\MultiChannelInput.cs" />
     <Compile Include="Models\MultiplexerSession.cs" />

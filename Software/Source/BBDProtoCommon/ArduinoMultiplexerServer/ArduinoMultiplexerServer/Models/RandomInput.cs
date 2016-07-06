@@ -10,10 +10,13 @@ namespace ArduinoMultiplexerServer
     {
         public RandomInput(int channelCount) : base(channelCount)
         {
+            List<RandomChannel> channels = new List<RandomChannel>();
             for (int i=0; i<channelCount; i++)
             {
-                this.channels.Add(new RandomChannel());
+                channels.Add(new RandomChannel());
             }
+
+            this.channels = channels.ToArray();
         }
 
     }

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ArduinoMultiplexerServer
 {
-    class HighResolutionTimer
+    public class HighResolutionTimer
     {
         private bool isPerfCounterSupported = false;
         private Int64 frequency = 0;

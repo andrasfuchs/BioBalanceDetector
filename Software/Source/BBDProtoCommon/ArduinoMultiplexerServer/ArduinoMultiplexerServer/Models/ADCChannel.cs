@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ArduinoMultiplexerServer
 {
@@ -59,9 +60,25 @@ namespace ArduinoMultiplexerServer
             return $"ch-{ADCChannelId} ({values.Count} samples)";
         }
 
-        public short? Get16BitSignedIntData(long startTimeInTicks, long durationInTicks)
+        public double? GetValue(long startTimeInTicks, long durationInTicks)
         {
-            throw new NotImplementedException();
+            List<ADCChannelValue> relevantValues = values.FindAll(v => (v?.TimeStamp.Ticks > startTimeInTicks) && (v?.TimeStamp.Ticks < startTimeInTicks + durationInTicks));
+
+            if (relevantValues.Count == 0) return null;
+                
+            return relevantValues.Average(v => v.Value);
+        }
+
+        public double? GetValue(long startTimeInTicks)
+        {
+            ADCChannelValue relevantValue = values.FindLast(v => (v?.TimeStamp.Ticks > startTimeInTicks));
+
+            return (relevantValue != null ? relevantValue.Value : (double?)null);
+        }
+
+        public double? GetValue()
+        {
+            return (values.Count > 0 ? values[values.Count - 1].Value : (double?)null);
         }
     }
 }

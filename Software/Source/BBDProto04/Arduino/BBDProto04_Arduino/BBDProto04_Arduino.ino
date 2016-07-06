@@ -86,7 +86,7 @@ void setup() {
 	bitSet(UCSR0A, U2X0);     // change the UART speed divider from 16 to 8
 
 	// set the sensitivity to the default (valid range is 0-4096)
-	setDAC(4096);
+	setDAC(2048);
 
 	setChannel(0);
 	for (int i = 0; i < 256; i++)
@@ -109,13 +109,16 @@ void timerInterrupt(void)
 
 void loop() {
 	//sendBenchmarkFlag('a');
-	//j++;
-	//setLED(j/10, j/10 + 128, j/10 + 256, 5);
+	j++;
+	if (j > 512) j = 0;
+	setLED(j, j + 128, j + 256, 50);
 
 	for (int i = 0; i < 256; i++)
 	{
+		//setChannel(((i%16) * 16) + (i/16));
 		setChannel(i);
 		readADC(true);
+		//delay(1);
 	}
 	delay(60);
 	//sendBenchmarkFlag('f');
@@ -208,8 +211,8 @@ unsigned int readADC(bool storeValue)
 	// take the SS pin low to select the chip:
 	digitalWrite(pinSelectADC, LOW);
 
-	byte rx1 = SPI.transfer(0);
-	byte rx2 = SPI.transfer(0);
+	byte rx1 = SPI.transfer(0b10000000);
+	byte rx2 = SPI.transfer(0b00000000);
 
 	// take the SS pin high to de-select the chip:
 	digitalWrite(pinSelectADC, HIGH);
