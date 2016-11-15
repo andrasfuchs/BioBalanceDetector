@@ -75,7 +75,8 @@ namespace ArduinoMultiplexerServer
                 Console.WriteLine(String.Format("Arduino is not connected on port '{0}', creating random signal generator as data-source.", arduinoPort));
 
                 // Arduino is not connected, let's create a 64-channel 16bit, 8kHz pseudo-source of data                
-                waveSource = (RandomInput)WriteWaveFile(waveFilename, new RandomInput(64));
+                //waveSource = (RandomInput)WriteWaveFile(waveFilename, new RandomInput(64));
+                waveSource = (SineInput)WriteWaveFile(waveFilename, new SineInput(64));
             }
 
 
@@ -341,7 +342,7 @@ namespace ArduinoMultiplexerServer
 
         static string GetWaveFilename()
         {
-            string waveFilePath = @"c:\Work\BioBalanceDetector\Recordings\BBDProto04\";
+            string waveFilePath = @"c:\Work\BioBalanceDetector\Recordings\";
             string waveFilename = "";
             if (!String.IsNullOrEmpty(sessionId))
             {
