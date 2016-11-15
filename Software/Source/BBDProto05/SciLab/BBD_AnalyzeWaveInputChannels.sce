@@ -1,6 +1,7 @@
-[wavfilepath]="c:\Work\BioBalanceDetector\Recordings\BBDProto04\";
-[wavfilename]="BBD_20161115_023637_R1MU.wav";
+[wavfilepath]="c:\Work\BioBalanceDetector\Recordings\";
+[wavfilename]="BBD_20161115_041427_DA72.wav";
 
+// FFTs are most efficient if the number of samples, N, is a power of 2.
 [points]=8192;
 [rate]=8000;
 [fmax]=60;
@@ -20,10 +21,12 @@ function [fftvalues] = analyzeWav (w,fmin,fmax,rate,points)
     if ( rhs <= 1 ) then fmin=10;  end ;
     defaultrate=22050;
     if rate==0; rate=defaultrate; end;
-    v=w(1:points);      // v contains the selected portion of the data
-    f=abs(fft(v,1));    // f is the FFT-d v
+    v=w(1:points);              // v contains the selected portion of the data
+    //f=abs(fft(v,1));            // f is the FFT-d v (using CPU)
+    fGPU=gpuFFT(v,1);           // f is the FFT-d v (using OpenCL)
+    f=abs(gpuGetData(fGPU));    // we need to get the data from the GPU's memory
     i=fmin/rate*points:fmax/rate*points;    // i is the range of the x-axis
-    fr=i/points*rate;   // convert i to Hz for the x-axis
+    fr=i/points*rate;           // convert i to Hz for the x-axis
     plot2d(fr',f(i)',rect=[fmin,0,fmax,0.5]);  // display Hz on the x-axis, and the FFT value on the y-axis
     
     [fftvalues]=return(f);
