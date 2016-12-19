@@ -1,0 +1,36 @@
+{
+  "version": 2,
+  "exports": {
+    "BBDDriver/1.0.0": {
+      "type": "project",
+      "framework": ".NETFramework,Version=v4.6.2",
+      "compile": {
+        "bin/Debug/BBDDriver.dll": {}
+      },
+      "runtime": {
+        "../packages/Microsoft.AspNet.Cors.5.2.3/lib/net45/System.Web.Cors.dll": {},
+        "../packages/Microsoft.AspNet.Mvc.5.2.3/lib/net45/System.Web.Mvc.dll": {},
+        "../packages/Microsoft.AspNet.Razor.3.2.3/lib/net45/System.Web.Razor.dll": {},
+        "../packages/Microsoft.AspNet.WebApi.Client.5.2.3/lib/net45/System.Net.Http.Formatting.dll": {},
+        "../packages/Microsoft.AspNet.WebApi.Core.5.2.3/lib/net45/System.Web.Http.dll": {},
+        "../packages/Microsoft.AspNet.WebApi.Cors.5.2.3/lib/net45/System.Web.Http.Cors.dll": {},
+        "../packages/Microsoft.AspNet.WebApi.SelfHost.5.2.3/lib/net45/System.Web.Http.SelfHost.dll": {},
+        "../packages/Microsoft.AspNet.WebPages.3.2.3/lib/net45/System.Web.Helpers.dll": {},
+        "../packages/Microsoft.AspNet.WebPages.3.2.3/lib/net45/System.Web.WebPages.Deployment.dll": {},
+        "../packages/Microsoft.AspNet.WebPages.3.2.3/lib/net45/System.Web.WebPages.Razor.dll": {},
+        "../packages/Microsoft.AspNet.WebPages.3.2.3/lib/net45/System.Web.WebPages.dll": {},
+        "../packages/Microsoft.Web.Infrastructure.1.0.0.0/lib/net40/Microsoft.Web.Infrastructure.dll": {},
+        "../packages/NAudio.1.7.3/lib/net35/NAudio.dll": {},
+        "../packages/Newtonsoft.Json.9.0.1/lib/net45/Newtonsoft.Json.dll": {},
+        "bin/Debug/BBDDriver.dll": {}
+      },
+      "contentFiles": {
+        "bin/Debug/BBDDriver.pdb": {
+          "buildAction": "None",
+          "codeLanguage": "any",
+          "copyToOutput": true
+        }
+      }
+    }
+  }
+}

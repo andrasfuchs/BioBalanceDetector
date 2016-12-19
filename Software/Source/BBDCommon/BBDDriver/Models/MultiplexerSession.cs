@@ -1,10 +1,11 @@
-﻿using System;
+﻿using BBDDriver.Models.Input;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ArduinoMultiplexerServer
+namespace BBDDriver.Models
 {
     public class MultiplexerSession
     {
@@ -23,9 +24,9 @@ namespace ArduinoMultiplexerServer
             }
         }
 
-        private List<ADCChannel> channelList;
+        private List<IDataChannel> channelList;
 
-        public List<ADCChannel> ChannelList
+        public List<IDataChannel> ChannelList
         {
             get
             {
@@ -35,11 +36,11 @@ namespace ArduinoMultiplexerServer
 
         public MultiplexerSession()
         {
-            channelList = new List<ADCChannel>();
+            channelList = new List<IDataChannel>();
 
             for (int i=0; i<64; i++)
             {
-                channelList.Add(new ADCChannel { ADCChannelId = i, BitRate = 16, SamplesPerSecond = 1000 });
+                channelList.Add(new ADCChannel(1000, 1024*1024) { ADCChannelId = i, BitRate = 16 });
             }
         }
 

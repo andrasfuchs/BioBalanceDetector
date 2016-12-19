@@ -15,298 +15,169 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NAudio.Wave;
 using System.IO;
+using BBDDriver.Models.Input;
+using BBDDriver.Models.Output;
+using BBDDriver.Models;
+using System.Diagnostics;
 
-namespace ArduinoMultiplexerServer
+namespace BBDDriver
 {
-    class Program
+    public class Program
     {
-        private static string selfHostedServerUrl = "http://localhost:8080";
+        private static string workingDirectory = @"c:\Work\BioBalanceDetector\Recordings\";
+
         private static string arduinoPort = "COM3";
 
-        //private static ushort[] valueBuffer = new ushort[655360];
-        private static string sessionId;
-
-        private static double?[] recentValues;
+        private static float[,,] recentValues;
         private static double recentChangesSensitivity = 1.00;
 
         private static DateTime firstActivity;
 
-        private static HttpClient selfHostedClient;
-
-        private static MultiChannelInput waveSource = null;
-        private static WaveFileWriter waveFile = null;
+        private static MultiChannelInput<IDataChannel> waveSource = null;
         private static long waveFileBytesWritten = 0;
 
+        private static string sessionId;
 
-        static void Main(string[] args)
+        public static string SessionId
         {
-            // let's start our self-hosted server
-            HttpSelfHostServer server = ConfigureServer(selfHostedServerUrl);
-            var serverSession = server.OpenAsync();
+            get
+            {
+                if (sessionId == null)
+                {
+                    sessionId = "BBD_" + DateTime.UtcNow.ToString("yyyyMMdd_HHmmss_") + RandomString(4);
+                }
 
+                return sessionId;
+            }
+        }
 
-            // initialize the client side
-            selfHostedClient = InitializeClient(selfHostedServerUrl);
-
+        public static void StartSession()
+        {
+            Console.SetOut(File.AppendText($"{workingDirectory}{SessionId}.log"));
 
             try
             {
-                serverSession.Wait();
-            }
-            catch
-            {
-                Console.WriteLine("You must have administrator privileges to run the web server.");
-                Console.ReadLine();
-                return;
-            }
-
-
-
-
-
-            string waveFilename = GetWaveFilename();
-
-            try
-            {
-                waveSource = (BBDInput)WriteWaveFile(waveFilename, new BBDInput(arduinoPort, 64));
+                waveSource = new BBDArduinoInput(arduinoPort, 64);
             }
             catch (System.IO.IOException)
             {
                 Console.WriteLine(String.Format("Arduino is not connected on port '{0}', creating random signal generator as data-source.", arduinoPort));
 
                 // Arduino is not connected, let's create a 64-channel 16bit, 8kHz pseudo-source of data                
-                //waveSource = (RandomInput)WriteWaveFile(waveFilename, new RandomInput(64));
-                waveSource = (SineInput)WriteWaveFile(waveFilename, new SineInput(64));
+                waveSource = new SineInput(8000, 4);
             }
 
+            WaveFileOutput wfo = new WaveFileOutput(waveSource, $"{workingDirectory}{SessionId}.wav");
+            wfo.DataWritten += Wfo_DataWritten;
 
-
-            System.Timers.Timer printMatrixTimer = new System.Timers.Timer(100);
-            printMatrixTimer.Elapsed += PrintMatrixTimer_Elapsed;
-            printMatrixTimer.Start();
-
-
-
-
-            if (waveSource != null)
-            {
-                waveSource.StartRecording();
-            }
+            VisualOutput vo = new VisualOutput(waveSource, 25, waveSource.ChannelCount);
+            vo.RefreshVisualOutput += Vo_RefreshVisualOutput;
 
             firstActivity = DateTime.UtcNow;
-            Console.WriteLine("Press any key to quit");
-            Console.ReadLine();
-
-            if (waveSource != null)
-            {
-                waveSource.StopRecording();
-                waveSource.Dispose();
-            }
         }
 
-        private static void PrintMatrixTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        private static void Wfo_DataWritten(object sender, DataWrittenEventArgs e)
         {
-            PrintValueMatrix();
+            waveFileBytesWritten = e.TotalDataWritten;
         }
 
-        static HttpSelfHostServer ConfigureServer(string serverUrl)
-        {
-            // set up the server side
-            var config = new HttpSelfHostConfiguration(serverUrl);
-            // Attribute routing
-            config.MapHttpAttributeRoutes();
-
-            // Convention-based routing
-            config.Routes.MapHttpRoute(
-                "API Default", "api/{controller}/{id}",
-                new { id = RouteParameter.Optional });
-
-            // set the default WebAPI format to JSON
-            config.Formatters.JsonFormatter.SupportedMediaTypes.Add(new MediaTypeHeaderValue("text/html"));
-
-            // enable Cross Origin Resource Sharing
-            config.EnableCors();
-
-            return new HttpSelfHostServer(config);
-        }
-
-        static HttpClient InitializeClient(string serverUrl)
-        {
-            HttpClient client = new HttpClient();
-
-            client.BaseAddress = new Uri(selfHostedServerUrl);
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-            // test the server if it's working properly
-            try
-            {
-                var response = client.GetAsync("api/test").Result;
-            }
-            catch
-            {
-                Console.WriteLine(String.Format("Could not communicate with '{0}', web server is not running.", selfHostedServerUrl));
-            }
-
-
-            if (sessionId == null)
-            {
-                var response = client.GetAsync("api/channels/createsession").Result;
-                response.EnsureSuccessStatusCode();
-
-                sessionId = JsonConvert.DeserializeObject<string>(response.Content.ReadAsStringAsync().Result);
-            }
-
-            return client;
-        }
-
-        static IWaveIn WriteWaveFile(string waveFilename, IWaveIn waveSource)
-        {
-            waveSource.DataAvailable += new EventHandler<WaveInEventArgs>(waveSource_DataAvailable);
-            waveSource.RecordingStopped += new EventHandler<StoppedEventArgs>(waveSource_RecordingStopped);
-
-            waveFile = new WaveFileWriter(waveFilename, waveSource.WaveFormat);
-
-            return waveSource;
-        }
-
-        static void waveSource_DataAvailable(object sender, WaveInEventArgs e)
-        {
-            if (waveFile != null)
-            {
-                lock (waveFile)
-                {
-                    waveFile.Write(e.Buffer, 0, e.BytesRecorded);
-                    waveFile.Flush();
-
-                    waveFileBytesWritten += e.BytesRecorded;
-                }
-            }
-        }
-
-        static void waveSource_RecordingStopped(object sender, StoppedEventArgs e)
-        {
-            if (waveFile != null)
-            {
-                lock (waveFile)
-                {
-                    waveFile.Dispose();
-                    waveFile = null;
-                }
-            }
-        }
-
-        static async void PrintValueMatrix()
+        private static void Vo_RefreshVisualOutput(object sender, RefreshVisualOutputEventArgs e)
         {
             try
             {
-                //var response = await selfHostedClient.GetAsync("api/channels/getvalues/" + sessionId + "/" + new TimeSpan(0, 0, 3).ToString());
+                if (!e.ChangedSinceLastRefresh) return;
 
-                //var jsonString = response.Content.ReadAsStringAsync();
-                //jsonString.Wait();
-
-                //ADCChannelValue[] values = JsonConvert.DeserializeObject<ADCChannelValue[]>(jsonString.Result);
-                double?[] values = waveSource.GetValues();
-
-                lock (sessionId)
+                lock (SessionId)
                 {
-                    if (recentValues != null)
-                    {
-                        bool isChanged = false;
-
-                        for (int i = 0; i < values.Length; i++)
-                        {
-                            if (values[i] != recentValues[i])
-                            {
-                                isChanged = true;
-                                break;
-                            }
-                        }
-
-                        if (!isChanged) return;
-                    }
-
-
-                    string[] valueStrings = new string[8 * 8];
-
+                    string[,,] valueStrings = new string[e.Dimensions[0], e.Dimensions[1], e.Dimensions[2]];
                     double sum = 0;
+
                     int equalsCount = 0;
 
-                    for (int i = 0; i < 8; i++)
+                    for (int z = 0; z < e.Dimensions[2]; z++)
                     {
-                        for (int j = 0; j < 8; j++)
+                        for (int y = 0; y < e.Dimensions[1]; y++)
                         {
-                            double? value = values[i * 8 + j];
-
-                            // A, show values
-                            valueStrings[i * 8 + j] = value == null ? "-.---" : value.Value.ToString("0.00");
-
-
-                            // B, show changes
-                            if (recentValues != null)
+                            for (int x = 0; x < e.Dimensions[0]; x++)
                             {
-                                if ((values[i * 8 + j] == null) || (recentValues[i * 8 + j] == null))
+                                float value = e.Values[x, y, z];
+
+                                // A, show values
+                                valueStrings[x, y, z] = value.ToString("0.00");
+
+                                
+                                // B, show changes
+                                if (recentValues != null)
                                 {
-                                    valueStrings[i * 8 + j] = "o";
+                                    if ((e.Values[x,y,z] == 0) || (recentValues[x, y, z] == 0))
+                                    {
+                                        valueStrings[x, y, z] = "o";
+                                    }
+                                    else
+                                    {
+                                        float diff = e.Values[x, y, z] - recentValues[x, y, z];
+
+                                        if (diff > recentChangesSensitivity * recentChangesSensitivity * recentChangesSensitivity)
+                                        {
+                                            valueStrings[x, y, z] = "+++";
+                                        }
+                                        else if (diff > recentChangesSensitivity * recentChangesSensitivity)
+                                        {
+                                            valueStrings[x, y, z] = "++";
+                                        }
+                                        else if (diff > recentChangesSensitivity)
+                                        {
+                                            valueStrings[x, y, z] = "+";
+                                        }
+
+                                        if (diff < -recentChangesSensitivity)
+                                        {
+                                            valueStrings[x, y, z] = "-";
+                                        }
+                                        else if (diff < -recentChangesSensitivity * recentChangesSensitivity)
+                                        {
+                                            valueStrings[x, y, z] = "--";
+                                        }
+                                        else if (diff < -recentChangesSensitivity * recentChangesSensitivity * recentChangesSensitivity)
+                                        {
+                                            valueStrings[x, y, z] = "---";
+                                        }
+
+                                        if ((diff > -recentChangesSensitivity) && (diff < recentChangesSensitivity))
+                                        {
+                                            valueStrings[x, y, z] = "";
+                                            equalsCount++;
+                                        }
+                                    }
                                 }
-                                else
-                                {
-                                    double diff = values[i * 8 + j].Value - recentValues[i * 8 + j].Value;
 
-                                    if (diff > recentChangesSensitivity * recentChangesSensitivity * recentChangesSensitivity)
-                                    {
-                                        valueStrings[i * 8 + j] = "+++";
-                                    }
-                                    else if (diff > recentChangesSensitivity * recentChangesSensitivity)
-                                    {
-                                        valueStrings[i * 8 + j] = "++";
-                                    }
-                                    else if (diff > recentChangesSensitivity)
-                                    {
-                                        valueStrings[i * 8 + j] = "+";
-                                    }
-
-                                    if (diff < -recentChangesSensitivity)
-                                    {
-                                        valueStrings[i * 8 + j] = "-";
-                                    }
-                                    else if (diff < -recentChangesSensitivity * recentChangesSensitivity)
-                                    {
-                                        valueStrings[i * 8 + j] = "--";
-                                    }
-                                    else if (diff < -recentChangesSensitivity * recentChangesSensitivity * recentChangesSensitivity)
-                                    {
-                                        valueStrings[i * 8 + j] = "---";
-                                    }
-
-                                    if ((diff > -recentChangesSensitivity) && (diff < recentChangesSensitivity))
-                                    {
-                                        valueStrings[i * 8 + j] = "";
-                                        equalsCount++;
-                                    }
-                                }
+                                sum += value;
                             }
-
-                            sum += (value == null ? 0 : value.Value);
                         }
                     }
 
-                    sum /= 64;
+                    sum /= e.Dimensions[0] * e.Dimensions[1] * e.Dimensions[2];
 
                     Console.WriteLine();
-                    for (int i = 0; i < 8; i++)
+                    for (int z = 0; z < e.Dimensions[2]; z++)
                     {
-                        Console.WriteLine(
-                            String.Format("|{0,5}|{1,5}|{2,5}|{3,5}|{4,5}|{5,5}|{6,5}|{7,5}|",
-                                valueStrings[i * 8 + 0], valueStrings[i * 8 + 1], valueStrings[i * 8 + 2], valueStrings[i * 8 + 3], valueStrings[i * 8 + 4], valueStrings[i * 8 + 5], valueStrings[i * 8 + 6], valueStrings[i * 8 + 7])
-                            );
+                        Console.WriteLine($"---- layer {z} ----");
+                        for (int y = 0; y < e.Dimensions[1]; y++)
+                        {
+                            Console.Write("|");
+                            for (int x = 0; x < e.Dimensions[0]; x++)
+                            {
+                                Console.Write(String.Format("{0,5}|", valueStrings[x,y,z]));
+                            }
+                            Console.WriteLine();
+                        }
                     }
 
-
                     double timeElapsed = (DateTime.UtcNow - firstActivity).TotalSeconds;
-                    Console.Title = $"{sessionId} - sum: {sum.ToString("0.000")}";
-                    if (waveSource is BBDInput)
+                    Console.Title = $"{SessionId} - sum: {sum.ToString("0.000")}";
+                    if (waveSource is BBDArduinoInput)
                     {
-                        BBDInput bbdInput = (BBDInput)waveSource;
+                        BBDArduinoInput bbdInput = (BBDArduinoInput)waveSource;
 
                         Console.Title += $" - {(bbdInput.COMPortBytesReceived / timeElapsed / 1024).ToString("0.00")} kbytes/sec - {((double)bbdInput.LLCommandReceived / timeElapsed).ToString("0.00")} fps";
                     }
@@ -318,7 +189,7 @@ namespace ArduinoMultiplexerServer
 
 
                     // comment this line to disable the feature
-                    //recentValues = values;
+                    //recentValues = e.Values;
                     if (equalsCount > 60)
                     {
                         recentChangesSensitivity /= 2.0;
@@ -340,26 +211,13 @@ namespace ArduinoMultiplexerServer
             }
         }
 
-        static string GetWaveFilename()
+        private static string RandomString(int length)
         {
-            string waveFilePath = @"c:\Work\BioBalanceDetector\Recordings\";
-            string waveFilename = "";
-            if (!String.IsNullOrEmpty(sessionId))
-            {
-                waveFilename = waveFilePath + sessionId + ".wav";
-            }
-            else
-            {
-                int i = 1;
-                while (File.Exists(waveFilePath + "BBD_" + i.ToString("0000") + ".wav"))
-                {
-                    i++;
-                }
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
-                waveFilename = waveFilePath + "BBD_" + i.ToString("0000") + ".wav";
-            }
-
-            return waveFilename;
+            var random = new Random();
+            return new string(Enumerable.Repeat(chars, length)
+              .Select(s => s[random.Next(s.Length)]).ToArray());
         }
     }
 }
