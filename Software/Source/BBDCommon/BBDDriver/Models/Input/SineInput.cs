@@ -14,6 +14,21 @@ namespace BBDDriver.Models.Input
             {
                 this.SetChannel(i, new SineChannel(samplesPerSecond, i*10, (i+5)*10, 5.0f));
             }
+
+            //this.channels[0].DataChanged += SineInput_DataChanged;
+            //this.channels[0].DataRead += SineInput_DataRead;
         }
+
+        /*
+        private void SineInput_DataRead(object sender, DataChangedEventArgs e)
+        {
+            Console.WriteLine($"R: {e.Channel} {e.Position} {e.DataCount}");
+        }
+
+        private void SineInput_DataChanged(object sender, DataChangedEventArgs e)
+        {
+            Console.WriteLine($"W: {e.Channel} {e.Position} {e.DataCount} {DateTime.UtcNow.Second}.{DateTime.UtcNow.Millisecond.ToString("000")}");
+        }
+        */
     }
 }

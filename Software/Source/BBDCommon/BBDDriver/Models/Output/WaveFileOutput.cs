@@ -49,38 +49,38 @@ namespace BBDDriver.Models.Output
 
         private void WriteDataToBuffer(object sender, AllChannelsDataChangedEventArgs e)
         {
+            foreach (var cdc in e.DataChanges)
+            {
+                if (cdc == null) continue;
+
+                if (changedChannels.Add(cdc.Channel.ChannelId))
+                {
+                    channelDataChanges.Add(new DataChangedEventArgs(cdc.Channel, cdc.Position, cdc.DataCount));
+                }
+                else
+                {
+                    var channelDataChange = channelDataChanges.Find(dc => dc.Channel.ChannelId == cdc.Channel.ChannelId);
+                    channelDataChange.Position = cdc.Position;
+                    channelDataChange.DataCount += cdc.DataCount;
+                }
+            }
+
+            int channelDataChangeCount = channelDataChanges.Min(dc => dc.DataCount);
+
+            float[][] dataToWrite = new float[channelDataChanges.Count][];
+
+            for (int i = 0; i < channelDataChanges.Count; i++)
+            {
+                var cdc = channelDataChanges[i];
+                int channelPosition = cdc.Position - (cdc.DataCount - channelDataChangeCount);
+
+                dataToWrite[i] = cdc.Channel.GetData(channelDataChangeCount, channelPosition);
+
+                cdc.DataCount -= channelDataChangeCount;
+            }
+
             lock (buffer)
             {
-                foreach (var cdc in e.DataChanges)
-                {
-                    if (cdc == null) continue;
-
-                    if (changedChannels.Add(cdc.Channel.ChannelId))
-                    {
-                        channelDataChanges.Add(new DataChangedEventArgs(cdc.Channel, cdc.NewBufferPosition, cdc.NewDataCount));
-                    }
-                    else
-                    {
-                        var channelDataChange = channelDataChanges.Find(dc => dc.Channel.ChannelId == cdc.Channel.ChannelId);
-                        channelDataChange.NewBufferPosition = cdc.NewBufferPosition;
-                        channelDataChange.NewDataCount += cdc.NewDataCount;
-                    }
-                }
-
-                int channelDataChangeCount = channelDataChanges.Min(dc => dc.NewDataCount);
-
-                float[][] dataToWrite = new float[channelDataChanges.Count][];
-
-                for (int i=0; i< channelDataChanges.Count; i++)
-                {
-                    var cdc = channelDataChanges[i];
-                    int channelPosition = cdc.NewBufferPosition - (cdc.NewDataCount - channelDataChangeCount);
-
-                    dataToWrite[i] = cdc.Channel.GetData(channelDataChangeCount, channelPosition);
-
-                    cdc.NewDataCount -= channelDataChangeCount;
-                }
-
                 for (int j = 0; j < channelDataChangeCount; j++)
                 {
                     for (int i = 0; i < channelDataChanges.Count; i++)
@@ -93,22 +93,22 @@ namespace BBDDriver.Models.Output
 
         private void WriteDataFromBuffer(object stateInfo)
         {
+            byte[] dataToWrite = null;
             lock (buffer)
             {
                 if (buffer.Count == 0) return;
-
-                waveWriter.Seek(0, SeekOrigin.End);
-
-                waveWriter.Write(buffer.ToArray(), 0, buffer.Count);
-                waveWriter.Flush();
-                bytesWritten += buffer.Count;
-
-                DataWritten?.Invoke(this, new DataWrittenEventArgs(waveFile.Name, buffer.Count, bytesWritten));
-
+                dataToWrite = buffer.ToArray();
                 buffer.Clear();
-
-                UpdateHeader(this.bytesWritten);
             }
+
+            waveWriter.Seek(0, SeekOrigin.End);
+
+            waveWriter.Write(dataToWrite, 0, dataToWrite.Length);
+            bytesWritten += dataToWrite.Length;
+
+            DataWritten?.Invoke(this, new DataWrittenEventArgs(waveFile.Name, dataToWrite.Length, bytesWritten));
+
+            UpdateHeader(this.bytesWritten);
         }
 
         private void WriteHeader(int samplesPerSecond, int bitsPerSample, int channelCount)

@@ -14,7 +14,8 @@ namespace BBDDriver.Models.Input
     public class SineChannel : SinglePrecisionDataChannel
     {
         private const double phaseReset = 2 * Math.PI;
-        private DateTime startTimeUtc = DateTime.UtcNow;
+        private DateTime startTimeUtc = DateTime.MinValue;
+        private DateTime lastGenerationTimeUtc = DateTime.MinValue;
 
         private int interval = 0;
         private Timer newDataGeneretedTimer;
@@ -38,20 +39,32 @@ namespace BBDDriver.Models.Input
 
         public override float[] GetData(int sampleCount, int? position = null)
         {
-            int readPosition = (position.HasValue ? position.Value : (int)((DateTime.UtcNow - startTimeUtc).TotalSeconds * this.SamplesPerSecond) % this.BufferSize);
+            if (startTimeUtc == DateTime.MinValue) return new float[sampleCount];
+
+            int readPosition = (position.HasValue ? position.Value : this.BufferPosition);
 
             return base.GetData(sampleCount, readPosition);
         }
 
         private void DataGenerated(object stateInfo)
         {
+            int newBufferPosition = 0;
+
+            if (startTimeUtc == DateTime.MinValue)
+            {
+                startTimeUtc = DateTime.UtcNow;
+                lastGenerationTimeUtc = DateTime.UtcNow;
+            }
+            int newDataCount = (int)(this.SamplesPerSecond * (DateTime.UtcNow - lastGenerationTimeUtc).TotalSeconds);
+
             lock (this.Data)
             {
-                int newDataCount = (this.SamplesPerSecond * interval) / 1000;
                 this.BufferPosition = (this.BufferPosition + newDataCount) % this.BufferSize;
-
-                OnDataChanged(new DataChangedEventArgs(this, this.BufferPosition, newDataCount));
+                newBufferPosition = this.BufferPosition;
+                lastGenerationTimeUtc = DateTime.UtcNow;
             }
+
+            OnDataChanged(new DataChangedEventArgs(this, newBufferPosition, newDataCount));
         }
     }
 }

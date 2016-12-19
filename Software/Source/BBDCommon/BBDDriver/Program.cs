@@ -54,17 +54,17 @@ namespace BBDDriver
         public static void StartSession()
         {
             Console.SetOut(File.AppendText($"{workingDirectory}{SessionId}.log"));
+            Console.WriteLine($"Session '{SessionId}' starts at {DateTime.Now} ({DateTime.UtcNow} UTC)");
 
             try
             {
+                Console.WriteLine($"Arduino is connected on port '{arduinoPort}', expecting 8x8 Matrix as data-source.");
                 waveSource = new BBDArduinoInput(arduinoPort, 64);
             }
             catch (System.IO.IOException)
             {
-                Console.WriteLine(String.Format("Arduino is not connected on port '{0}', creating random signal generator as data-source.", arduinoPort));
-
-                // Arduino is not connected, let's create a 64-channel 16bit, 8kHz pseudo-source of data                
-                waveSource = new SineInput(8000, 4);
+                Console.WriteLine($"Arduino is not connected on port '{arduinoPort}', creating 8kHz 8ch sine signal generator as data-source.");
+                waveSource = new SineInput(8000, 8);
             }
 
             WaveFileOutput wfo = new WaveFileOutput(waveSource, $"{workingDirectory}{SessionId}.wav");
@@ -174,7 +174,7 @@ namespace BBDDriver
                     }
 
                     double timeElapsed = (DateTime.UtcNow - firstActivity).TotalSeconds;
-                    Console.Title = $"{SessionId} - sum: {sum.ToString("0.000")}";
+                    Console.Title = $"{SessionId} - sum: {sum.ToString("  0.000;-0.000")}";
                     if (waveSource is BBDArduinoInput)
                     {
                         BBDArduinoInput bbdInput = (BBDArduinoInput)waveSource;

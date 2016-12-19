@@ -12,14 +12,14 @@ namespace BBDDriver.Models
     public class DataChangedEventArgs : EventArgs
     {
         public IDataChannel Channel;
-        public int NewBufferPosition;
-        public int NewDataCount;
+        public int Position;
+        public int DataCount;
 
         public DataChangedEventArgs(IDataChannel channel, int newBufferPosition, int newDataCount)
         {
             this.Channel = channel;
-            this.NewBufferPosition = newBufferPosition;
-            this.NewDataCount = newDataCount;
+            this.Position = newBufferPosition;
+            this.DataCount = newDataCount;
         }
     }
 }

@@ -58,21 +58,25 @@ namespace BBDDriver.Models.Input
             int index = Array.IndexOf(channels, e.Channel);
             if (index < 0) throw new ArgumentOutOfRangeException("channel", "The channel passed to the multichannel input's datachanged event is not part of that multichannel input.");
 
-            if (changedChannels.Add(e.Channel.ChannelId))
+            lock (changedChannels)
             {
-                channelDataChanges[index] = new DataChangedEventArgs(e.Channel, e.NewBufferPosition, e.NewDataCount);
-            } else
-            {
-                channelDataChanges[index].NewBufferPosition = e.NewBufferPosition;
-                channelDataChanges[index].NewDataCount += e.NewDataCount;
-            }
+                if (changedChannels.Add(e.Channel.ChannelId))
+                {
+                    channelDataChanges[index] = new DataChangedEventArgs(e.Channel, e.Position, e.DataCount);
+                }
+                else
+                {
+                    channelDataChanges[index].Position = e.Position;
+                    channelDataChanges[index].DataCount += e.DataCount;
+                }
 
-            if (changedChannels.Count == channels.Length)
-            {
-                AllChannelsDataChanged?.Invoke(this, new AllChannelsDataChangedEventArgs(channelDataChanges));
+                if (changedChannels.Count == channels.Length)
+                {
+                    AllChannelsDataChanged?.Invoke(this, new AllChannelsDataChangedEventArgs(channelDataChanges));
 
-                changedChannels.Clear();
-                channelDataChanges = new DataChangedEventArgs[this.ChannelCount];
+                    changedChannels.Clear();
+                    channelDataChanges = new DataChangedEventArgs[this.ChannelCount];
+                }
             }
         }
 

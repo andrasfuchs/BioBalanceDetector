@@ -13,6 +13,7 @@ namespace BBDDriver.Models.Input
         int SamplesPerSecond { get; }
 
         event DataChangedEventHandler DataChanged;
+        event DataChangedEventHandler DataRead;
 
         float[] GetData(int sampleCount, int? position = null);
     }

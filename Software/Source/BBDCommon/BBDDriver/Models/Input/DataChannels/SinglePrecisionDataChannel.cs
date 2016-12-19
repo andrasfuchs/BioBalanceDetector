@@ -43,6 +43,7 @@ namespace BBDDriver.Models.Input
         public float[] Quality { get; protected set; }
 
         public event DataChangedEventHandler DataChanged;
+        public event DataChangedEventHandler DataRead;
 
         public SinglePrecisionDataChannel(int samplesPerSecond, int bufferSize)
         {
@@ -120,6 +121,8 @@ namespace BBDDriver.Models.Input
                 {
                     Array.Copy(this.Data, BufferSize - firstSegmentDataCount, result, result.Length - secondSegmentDataCount - firstSegmentDataCount, firstSegmentDataCount);
                 }
+
+                DataRead?.Invoke(this, new DataChangedEventArgs(this, readRosition, dataCount));
             }
 
             return result;
