@@ -37,6 +37,14 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Kitware.mummy.Runtime, Version=1.0.2.599, Culture=neutral, PublicKeyToken=995c7fb9db2c1b44, processorArchitecture=AMD64">
+      <HintPath>..\packages\Activiz.NET.x64.5.8.0\lib\net20\Kitware.mummy.Runtime.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Kitware.VTK, Version=5.8.0.607, Culture=neutral, PublicKeyToken=995c7fb9db2c1b44, processorArchitecture=AMD64">
+      <HintPath>..\packages\Activiz.NET.x64.5.8.0\lib\net20\Kitware.VTK.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
       <Private>True</Private>
@@ -106,22 +114,23 @@
     <Compile Include="Helpers\HighResolutionTimer.cs" />
     <Compile Include="Models\AllChannelsDataChangedEventArgs.cs" />
     <Compile Include="Models\DataWrittenEventArgs.cs" />
+    <Compile Include="Models\Output\FileOutput.cs" />
     <Compile Include="Models\RefreshVisualOutputEventArgs.cs" />
     <Compile Include="Models\DataChangedEventArgs.cs" />
-    <Compile Include="Models\Input\DataChannels\ADCChannel.cs" />
+    <Compile Include="Models\Source\DataChannels\ADCChannel.cs" />
     <Compile Include="Models\ADCChannelValue.cs" />
-    <Compile Include="Models\Input\BBDArduinoInput.cs" />
-    <Compile Include="Models\Input\IDataChannel.cs" />
-    <Compile Include="Models\Input\MultiChannelInput.cs" />
+    <Compile Include="Models\Source\Inputs\BBDArduinoInput.cs" />
+    <Compile Include="Models\Source\IDataChannel.cs" />
+    <Compile Include="Models\Source\Inputs\MultiChannelInput.cs" />
     <Compile Include="Models\Mapper\ChannelMapper.cs" />
     <Compile Include="Models\MultiplexerSession.cs" />
-    <Compile Include="Models\Input\SineInput.cs" />
-    <Compile Include="Models\Input\DataChannels\SineChannel.cs" />
+    <Compile Include="Models\Source\Inputs\SineInput.cs" />
+    <Compile Include="Models\Source\DataChannels\SineChannel.cs" />
     <Compile Include="Models\Output\VisualOutput.cs" />
     <Compile Include="Models\Output\WaveFileOutput.cs" />
     <Compile Include="Models\SerialCommand.cs" />
     <Compile Include="Models\SessionsCache.cs" />
-    <Compile Include="Models\Input\DataChannels\SinglePrecisionDataChannel.cs" />
+    <Compile Include="Models\Source\DataChannels\SinglePrecisionDataChannel.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -132,7 +141,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Models\Processor\" />
+    <Folder Include="Models\Filter\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

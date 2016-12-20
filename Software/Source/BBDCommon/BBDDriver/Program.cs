@@ -34,6 +34,9 @@ namespace BBDDriver
         private static DateTime firstActivity;
 
         private static MultiChannelInput<IDataChannel> waveSource = null;
+
+        private static WaveFileOutput wfo;
+        private static int dataOverflowWarningCount = 0;
         private static long waveFileBytesWritten = 0;
 
         private static string sessionId;
@@ -63,11 +66,11 @@ namespace BBDDriver
             }
             catch (System.IO.IOException)
             {
-                Console.WriteLine($"Arduino is not connected on port '{arduinoPort}', creating 8kHz 8ch sine signal generator as data-source.");
-                waveSource = new SineInput(8000, 8);
+                Console.WriteLine($"Arduino is not connected on port '{arduinoPort}', creating 8kHz 64ch sine signal generator as data-source.");
+                waveSource = new SineInput(8000, 64);
             }
 
-            WaveFileOutput wfo = new WaveFileOutput(waveSource, $"{workingDirectory}{SessionId}.wav");
+            wfo = new WaveFileOutput(waveSource, $"{workingDirectory}{SessionId}.wav");
             wfo.DataWritten += Wfo_DataWritten;
 
             VisualOutput vo = new VisualOutput(waveSource, 25, waveSource.ChannelCount);
@@ -79,6 +82,7 @@ namespace BBDDriver
         private static void Wfo_DataWritten(object sender, DataWrittenEventArgs e)
         {
             waveFileBytesWritten = e.TotalDataWritten;
+            dataOverflowWarningCount = e.DataOverflowWarningCount;
         }
 
         private static void Vo_RefreshVisualOutput(object sender, RefreshVisualOutputEventArgs e)
@@ -174,18 +178,23 @@ namespace BBDDriver
                     }
 
                     double timeElapsed = (DateTime.UtcNow - firstActivity).TotalSeconds;
-                    Console.Title = $"{SessionId} - sum: {sum.ToString("  0.000;-0.000")}";
+                    string consoleTitle = $"{SessionId} - sum: {sum.ToString("  0.000;-0.000")}";
                     if (waveSource is BBDArduinoInput)
                     {
                         BBDArduinoInput bbdInput = (BBDArduinoInput)waveSource;
 
-                        Console.Title += $" - {(bbdInput.COMPortBytesReceived / timeElapsed / 1024).ToString("0.00")} kbytes/sec - {((double)bbdInput.LLCommandReceived / timeElapsed).ToString("0.00")} fps";
+                        consoleTitle += $" - {(bbdInput.COMPortBytesReceived / timeElapsed / 1024).ToString("0.00")} kbytes/sec - {((double)bbdInput.LLCommandReceived / timeElapsed).ToString("0.00")} fps";
                     }
                     if (recentValues != null)
                     {
-                        Console.Title += $" - sensibility { recentChangesSensitivity.ToString("0.0000")}";
+                        consoleTitle += $" - sensibility { recentChangesSensitivity.ToString("0.0000")}";
                     }
-                    Console.Title += $" - wav file: {(waveFileBytesWritten / 1024).ToString("#,0")} kbytes";
+
+                    if (wfo != null)
+                    {
+                        consoleTitle += $" - wav file: {(waveFileBytesWritten / 1024).ToString("#,0")} kbytes (jitter: {wfo.BufferJitter} samples, overflow warnings: {wfo.DataOverflowWarningCount})";
+                    }
+                    Console.Title = consoleTitle;
 
 
                     // comment this line to disable the feature

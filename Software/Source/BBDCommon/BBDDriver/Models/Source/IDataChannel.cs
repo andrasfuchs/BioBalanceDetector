@@ -12,6 +12,8 @@ namespace BBDDriver.Models.Input
 
         int SamplesPerSecond { get; }
 
+        int BufferSize { get; }
+
         event DataChangedEventHandler DataChanged;
         event DataChangedEventHandler DataRead;
 
