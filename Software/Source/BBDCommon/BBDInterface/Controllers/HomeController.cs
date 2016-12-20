@@ -13,17 +13,18 @@ namespace BBDInterface.Controllers
             return View();
         }
 
-        public IActionResult About()
+        public IActionResult Remote()
         {
-            ViewData["Message"] = "Your application description page.";
+            return View();
+        }
 
+        public IActionResult Settings()
+        {
             return View();
         }
 
         public IActionResult Contact()
         {
-            ViewData["Message"] = "Your contact page.";
-
             return View();
         }
 
