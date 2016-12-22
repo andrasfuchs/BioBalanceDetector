@@ -12,20 +12,21 @@ namespace BBDDriver.Models.Output
 {
     public class WaveFileOutput : FileOutput
     {
+        private FileStream waveFileStream;
         private BinaryWriter waveWriter;
 
         public WaveFileOutput(MultiChannelInput<IDataChannel> mci, string path) : base(mci, path)
         {
-            this.waveWriter = new BinaryWriter(waveFile);
+            this.waveFileStream = new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.ReadWrite);
+            this.waveWriter = new BinaryWriter(waveFileStream);
             WriteHeader(mci.SamplesPerSecond, 16, mci.ChannelCount);            
         }
 
-        public new void Dispose()
+        public override void Dispose()
         {
             UpdateHeader(bytesWritten);
-            waveWriter.Close();
-
-            base.Dispose();
+            this.waveWriter.Close();
+            this.waveFileStream.Close();
         }
 
 

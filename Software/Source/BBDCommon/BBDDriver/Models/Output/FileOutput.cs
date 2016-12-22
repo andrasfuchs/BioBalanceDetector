@@ -1,5 +1,4 @@
 ﻿using BBDDriver.Models.Input;
-using NAudio.Wave;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,8 +15,7 @@ namespace BBDDriver.Models.Output
         private int latencyMs = 40;           // this means that the file will be written every 40ms (effectively 25fps)
         private Timer dataWriterTimer;        // this thread calles the DataWriter event handler
 
-        protected FileStream waveFile;
-
+        protected string filename;
         protected long bytesWritten;
         private int smallestBufferSize;
 
@@ -34,9 +32,7 @@ namespace BBDDriver.Models.Output
 
         public FileOutput(MultiChannelInput<IDataChannel> mci, string path)
         {
-
-            this.waveFile = new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.ReadWrite);
-
+            this.filename = path;
             this.changedChannels = new HashSet<int>();
             this.channelDataChanges = new List<Models.DataChangedEventArgs>();
             mci.AllChannelsDataChanged += WriteDataToBuffer;
@@ -44,9 +40,8 @@ namespace BBDDriver.Models.Output
             dataWriterTimer = new Timer(WriteDataFromBuffer, this, 0, latencyMs);
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
-            waveFile.Close();
         }
 
         private void WriteDataToBuffer(object sender, AllChannelsDataChangedEventArgs e)
@@ -112,7 +107,7 @@ namespace BBDDriver.Models.Output
 
             AppendData(dataToWrite);
 
-            DataWritten?.Invoke(this, new DataWrittenEventArgs(waveFile.Name, dataToWrite.Length, bytesWritten, this.DataOverflowWarningCount));
+            DataWritten?.Invoke(this, new DataWrittenEventArgs(filename, dataToWrite.Length, bytesWritten, this.DataOverflowWarningCount));
         }
 
         protected virtual byte[] ConvertData(float data)
