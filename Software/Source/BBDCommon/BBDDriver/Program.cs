@@ -13,7 +13,6 @@ using System.Net.Http.Headers;
 using System.Threading;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using NAudio.Wave;
 using System.IO;
 using BBDDriver.Models.Input;
 using BBDDriver.Models.Output;

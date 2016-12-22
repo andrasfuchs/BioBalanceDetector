@@ -42,14 +42,14 @@ namespace BBDDriver.Models.Output
             vtkFieldData fieldData = vtkFieldData.New();
 
             vtkRectilinearGrid grid = vtkRectilinearGrid.New();
-            grid.SetFieldData();
+            //grid.SetFieldData();
             polydata.SetPoints(points);
 
             vtkWriter.SetInput(polydata);
 
             vtkWriter.Write();
 
-            bytesWritten += points.Length * 3 * 4;      // 3x 64-bit double
+            //bytesWritten += points.Length * 3 * 4;      // 3x 64-bit double
         }
 
         protected override byte[] ConvertData(float data)
