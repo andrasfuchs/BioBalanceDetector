@@ -1,0 +1,518 @@
+<ParaView>
+  <ServerManagerState version="4.1.0">
+    <Proxy group="animation" type="AnimationScene" id="263" servers="16">
+      <Property name="AnimationTime" id="263.AnimationTime" number_of_elements="1">
+        <Element index="0" value="0"/>
+      </Property>
+      <Property name="Caching" id="263.Caching" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="bool" id="263.Caching.bool"/>
+      </Property>
+      <Property name="Cues" id="263.Cues" number_of_elements="1">
+        <Proxy value="264"/>
+        <Domain name="groups" id="263.Cues.groups"/>
+      </Property>
+      <Property name="Duration" id="263.Duration" number_of_elements="1">
+        <Element index="0" value="10"/>
+      </Property>
+      <Property name="EndTime" id="263.EndTime" number_of_elements="1">
+        <Element index="0" value="1"/>
+      </Property>
+      <Property name="EndTimeInfo" id="263.EndTimeInfo" number_of_elements="1">
+        <Element index="0" value="1"/>
+      </Property>
+      <Property name="FramesPerTimestep" id="263.FramesPerTimestep" number_of_elements="1">
+        <Element index="0" value="1"/>
+        <Domain name="range" id="263.FramesPerTimestep.range"/>
+      </Property>
+      <Property name="GoToFirst" id="263.GoToFirst"/>
+      <Property name="GoToLast" id="263.GoToLast"/>
+      <Property name="GoToNext" id="263.GoToNext"/>
+      <Property name="GoToPrevious" id="263.GoToPrevious"/>
+      <Property name="LockEndTime" id="263.LockEndTime" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="bool" id="263.LockEndTime.bool"/>
+      </Property>
+      <Property name="LockStartTime" id="263.LockStartTime" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="bool" id="263.LockStartTime.bool"/>
+      </Property>
+      <Property name="Loop" id="263.Loop" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="bool" id="263.Loop.bool"/>
+      </Property>
+      <Property name="NumberOfFrames" id="263.NumberOfFrames" number_of_elements="1">
+        <Element index="0" value="10"/>
+        <Domain name="range" id="263.NumberOfFrames.range"/>
+      </Property>
+      <Property name="Play" id="263.Play"/>
+      <Property name="PlayMode" id="263.PlayMode" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="enum" id="263.PlayMode.enum">
+          <Entry value="0" text="Sequence"/>
+          <Entry value="1" text="Real Time"/>
+          <Entry value="2" text="Snap To TimeSteps"/>
+        </Domain>
+      </Property>
+      <Property name="StartTime" id="263.StartTime" number_of_elements="1">
+        <Element index="0" value="0"/>
+      </Property>
+      <Property name="StartTimeInfo" id="263.StartTimeInfo" number_of_elements="1">
+        <Element index="0" value="0"/>
+      </Property>
+      <Property name="Stop" id="263.Stop"/>
+      <Property name="TimeKeeper" id="263.TimeKeeper" number_of_elements="1">
+        <Proxy value="257"/>
+      </Property>
+      <Property name="ViewModules" id="263.ViewModules" number_of_elements="1">
+        <Proxy value="4367"/>
+        <Domain name="groups" id="263.ViewModules.groups"/>
+      </Property>
+    </Proxy>
+    <Proxy group="animation" type="TimeAnimationCue" id="264" servers="16">
+      <Property name="AnimatedDomainName" id="264.AnimatedDomainName" number_of_elements="1">
+        <Element index="0" value=""/>
+      </Property>
+      <Property name="AnimatedElement" id="264.AnimatedElement" number_of_elements="1">
+        <Element index="0" value="0"/>
+      </Property>
+      <Property name="AnimatedPropertyName" id="264.AnimatedPropertyName" number_of_elements="1">
+        <Element index="0" value="Time"/>
+      </Property>
+      <Property name="AnimatedProxy" id="264.AnimatedProxy" number_of_elements="1">
+        <Proxy value="257"/>
+        <Domain name="groups" id="264.AnimatedProxy.groups"/>
+      </Property>
+      <Property name="Enabled" id="264.Enabled" number_of_elements="1">
+        <Element index="0" value="1"/>
+        <Domain name="bool" id="264.Enabled.bool"/>
+      </Property>
+      <Property name="EndTime" id="264.EndTime" number_of_elements="1">
+        <Element index="0" value="1"/>
+      </Property>
+      <Property name="KeyFrames" id="264.KeyFrames">
+        <Domain name="groups" id="264.KeyFrames.groups"/>
+      </Property>
+      <Property name="LastAddedKeyFrameIndex" id="264.LastAddedKeyFrameIndex" number_of_elements="1">
+        <Element index="0" value="0"/>
+      </Property>
+      <Property name="StartTime" id="264.StartTime" number_of_elements="1">
+        <Element index="0" value="0"/>
+      </Property>
+      <Property name="TimeMode" id="264.TimeMode" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="enum" id="264.TimeMode.enum">
+          <Entry value="0" text="Normalized"/>
+          <Entry value="1" text="Relative"/>
+        </Domain>
+      </Property>
+      <Property name="UseAnimationTime" id="264.UseAnimationTime" number_of_elements="1">
+        <Element index="0" value="1"/>
+        <Domain name="bool" id="264.UseAnimationTime.bool"/>
+      </Property>
+    </Proxy>
+    <Proxy group="misc" type="ViewLayout" id="4386" servers="16">
+      <Layout number_of_elements="1">
+        <Item direction="0" fraction="0.5" view="4367"/>
+      </Layout>
+    </Proxy>
+    <Proxy group="misc" type="RepresentationAnimationHelper" id="4363" servers="16">
+      <Property name="Source" id="4363.Source" number_of_elements="1">
+        <Proxy value="4255"/>
+      </Property>
+    </Proxy>
+    <Proxy group="sources" type="ConeSource" id="4255" servers="1">
+      <Property name="Capping" id="4255.Capping" number_of_elements="1">
+        <Element index="0" value="1"/>
+        <Domain name="bool" id="4255.Capping.bool"/>
+      </Property>
+      <Property name="Center" id="4255.Center" number_of_elements="3">
+        <Element index="0" value="0"/>
+        <Element index="1" value="0"/>
+        <Element index="2" value="0"/>
+        <Domain name="range" id="4255.Center.range"/>
+      </Property>
+      <Property name="Direction" id="4255.Direction" number_of_elements="3">
+        <Element index="0" value="1"/>
+        <Element index="1" value="0"/>
+        <Element index="2" value="0"/>
+        <Domain name="range" id="4255.Direction.range"/>
+      </Property>
+      <Property name="Height" id="4255.Height" number_of_elements="1">
+        <Element index="0" value="1"/>
+        <Domain name="range" id="4255.Height.range"/>
+      </Property>
+      <Property name="Radius" id="4255.Radius" number_of_elements="1">
+        <Element index="0" value="0.5"/>
+        <Domain name="range" id="4255.Radius.range"/>
+      </Property>
+      <Property name="Resolution" id="4255.Resolution" number_of_elements="1">
+        <Element index="0" value="100"/>
+        <Domain name="range" id="4255.Resolution.range"/>
+      </Property>
+    </Proxy>
+    <Proxy group="misc" type="TimeKeeper" id="257" servers="16">
+      <Property name="Time" id="257.Time" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="range" id="257.Time.range"/>
+      </Property>
+      <Property name="TimeLabel" id="257.TimeLabel" number_of_elements="1">
+        <Element index="0" value="Time"/>
+      </Property>
+      <Property name="TimeRange" id="257.TimeRange" number_of_elements="2">
+        <Element index="0" value="0"/>
+        <Element index="1" value="0"/>
+      </Property>
+      <Property name="TimeSources" id="257.TimeSources"/>
+      <Property name="TimestepValues" id="257.TimestepValues"/>
+      <Property name="Views" id="257.Views" number_of_elements="1">
+        <Proxy value="4367"/>
+      </Property>
+    </Proxy>
+    <Proxy group="views" type="RenderView" id="4367" servers="21">
+      <Property name="AlphaBitPlanes" id="4367.AlphaBitPlanes" number_of_elements="1">
+        <Element index="0" value="1"/>
+        <Domain name="bool" id="4367.AlphaBitPlanes.bool"/>
+      </Property>
+      <Property name="BackLightAzimuth" id="4367.BackLightAzimuth" number_of_elements="1">
+        <Element index="0" value="110"/>
+        <Domain name="range" id="4367.BackLightAzimuth.range"/>
+      </Property>
+      <Property name="BackLightElevation" id="4367.BackLightElevation" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="range" id="4367.BackLightElevation.range"/>
+      </Property>
+      <Property name="BackLightK:B Ratio" id="4367.BackLightK:B Ratio" number_of_elements="1">
+        <Element index="0" value="3.5"/>
+        <Domain name="range" id="4367.BackLightK:B Ratio.range"/>
+      </Property>
+      <Property name="BackLightWarmth" id="4367.BackLightWarmth" number_of_elements="1">
+        <Element index="0" value="0.5"/>
+        <Domain name="range" id="4367.BackLightWarmth.range"/>
+      </Property>
+      <Property name="Background" id="4367.Background" number_of_elements="3">
+        <Element index="0" value="0.0156863"/>
+        <Element index="1" value="0.0156863"/>
+        <Element index="2" value="0.0156863"/>
+        <Domain name="range" id="4367.Background.range"/>
+      </Property>
+      <Property name="Background2" id="4367.Background2" number_of_elements="3">
+        <Element index="0" value="0"/>
+        <Element index="1" value="0"/>
+        <Element index="2" value="0.165"/>
+        <Domain name="range" id="4367.Background2.range"/>
+      </Property>
+      <Property name="BackgroundTexture" id="4367.BackgroundTexture">
+        <Domain name="groups" id="4367.BackgroundTexture.groups"/>
+      </Property>
+      <Property name="CacheKey" id="4367.CacheKey" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="range" id="4367.CacheKey.range"/>
+      </Property>
+      <Property name="CenterAxesVisibility" id="4367.CenterAxesVisibility" number_of_elements="1">
+        <Element index="0" value="1"/>
+        <Domain name="bool" id="4367.CenterAxesVisibility.bool"/>
+      </Property>
+      <Property name="CenterOfRotation" id="4367.CenterOfRotation" number_of_elements="3">
+        <Element index="0" value="0"/>
+        <Element index="1" value="0"/>
+        <Element index="2" value="0"/>
+      </Property>
+      <Property name="CollectGeometryThreshold" id="4367.CollectGeometryThreshold" number_of_elements="1">
+        <Element index="0" value="100"/>
+      </Property>
+      <Property name="CompressorConfig" id="4367.CompressorConfig" number_of_elements="1">
+        <Element index="0" value="vtkSquirtCompressor 0 3"/>
+      </Property>
+      <Property name="DepthPeeling" id="4367.DepthPeeling" number_of_elements="1">
+        <Element index="0" value="1"/>
+        <Domain name="bool" id="4367.DepthPeeling.bool"/>
+      </Property>
+      <Property name="FillLightAzimuth" id="4367.FillLightAzimuth" number_of_elements="1">
+        <Element index="0" value="-10"/>
+        <Domain name="range" id="4367.FillLightAzimuth.range"/>
+      </Property>
+      <Property name="FillLightElevation" id="4367.FillLightElevation" number_of_elements="1">
+        <Element index="0" value="-75"/>
+        <Domain name="range" id="4367.FillLightElevation.range"/>
+      </Property>
+      <Property name="FillLightK:F Ratio" id="4367.FillLightK:F Ratio" number_of_elements="1">
+        <Element index="0" value="3"/>
+        <Domain name="range" id="4367.FillLightK:F Ratio.range"/>
+      </Property>
+      <Property name="FillLightWarmth" id="4367.FillLightWarmth" number_of_elements="1">
+        <Element index="0" value="0.4"/>
+        <Domain name="range" id="4367.FillLightWarmth.range"/>
+      </Property>
+      <Property name="HeadLightK:H Ratio" id="4367.HeadLightK:H Ratio" number_of_elements="1">
+        <Element index="0" value="3"/>
+        <Domain name="range" id="4367.HeadLightK:H Ratio.range"/>
+      </Property>
+      <Property name="HeadLightWarmth" id="4367.HeadLightWarmth" number_of_elements="1">
+        <Element index="0" value="0.5"/>
+        <Domain name="range" id="4367.HeadLightWarmth.range"/>
+      </Property>
+      <Property name="ImageReductionFactor" id="4367.ImageReductionFactor" number_of_elements="1">
+        <Element index="0" value="2"/>
+        <Domain name="range" id="4367.ImageReductionFactor.range"/>
+      </Property>
+      <Property name="InteractionMode" id="4367.InteractionMode" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="enum" id="4367.InteractionMode.enum">
+          <Entry value="0" text="3D"/>
+          <Entry value="1" text="2D"/>
+          <Entry value="2" text="Selection"/>
+        </Domain>
+      </Property>
+      <Property name="KeyLightAzimuth" id="4367.KeyLightAzimuth" number_of_elements="1">
+        <Element index="0" value="10"/>
+        <Domain name="range" id="4367.KeyLightAzimuth.range"/>
+      </Property>
+      <Property name="KeyLightElevation" id="4367.KeyLightElevation" number_of_elements="1">
+        <Element index="0" value="50"/>
+        <Domain name="range" id="4367.KeyLightElevation.range"/>
+      </Property>
+      <Property name="KeyLightIntensity" id="4367.KeyLightIntensity" number_of_elements="1">
+        <Element index="0" value="0.75"/>
+        <Domain name="range" id="4367.KeyLightIntensity.range"/>
+      </Property>
+      <Property name="KeyLightWarmth" id="4367.KeyLightWarmth" number_of_elements="1">
+        <Element index="0" value="0.6"/>
+        <Domain name="range" id="4367.KeyLightWarmth.range"/>
+      </Property>
+      <Property name="LODResolution" id="4367.LODResolution" number_of_elements="1">
+        <Element index="0" value="50"/>
+        <Domain name="range" id="4367.LODResolution.range"/>
+      </Property>
+      <Property name="LODThreshold" id="4367.LODThreshold" number_of_elements="1">
+        <Element index="0" value="5"/>
+        <Domain name="range" id="4367.LODThreshold.range"/>
+      </Property>
+      <Property name="LightAmbientColor" id="4367.LightAmbientColor" number_of_elements="3">
+        <Element index="0" value="1"/>
+        <Element index="1" value="1"/>
+        <Element index="2" value="1"/>
+        <Domain name="range" id="4367.LightAmbientColor.range"/>
+      </Property>
+      <Property name="LightDiffuseColor" id="4367.LightDiffuseColor" number_of_elements="3">
+        <Element index="0" value="1"/>
+        <Element index="1" value="1"/>
+        <Element index="2" value="1"/>
+        <Domain name="range" id="4367.LightDiffuseColor.range"/>
+      </Property>
+      <Property name="LightIntensity" id="4367.LightIntensity" number_of_elements="1">
+        <Element index="0" value="1"/>
+        <Domain name="range" id="4367.LightIntensity.range"/>
+      </Property>
+      <Property name="LightSpecularColor" id="4367.LightSpecularColor" number_of_elements="3">
+        <Element index="0" value="1"/>
+        <Element index="1" value="1"/>
+        <Element index="2" value="1"/>
+        <Domain name="range" id="4367.LightSpecularColor.range"/>
+      </Property>
+      <Property name="LightSwitch" id="4367.LightSwitch" number_of_elements="1">
+        <Element index="0" value="1"/>
+        <Domain name="bool" id="4367.LightSwitch.bool"/>
+      </Property>
+      <Property name="LightType" id="4367.LightType" number_of_elements="1">
+        <Element index="0" value="1"/>
+        <Domain name="enum" id="4367.LightType.enum">
+          <Entry value="1" text="HeadLight"/>
+          <Entry value="2" text="CameraLight"/>
+          <Entry value="3" text="SceneLight"/>
+        </Domain>
+      </Property>
+      <Property name="MaintainLuminance" id="4367.MaintainLuminance" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="bool" id="4367.MaintainLuminance.bool"/>
+      </Property>
+      <Property name="MaximumNumberOfPeels" id="4367.MaximumNumberOfPeels" number_of_elements="1">
+        <Element index="0" value="4"/>
+        <Domain name="range" id="4367.MaximumNumberOfPeels.range"/>
+      </Property>
+      <Property name="MultiSamples" id="4367.MultiSamples" number_of_elements="1">
+        <Element index="0" value="0"/>
+      </Property>
+      <Property name="NonInteractiveRenderDelay" id="4367.NonInteractiveRenderDelay" number_of_elements="1">
+        <Element index="0" value="0"/>
+      </Property>
+      <Property name="OrientationAxesInteractivity" id="4367.OrientationAxesInteractivity" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="bool" id="4367.OrientationAxesInteractivity.bool"/>
+      </Property>
+      <Property name="OrientationAxesLabelColor" id="4367.OrientationAxesLabelColor" number_of_elements="3">
+        <Element index="0" value="1"/>
+        <Element index="1" value="1"/>
+        <Element index="2" value="1"/>
+      </Property>
+      <Property name="OrientationAxesOutlineColor" id="4367.OrientationAxesOutlineColor" number_of_elements="3">
+        <Element index="0" value="1"/>
+        <Element index="1" value="1"/>
+        <Element index="2" value="1"/>
+      </Property>
+      <Property name="OrientationAxesVisibility" id="4367.OrientationAxesVisibility" number_of_elements="1">
+        <Element index="0" value="1"/>
+        <Domain name="bool" id="4367.OrientationAxesVisibility.bool"/>
+      </Property>
+      <Property name="RemoteRenderThreshold" id="4367.RemoteRenderThreshold" number_of_elements="1">
+        <Element index="0" value="20"/>
+        <Domain name="range" id="4367.RemoteRenderThreshold.range"/>
+      </Property>
+      <Property name="Representations" id="4367.Representations"/>
+      <Property name="ResetCamera" id="4367.ResetCamera"/>
+      <Property name="StencilCapable" id="4367.StencilCapable" number_of_elements="1">
+        <Element index="0" value="1"/>
+        <Domain name="bool" id="4367.StencilCapable.bool"/>
+      </Property>
+      <Property name="StereoCapableWindow" id="4367.StereoCapableWindow" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="bool" id="4367.StereoCapableWindow.bool"/>
+      </Property>
+      <Property name="StereoRender" id="4367.StereoRender" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="bool" id="4367.StereoRender.bool"/>
+      </Property>
+      <Property name="StereoType" id="4367.StereoType" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="enum" id="4367.StereoType.enum">
+          <Entry value="1" text="Crystal Eyes"/>
+          <Entry value="2" text="Red-Blue"/>
+          <Entry value="3" text="Interlaced"/>
+          <Entry value="4" text="Left"/>
+          <Entry value="5" text="Right"/>
+          <Entry value="6" text="Dresden"/>
+          <Entry value="7" text="Anaglyph"/>
+          <Entry value="8" text="Checkerboard"/>
+          <Entry value="9" text="SplitViewportHorizontal"/>
+        </Domain>
+      </Property>
+      <Property name="StillRenderImageReductionFactor" id="4367.StillRenderImageReductionFactor" number_of_elements="1">
+        <Element index="0" value="1"/>
+        <Domain name="range" id="4367.StillRenderImageReductionFactor.range"/>
+      </Property>
+      <Property name="UseCache" id="4367.UseCache" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="bool" id="4367.UseCache.bool"/>
+      </Property>
+      <Property name="UseGradientBackground" id="4367.UseGradientBackground" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="bool" id="4367.UseGradientBackground.bool"/>
+      </Property>
+      <Property name="UseInteractiveRenderingForSceenshots" id="4367.UseInteractiveRenderingForSceenshots" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="bool" id="4367.UseInteractiveRenderingForSceenshots.bool"/>
+      </Property>
+      <Property name="UseLight" id="4367.UseLight" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="bool" id="4367.UseLight.bool"/>
+      </Property>
+      <Property name="UseOffscreenRendering" id="4367.UseOffscreenRendering" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="bool" id="4367.UseOffscreenRendering.bool"/>
+      </Property>
+      <Property name="UseOffscreenRenderingForScreenshots" id="4367.UseOffscreenRenderingForScreenshots" number_of_elements="1">
+        <Element index="0" value="1"/>
+        <Domain name="bool" id="4367.UseOffscreenRenderingForScreenshots.bool"/>
+      </Property>
+      <Property name="UseOutlineForLODRendering" id="4367.UseOutlineForLODRendering" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="bool" id="4367.UseOutlineForLODRendering.bool"/>
+      </Property>
+      <Property name="UseTexturedBackground" id="4367.UseTexturedBackground" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="bool" id="4367.UseTexturedBackground.bool"/>
+      </Property>
+      <Property name="ViewPosition" id="4367.ViewPosition" number_of_elements="2">
+        <Element index="0" value="0"/>
+        <Element index="1" value="0"/>
+      </Property>
+      <Property name="ViewSize" id="4367.ViewSize" number_of_elements="2">
+        <Element index="0" value="1629"/>
+        <Element index="1" value="816"/>
+      </Property>
+      <Property name="ViewTime" id="4367.ViewTime" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="range" id="4367.ViewTime.range"/>
+      </Property>
+      <Property name="CameraClippingRange" id="4367.CameraClippingRange" number_of_elements="2">
+        <Element index="0" value="4.6352087"/>
+        <Element index="1" value="9.29751195"/>
+      </Property>
+      <Property name="CameraClippingRangeInfo" id="4367.CameraClippingRangeInfo" number_of_elements="2">
+        <Element index="0" value="4.6352087"/>
+        <Element index="1" value="9.29751195"/>
+      </Property>
+      <Property name="CameraFocalPoint" id="4367.CameraFocalPoint" number_of_elements="3">
+        <Element index="0" value="0"/>
+        <Element index="1" value="0"/>
+        <Element index="2" value="0"/>
+      </Property>
+      <Property name="CameraFocalPointInfo" id="4367.CameraFocalPointInfo" number_of_elements="3">
+        <Element index="0" value="0"/>
+        <Element index="1" value="0"/>
+        <Element index="2" value="0"/>
+      </Property>
+      <Property name="CameraParallelProjection" id="4367.CameraParallelProjection" number_of_elements="1">
+        <Element index="0" value="0"/>
+        <Domain name="bool" id="4367.CameraParallelProjection.bool"/>
+      </Property>
+      <Property name="CameraParallelScale" id="4367.CameraParallelScale" number_of_elements="1">
+        <Element index="0" value="1.73205"/>
+      </Property>
+      <Property name="CameraParallelScaleInfo" id="4367.CameraParallelScaleInfo" number_of_elements="1">
+        <Element index="0" value="1.73205"/>
+      </Property>
+      <Property name="CameraPosition" id="4367.CameraPosition" number_of_elements="3">
+        <Element index="0" value="0"/>
+        <Element index="1" value="0"/>
+        <Element index="2" value="6.69213"/>
+      </Property>
+      <Property name="CameraPositionInfo" id="4367.CameraPositionInfo" number_of_elements="3">
+        <Element index="0" value="0"/>
+        <Element index="1" value="0"/>
+        <Element index="2" value="6.69213"/>
+      </Property>
+      <Property name="CameraViewAngle" id="4367.CameraViewAngle" number_of_elements="1">
+        <Element index="0" value="30"/>
+      </Property>
+      <Property name="CameraViewUp" id="4367.CameraViewUp" number_of_elements="3">
+        <Element index="0" value="0"/>
+        <Element index="1" value="1"/>
+        <Element index="2" value="0"/>
+      </Property>
+      <Property name="CameraViewUpInfo" id="4367.CameraViewUpInfo" number_of_elements="3">
+        <Element index="0" value="0"/>
+        <Element index="1" value="1"/>
+        <Element index="2" value="0"/>
+      </Property>
+      <Property name="EyeAngle" id="4367.EyeAngle" number_of_elements="1">
+        <Element index="0" value="2"/>
+        <Domain name="range" id="4367.EyeAngle.range"/>
+      </Property>
+    </Proxy>
+    <ProxyCollection name="animation">
+      <Item id="263" name="AnimationScene1"/>
+      <Item id="264" name="TimeAnimationCue1"/>
+    </ProxyCollection>
+    <ProxyCollection name="layouts">
+      <Item id="4386" name="ViewLayout1"/>
+    </ProxyCollection>
+    <ProxyCollection name="pq_helper_proxies.4255">
+      <Item id="4363" name="RepresentationAnimationHelper"/>
+    </ProxyCollection>
+    <ProxyCollection name="sources">
+      <Item id="4255" name="Cone1"/>
+    </ProxyCollection>
+    <ProxyCollection name="timekeeper">
+      <Item id="257" name="TimeKeeper"/>
+    </ProxyCollection>
+    <ProxyCollection name="views">
+      <Item id="4367" name="RenderView1"/>
+    </ProxyCollection>
+    <CustomProxyDefinitions/>
+    <Links/>
+    <GlobalPropertiesManagers>
+      <GlobalPropertiesManager group="misc" type="GlobalProperties" name="ParaViewProperties"/>
+    </GlobalPropertiesManagers>
+  </ServerManagerState>
+</ParaView>
