@@ -11,11 +11,13 @@ namespace BBDDriver.Models.Output
 {
     public class FileOutput : IDisposable
     {
-        private List<byte> buffer = new List<byte>();
         private int latencyMs = 40;           // this means that the file will be written every 40ms (effectively 25fps)
         private Timer dataWriterTimer;        // this thread calles the DataWriter event handler
 
+        protected string directory;
         protected string filename;
+        protected string extension;
+
         protected long bytesWritten;
         private int smallestBufferSize;
 
@@ -26,16 +28,20 @@ namespace BBDDriver.Models.Output
         private const float fileWriteThreshold = 0.25f;      // if the amount of data to be written is less then the 50% of smallest buffer then we keep going, we don't need to write it just yet
 
         private HashSet<int> changedChannels;
-        private List<DataChangedEventArgs> channelDataChanges;
+        protected List<DataChangedEventArgs> channelDataChanges;
 
         public event DataWrittenEventHandler DataWritten;
 
         public FileOutput(MultiChannelInput<IDataChannel> mci, string path)
         {
-            this.filename = path;
+            this.directory = Path.GetDirectoryName(path);
+            this.filename = Path.GetFileNameWithoutExtension(path);
+            this.extension = Path.GetExtension(path);
+
             this.changedChannels = new HashSet<int>();
             this.channelDataChanges = new List<Models.DataChangedEventArgs>();
-            mci.AllChannelsDataChanged += WriteDataToBuffer;
+
+            mci.AllChannelsDataChanged += AllDataChanged;
 
             dataWriterTimer = new Timer(WriteDataFromBuffer, this, 0, latencyMs);
         }
@@ -44,7 +50,7 @@ namespace BBDDriver.Models.Output
         {
         }
 
-        private void WriteDataToBuffer(object sender, AllChannelsDataChangedEventArgs e)
+        private void AllDataChanged(object sender, AllChannelsDataChangedEventArgs e)
         {
             foreach (var cdc in e.DataChanges)
             {
@@ -83,31 +89,17 @@ namespace BBDDriver.Models.Output
                 cdc.DataCount -= channelDataCanBeWrittenCount;
             }
 
-            lock (buffer)
-            {
-                for (int j = 0; j < channelDataCanBeWrittenCount; j++)
-                {
-                    for (int i = 0; i < channelDataChanges.Count; i++)
-                    {
-                        buffer.AddRange(ConvertData(dataToWrite[i][j]));
-                    }
-                }
-            }
+            WriteDataToBuffer(dataToWrite, channelDataCanBeWrittenCount);
         }
 
-        private void WriteDataFromBuffer(object stateInfo)
+        protected virtual void WriteDataToBuffer(float[][] dataToWrite, int dataCount)
         {
-            byte[] dataToWrite = null;
-            lock (buffer)
-            {
-                if (buffer.Count == 0) return;
-                dataToWrite = buffer.ToArray();
-                buffer.Clear();
-            }
+            throw new NotImplementedException();
+        }
 
-            AppendData(dataToWrite);
-
-            DataWritten?.Invoke(this, new DataWrittenEventArgs(filename, dataToWrite.Length, bytesWritten, this.DataOverflowWarningCount));
+        protected virtual void WriteDataFromBuffer(object stateInfo)
+        {
+            throw new NotImplementedException();
         }
 
         protected virtual byte[] ConvertData(float data)
@@ -115,9 +107,10 @@ namespace BBDDriver.Models.Output
             return BitConverter.GetBytes(data);
         }
 
-        protected virtual void AppendData(byte[] dataToWrite)
+        protected virtual void OnDataWritten(object sender, DataWrittenEventArgs e)
         {
-            throw new NotImplementedException();
+            DataWritten?.Invoke(sender, e);
         }
+
     }
 }

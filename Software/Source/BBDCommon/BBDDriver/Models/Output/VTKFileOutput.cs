@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using Kitware.VTK;
 
 namespace BBDDriver.Models.Output
@@ -13,43 +11,62 @@ namespace BBDDriver.Models.Output
     public class VTKFileOutput : FileOutput
     {
         private vtkRectilinearGridWriter vtkWriter;
+        private vtkXMLStructuredGridWriter vtkXMLWriter;
+
+        private vtkStructuredGrid structuredGrid;
         private vtkPoints points;
 
         public VTKFileOutput(MultiChannelInput<IDataChannel> mci, string path, bool asciiMode = false) : base(mci, path)
         {
-            vtkWriter = vtkRectilinearGridWriter.New();
-            vtkWriter.SetFileName(path);
-            vtkWriter.SetFileTypeToBinary();
-
+            structuredGrid = vtkStructuredGrid.New();
             points = vtkPoints.New();
+
+            vtkWriter = vtkRectilinearGridWriter.New();
+            vtkWriter.SetFileName(directory + filename + ".vtk");
+            vtkWriter.SetFileTypeToASCII();
+            //vtkWriter.SetFileTypeToBinary();
+            vtkWriter.SetInput(structuredGrid);
+
+            vtkXMLWriter = vtkXMLStructuredGridWriter.New();
+            vtkXMLWriter.SetFileName(directory + filename + ".vts");
+            vtkXMLWriter.SetInput(structuredGrid);
         }
 
-        public new void Dispose()
+        protected override void WriteDataToBuffer(float[][] dataToWrite, int dataCount)
         {
-            base.Dispose();
-        }
+            if (vtkXMLWriter == null) return;
 
+            // reader
+            vtkXMLStructuredGridReader reader = vtkXMLStructuredGridReader.New();
+            reader.SetFileName(@"c:\Work\BioBalanceDetector\Tools\ParaView\2008 Workshop on Scientific Visualization\Data\subset.vts");
+            reader.Update(); // here we read the file actually
 
-        protected override void AppendData(byte[] dataToWrite)
-        {
+            structuredGrid = reader.GetOutput();
+
+            // Create a grid
             points.InsertNextPoint(0, 0, 0);
-            points.InsertNextPoint(0, 0, 1);
             points.InsertNextPoint(1, 0, 0);
             points.InsertNextPoint(0, 1, 0);
+            points.InsertNextPoint(1, 1, 0);
+            points.InsertNextPoint(0, 2, 0);
+            points.InsertNextPoint(1, 2, 1);
 
-            // Create a polydata object and add the points to it.
-            vtkPolyData polydata = vtkPolyData.New();
-            vtkFieldData fieldData = vtkFieldData.New();
+            // Specify the dimensions of the grid
+            structuredGrid.SetDimensions(2, 3, 1);
+            structuredGrid.SetPoints(points);
 
-            vtkRectilinearGrid grid = vtkRectilinearGrid.New();
-            //grid.SetFieldData();
-            polydata.SetPoints(points);
+            //vtkFieldData data = vtkFieldData.New();
+            //structuredGrid.SetFieldData();
 
-            vtkWriter.SetInput(polydata);
-
-            vtkWriter.Write();
 
             //bytesWritten += points.Length * 3 * 4;      // 3x 64-bit double
+        }
+
+        protected override void WriteDataFromBuffer(object stateInfo)
+        {
+            if (vtkXMLWriter == null) return;
+
+            vtkXMLWriter.Write();
         }
 
         protected override byte[] ConvertData(float data)

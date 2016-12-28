@@ -35,6 +35,7 @@ namespace BBDDriver
         private static MultiChannelInput<IDataChannel> waveSource = null;
 
         private static WaveFileOutput wfo;
+        private static VTKFileOutput vtkfo;
         private static int dataOverflowWarningCount = 0;
         private static long waveFileBytesWritten = 0;
 
@@ -56,7 +57,7 @@ namespace BBDDriver
         public static void StartSession()
         {
             Console.SetOut(File.AppendText($"{workingDirectory}{SessionId}.log"));
-            Console.WriteLine($"Session '{SessionId}' starts at {DateTime.Now} ({DateTime.UtcNow} UTC)");
+            Console.WriteLine($"Session '{SessionId}' starts at {DateTime.Now.ToString("yyyy-MM-dd HH\\:mm\\:sszzz")} ({DateTime.UtcNow.ToString("yyyy-MM-dd HH\\:mm\\:ss")} UTC)");
 
             try
             {
@@ -69,8 +70,11 @@ namespace BBDDriver
                 waveSource = new SineInput(8000, 64);
             }
 
-            wfo = new WaveFileOutput(waveSource, $"{workingDirectory}{SessionId}.wav");
-            wfo.DataWritten += Wfo_DataWritten;
+            //wfo = new WaveFileOutput(waveSource, $"{workingDirectory}{SessionId}.wav");
+            //wfo.DataWritten += Wfo_DataWritten;
+
+            vtkfo = new VTKFileOutput(waveSource, $"{workingDirectory}{SessionId}.vts");
+            vtkfo.DataWritten += Wfo_DataWritten;
 
             VisualOutput vo = new VisualOutput(waveSource, 25, waveSource.ChannelCount);
             vo.RefreshVisualOutput += Vo_RefreshVisualOutput;

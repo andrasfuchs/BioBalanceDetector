@@ -9,14 +9,14 @@ using System.Threading.Tasks;
 
 namespace BBDDriver.Models.Output
 {
-    public class WaveFileOutput : FileOutput
+    public class WaveFileOutput : BinaryFileOutput
     {
         private FileStream waveFileStream;
         private BinaryWriter waveWriter;
 
         public WaveFileOutput(MultiChannelInput<IDataChannel> mci, string path) : base(mci, path)
         {
-            this.waveFileStream = new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.ReadWrite);
+            this.waveFileStream = new FileStream(directory + filename + ".wav", FileMode.Append, FileAccess.Write, FileShare.ReadWrite);
             this.waveWriter = new BinaryWriter(waveFileStream);
             WriteHeader(mci.SamplesPerSecond, 16, mci.ChannelCount);            
         }

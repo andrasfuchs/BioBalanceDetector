@@ -111,6 +111,7 @@
     <Compile Include="Models\AllChannelsDataChangedEventArgs.cs" />
     <Compile Include="Models\DataWrittenEventArgs.cs" />
     <Compile Include="Models\Output\FileOutput.cs" />
+    <Compile Include="Models\Output\BinaryFileOutput.cs" />
     <Compile Include="Models\Output\VTKFileOutput.cs" />
     <Compile Include="Models\RefreshVisualOutputEventArgs.cs" />
     <Compile Include="Models\DataChangedEventArgs.cs" />
