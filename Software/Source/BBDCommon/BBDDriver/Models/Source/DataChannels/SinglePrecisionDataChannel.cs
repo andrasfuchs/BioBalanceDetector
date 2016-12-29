@@ -60,6 +60,11 @@ namespace BBDDriver.Models.Input
             this.Quality = new float[bufferSize];
         }
 
+        public void AppendData(float[] data)
+        {
+            AppendData(data, null, null, null);
+        }
+
         public virtual void AppendData(float[] data, string[] labels = null, DateTime[] timeStamps = null, float[] quality = null)
         {
             int oldBufferPosition = this.BufferPosition;

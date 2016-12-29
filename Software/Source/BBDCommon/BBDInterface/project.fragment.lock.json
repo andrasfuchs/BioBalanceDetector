@@ -10,6 +10,7 @@
       "runtime": {
         "../packages/Activiz.NET.x64.5.8.0/lib/net20/Kitware.VTK.dll": {},
         "../packages/Activiz.NET.x64.5.8.0/lib/net20/Kitware.mummy.Runtime.dll": {},
+        "../packages/FFTW.3.3.5/fftwlib.dll": {},
         "../packages/Microsoft.AspNet.Cors.5.2.3/lib/net45/System.Web.Cors.dll": {},
         "../packages/Microsoft.AspNet.Mvc.5.2.3/lib/net45/System.Web.Mvc.dll": {},
         "../packages/Microsoft.AspNet.Razor.3.2.3/lib/net45/System.Web.Razor.dll": {},

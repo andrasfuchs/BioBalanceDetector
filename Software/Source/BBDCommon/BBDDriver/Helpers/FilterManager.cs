@@ -1,0 +1,32 @@
+﻿using BBDDriver.Models.Filter;
+using BBDDriver.Models.Input;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace BBDDriver.Helpers
+{
+    public static class FilterManager
+    {
+        public static MultiChannelInput<IDataChannel> ApplyFilters(MultiChannelInput<IDataChannel> mci, params IChannelFilter[] filters)
+        {
+            MultiChannelInput<IDataChannel> result = new MultiChannelInput<IDataChannel>(mci.SamplesPerSecond, mci.ChannelCount);
+
+            for (int i = 0; i < mci.ChannelCount; i++)
+            {
+                IDataChannel dataChannel = mci.GetChannel(i);
+
+                foreach (IChannelFilter filter in filters)
+                {
+                    dataChannel = filter.Copy().Apply(dataChannel);
+                }
+
+                result.SetChannel(i, dataChannel);
+            }
+
+            return result;
+        }
+    }
+}

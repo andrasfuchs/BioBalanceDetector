@@ -4,3 +4,5 @@
 # User-specific files
 *.wav
 *.log
+*.vtklog
+*.vts

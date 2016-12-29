@@ -16,7 +16,7 @@ namespace BBDDriver.Models.Output
 
         public WaveFileOutput(MultiChannelInput<IDataChannel> mci, string path) : base(mci, path)
         {
-            this.waveFileStream = new FileStream(directory + filename + ".wav", FileMode.Append, FileAccess.Write, FileShare.ReadWrite);
+            this.waveFileStream = new FileStream(Path.Combine(directory, filename + ".wav"), FileMode.Append, FileAccess.Write, FileShare.ReadWrite);
             this.waveWriter = new BinaryWriter(waveFileStream);
             WriteHeader(mci.SamplesPerSecond, 16, mci.ChannelCount);            
         }

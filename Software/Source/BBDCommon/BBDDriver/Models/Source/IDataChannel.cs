@@ -14,9 +14,18 @@ namespace BBDDriver.Models.Input
 
         int BufferSize { get; }
 
+        /// <summary>
+        /// The event fires when new data is available in its buffer
+        /// </summary>
         event DataChangedEventHandler DataChanged;
+
+        /// <summary>
+        /// The event fires after some data was read from the datachannel's buffer
+        /// </summary>
         event DataChangedEventHandler DataRead;
 
         float[] GetData(int sampleCount, int? position = null);
+
+        void AppendData(float[] data);
     }
 }

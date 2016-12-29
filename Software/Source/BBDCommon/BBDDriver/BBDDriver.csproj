@@ -37,6 +37,10 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="fftwlib, Version=3.3.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\FFTW.3.3.5\fftwlib.dll</HintPath>
+    </Reference>
     <Reference Include="Kitware.mummy.Runtime, Version=1.0.2.599, Culture=neutral, PublicKeyToken=995c7fb9db2c1b44, processorArchitecture=AMD64">
       <HintPath>..\packages\Activiz.NET.x64.5.8.0\lib\net20\Kitware.mummy.Runtime.dll</HintPath>
       <Private>True</Private>
@@ -107,9 +111,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helpers\FilterManager.cs" />
     <Compile Include="Helpers\HighResolutionTimer.cs" />
     <Compile Include="Models\AllChannelsDataChangedEventArgs.cs" />
     <Compile Include="Models\DataWrittenEventArgs.cs" />
+    <Compile Include="Models\Filter\BaseChannelFilter.cs" />
+    <Compile Include="Models\Filter\FFTWFilter.cs" />
+    <Compile Include="Models\Filter\FillFilter.cs" />
+    <Compile Include="Models\Filter\ByPassFilter.cs" />
+    <Compile Include="Models\Filter\ChannelFilterSettings.cs" />
+    <Compile Include="Models\Filter\IChannelFilter.cs" />
+    <Compile Include="Models\Filter\SettingsChangedEventArgs.cs" />
     <Compile Include="Models\Output\FileOutput.cs" />
     <Compile Include="Models\Output\BinaryFileOutput.cs" />
     <Compile Include="Models\Output\VTKFileOutput.cs" />
@@ -138,9 +150,7 @@
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Models\Filter\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

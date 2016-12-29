@@ -18,6 +18,8 @@ using BBDDriver.Models.Input;
 using BBDDriver.Models.Output;
 using BBDDriver.Models;
 using System.Diagnostics;
+using BBDDriver.Helpers;
+using BBDDriver.Models.Filter;
 
 namespace BBDDriver
 {
@@ -70,11 +72,14 @@ namespace BBDDriver
                 waveSource = new SineInput(8000, 64);
             }
 
-            //wfo = new WaveFileOutput(waveSource, $"{workingDirectory}{SessionId}.wav");
-            //wfo.DataWritten += Wfo_DataWritten;
+            //MultiChannelInput<IDataChannel> filteredSource = FilterManager.ApplyFilters(waveSource, new ByPassFilter() { Settings = new ByPassFilterSettings() { Enabled = true } });
+            MultiChannelInput<IDataChannel> filteredSource = FilterManager.ApplyFilters(waveSource, new FillFilter() { Settings = new FillFilterSettings() { Enabled = true, ValueToFillWith = 0.75f } });
 
-            vtkfo = new VTKFileOutput(waveSource, $"{workingDirectory}{SessionId}.vts");
-            vtkfo.DataWritten += Wfo_DataWritten;
+            wfo = new WaveFileOutput(filteredSource, $"{workingDirectory}{SessionId}.wav");
+            wfo.DataWritten += Wfo_DataWritten;
+
+            //vtkfo = new VTKFileOutput(waveSource, $"{workingDirectory}{SessionId}.vts");
+            //vtkfo.DataWritten += Wfo_DataWritten;
 
             VisualOutput vo = new VisualOutput(waveSource, 25, waveSource.ChannelCount);
             vo.RefreshVisualOutput += Vo_RefreshVisualOutput;

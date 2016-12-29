@@ -37,6 +37,16 @@ namespace BBDDriver.Models.Input
             this.channelDataChanges = new DataChangedEventArgs[channelCount];
         }
 
+        public T GetChannel(int index)
+        {
+            lock (channels)
+            {
+                if ((index < 0) || (index >= channels.Length)) throw new ArgumentOutOfRangeException("index", $"Since the input has {channels.Length} channels, the index must be between 0 and {channels.Length - 1}");
+
+                return channels[index];
+            }
+        }
+
         public void SetChannel(int index, T channel)
         {
             lock (channels)
