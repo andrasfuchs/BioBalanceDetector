@@ -24,8 +24,13 @@ namespace BBDDriver.Models.Output
 
         private StringBuilder sb;
 
-        public SimpleVTSFileOutput(MultiChannelInput<IDataChannel> mci, string path, int fftSize) : base(mci, path)
+        private bool createFileSeries = false;
+        private int fileSeriesIndex = 1;
+
+        public SimpleVTSFileOutput(MultiChannelInput<IDataChannel> mci, string path, int fftSize, bool createFileSeries = false) : base(mci, path)
         {
+            this.createFileSeries = createFileSeries;
+
             int cellCount = ((mci.ChannelCount - 1) / 8) + 1;
             double frequencyStep = ((double)mci.SamplesPerSecond / 2) / fftSize;
 
@@ -150,7 +155,8 @@ namespace BBDDriver.Models.Output
             {
                 string content = header + pointData + cellData + points + footer;
 
-                File.WriteAllText(Path.Combine(directory, filename + ".vts"), content);
+                File.WriteAllText(Path.Combine(directory, filename + (createFileSeries ? "_" + fileSeriesIndex : "") + ".vts"), content);
+                fileSeriesIndex++;
 
                 bytesWritten += content.Length;
             }
