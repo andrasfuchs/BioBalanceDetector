@@ -25,7 +25,18 @@ namespace BBDDriver.Models.Output
             vtkOutputWindow.SetInstance(vtkLogFile);
 
             structuredGrid = vtkStructuredGrid.New();
+            // Specify the dimensions of the grid
+            structuredGrid.SetDimensions(mci.ChannelCount, 1, 1);
+
             points = vtkPoints.New();
+            // Create a grid - add point with their coordinates
+            for (int i=0; i<mci.ChannelCount; i++)
+            {
+                var ch = mci.GetChannel(i);
+                points.InsertNextPoint(i, 0, 0);
+            }
+            structuredGrid.SetPoints(points);
+
 
             if (forceLegacyFormat)
             {
@@ -41,34 +52,31 @@ namespace BBDDriver.Models.Output
                 vtkXMLWriter.SetFileName(Path.Combine(directory, filename + ".vts"));
                 vtkXMLWriter.SetInput(structuredGrid);
             }
-
-            // reader
-            vtkXMLStructuredGridReader reader = vtkXMLStructuredGridReader.New();
-            reader.SetFileName(Path.Combine(directory, "subset.vts"));
-            reader.Update(); // here we read the file actually
-
-            structuredGrid = reader.GetOutput();
         }
 
         protected override void WriteDataToBuffer(float[][] dataToWrite, int dataCount)
         {
             if (points != null)
             {
-                // Create a grid
-                points.InsertNextPoint(0, 0, 0);
-                points.InsertNextPoint(1, 0, 0);
-                points.InsertNextPoint(0, 1, 0);
-                points.InsertNextPoint(1, 1, 0);
-                points.InsertNextPoint(0, 2, 0);
-                points.InsertNextPoint(1, 2, 1);
+                //GCHandle pinnedArray = GCHandle.Alloc(byteArray, GCHandleType.Pinned);
+                //IntPtr pointer = pinnedArray.AddrOfPinnedObject();
+                //// Do your stuff...
+                //pinnedArray.Free();
 
-                // Specify the dimensions of the grid
-                structuredGrid.SetDimensions(2, 3, 1);
-                structuredGrid.SetPoints(points);
+                vtkFieldData fieldData = vtkFieldData.New();
 
-                //vtkFieldData data = vtkFieldData.New();
-                //structuredGrid.SetFieldData();
+                vtkFloatArray density = vtkFloatArray.New();
+                density.SetName("Density");
+                //density.SetArray();
 
+                vtkFloatArray momentum = vtkFloatArray.New();
+                momentum.SetName("Momentum");
+                momentum.SetNumberOfComponents(3);
+                //momentum.SetArray();
+
+                fieldData.AddArray(density);
+                fieldData.AddArray(momentum);
+                structuredGrid.SetFieldData(fieldData);
 
                 //bytesWritten += points.Length * 3 * 4;      // 3x 64-bit double
             }

@@ -73,7 +73,8 @@ namespace BBDDriver
             }
 
             //MultiChannelInput<IDataChannel> filteredSource = FilterManager.ApplyFilters(waveSource, new ByPassFilter() { Settings = new ByPassFilterSettings() { Enabled = true } });
-            MultiChannelInput<IDataChannel> filteredSource = FilterManager.ApplyFilters(waveSource, new FillFilter() { Settings = new FillFilterSettings() { Enabled = true, ValueToFillWith = 0.75f } });
+            //MultiChannelInput<IDataChannel> filteredSource = FilterManager.ApplyFilters(waveSource, new FillFilter() { Settings = new FillFilterSettings() { Enabled = true, ValueToFillWith = 0.75f } });
+            MultiChannelInput<IDataChannel> filteredSource = FilterManager.ApplyFilters(waveSource, new FFTWFilter() { Settings = new FFTWFilterSettings() { Enabled = true, FFTSampleCount = 8192, IsBackward = false, PlanningRigor = FFTPlanningRigor.Estimate, IsRealTime = true, Timeout = 300 } });
 
             wfo = new WaveFileOutput(filteredSource, $"{workingDirectory}{SessionId}.wav");
             wfo.DataWritten += Wfo_DataWritten;
