@@ -18,6 +18,7 @@ namespace BBDDriver.Models.Output
         protected string filename;
         protected string extension;
 
+        protected long dataProcessed;
         protected long bytesWritten;
         private int smallestBufferSize;
 

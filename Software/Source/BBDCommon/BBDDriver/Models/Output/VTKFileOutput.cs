@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Kitware.VTK;
+using System.Runtime.InteropServices;
 
 namespace BBDDriver.Models.Output
 {
@@ -26,14 +27,17 @@ namespace BBDDriver.Models.Output
 
             structuredGrid = vtkStructuredGrid.New();
             // Specify the dimensions of the grid
-            structuredGrid.SetDimensions(mci.ChannelCount, 1, 1);
+            structuredGrid.SetDimensions(8192 * 2, mci.ChannelCount, 1);
 
             points = vtkPoints.New();
             // Create a grid - add point with their coordinates
-            for (int i=0; i<mci.ChannelCount; i++)
+            for (int x = 0; x < 8192 * 2; x++)
             {
-                var ch = mci.GetChannel(i);
-                points.InsertNextPoint(i, 0, 0);
+                for (int y = 0; y < mci.ChannelCount; y++)
+                {
+                    //var ch = mci.GetChannel(i);
+                    points.InsertNextPoint(x, y, 0);
+                }
             }
             structuredGrid.SetPoints(points);
 
@@ -58,27 +62,29 @@ namespace BBDDriver.Models.Output
         {
             if (points != null)
             {
-                //GCHandle pinnedArray = GCHandle.Alloc(byteArray, GCHandleType.Pinned);
-                //IntPtr pointer = pinnedArray.AddrOfPinnedObject();
-                //// Do your stuff...
-                //pinnedArray.Free();
+                for (int y = 0; y < dataToWrite.Length; y++)
+                {
+                    GCHandle pinnedArray = GCHandle.Alloc(dataToWrite[0], GCHandleType.Pinned);
 
-                vtkFieldData fieldData = vtkFieldData.New();
+                    vtkFieldData fieldData = vtkFieldData.New();
 
-                vtkFloatArray density = vtkFloatArray.New();
-                density.SetName("Density");
-                //density.SetArray();
+                    vtkFloatArray density = vtkFloatArray.New();
+                    density.SetName("Density");
+                    density.SetArray(pinnedArray.AddrOfPinnedObject(), dataCount * 4, 0);
 
-                vtkFloatArray momentum = vtkFloatArray.New();
-                momentum.SetName("Momentum");
-                momentum.SetNumberOfComponents(3);
-                //momentum.SetArray();
+                    vtkFloatArray momentum = vtkFloatArray.New();
+                    momentum.SetName("Momentum");
+                    momentum.SetNumberOfComponents(3);
+                    //momentum.SetArray();
 
-                fieldData.AddArray(density);
-                fieldData.AddArray(momentum);
-                structuredGrid.SetFieldData(fieldData);
+                    fieldData.AddArray(density);
+                    fieldData.AddArray(momentum);
+                    structuredGrid.SetFieldData(fieldData);
 
-                //bytesWritten += points.Length * 3 * 4;      // 3x 64-bit double
+                    //pinnedArray.Free();
+
+                    bytesWritten += dataCount * 4;      // 64-bit double
+                }
             }
         }
 

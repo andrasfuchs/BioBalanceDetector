@@ -38,6 +38,7 @@ namespace BBDDriver
 
         private static WaveFileOutput wfo;
         private static VTKFileOutput vtkfo;
+        private static SimpleVTSFileOutput vtsfo;
         private static int dataOverflowWarningCount = 0;
         private static long waveFileBytesWritten = 0;
 
@@ -69,18 +70,21 @@ namespace BBDDriver
             catch (System.IO.IOException)
             {
                 Console.WriteLine($"Arduino is not connected on port '{arduinoPort}', creating 8kHz 64ch sine signal generator as data-source.");
-                waveSource = new SineInput(8000, 64);
+                waveSource = new SineInput(8000, 4);
             }
 
             //MultiChannelInput<IDataChannel> filteredSource = FilterManager.ApplyFilters(waveSource, new ByPassFilter() { Settings = new ByPassFilterSettings() { Enabled = true } });
             //MultiChannelInput<IDataChannel> filteredSource = FilterManager.ApplyFilters(waveSource, new FillFilter() { Settings = new FillFilterSettings() { Enabled = true, ValueToFillWith = 0.75f } });
             MultiChannelInput<IDataChannel> filteredSource = FilterManager.ApplyFilters(waveSource, new FFTWFilter() { Settings = new FFTWFilterSettings() { Enabled = true, FFTSampleCount = 8192, IsBackward = false, PlanningRigor = FFTPlanningRigor.Estimate, IsRealTime = true, Timeout = 300 } });
 
-            wfo = new WaveFileOutput(filteredSource, $"{workingDirectory}{SessionId}.wav");
+            wfo = new WaveFileOutput(waveSource, $"{workingDirectory}{SessionId}.wav");
             wfo.DataWritten += Wfo_DataWritten;
 
-            //vtkfo = new VTKFileOutput(waveSource, $"{workingDirectory}{SessionId}.vts");
+            //vtkfo = new VTKFileOutput(filteredSource, $"{workingDirectory}{SessionId}.vts");
             //vtkfo.DataWritten += Wfo_DataWritten;
+            
+            vtsfo = new SimpleVTSFileOutput(filteredSource, $"{workingDirectory}{SessionId}.vts", 8192);
+            vtsfo.DataWritten += Wfo_DataWritten;
 
             VisualOutput vo = new VisualOutput(waveSource, 25, waveSource.ChannelCount);
             vo.RefreshVisualOutput += Vo_RefreshVisualOutput;
