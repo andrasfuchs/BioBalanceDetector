@@ -92,12 +92,12 @@ namespace BBDDriver.Models.Filter
         {
             // convert the complex data
             complexOutput = mfout.GetData_Float();
-            for (int i = 0; i < settings.FFTSampleCount; i++)
-            {
-                frequencyDomainData[i] = complexOutput[i * 2];
-            }
+            //for (int i = 0; i < settings.FFTSampleCount; i++)
+            //{
+            //    frequencyDomainData[i] = complexOutput[i * 2];
+            //}
 
-            this.Output.AppendData(frequencyDomainData);
+            this.Output.AppendData(complexOutput);
             isProcessing = false;
         }
 

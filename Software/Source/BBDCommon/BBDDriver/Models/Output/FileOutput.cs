@@ -25,8 +25,8 @@ namespace BBDDriver.Models.Output
         public int DataOverflowWarningCount { get; private set; }
         public int BufferJitter { get; private set; }
 
-        private const float dataOverflowWarning = 0.8f;     // if the data waiting to be read is more then the 80% of the size of the smallest buffer amount the channels, we get a warning
-        private const float fileWriteThreshold = 0.25f;      // if the amount of data to be written is less then the 50% of smallest buffer then we keep going, we don't need to write it just yet
+        protected float dataOverflowWarning = 0.8f;     // if the data waiting to be read is more then the 80% of the size of the smallest buffer amount the channels, we get a warning
+        protected float fileWriteThreshold = 0.25f;     // if the amount of data to be written is less then the 50% of smallest buffer then we keep going, we don't need to write it just yet
 
         private HashSet<int> changedChannels;
         protected List<DataChangedEventArgs> channelDataChanges;

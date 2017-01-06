@@ -25,10 +25,13 @@ namespace BBDDriver.Models.Output
         private bool dataChanged;
 
         private bool createFileSeries = false;
-        private int fileSeriesIndex = 1;        
+        private int fileSeriesIndex = 1;
+        private float maxFilesPerMinute = 300;
+        private DateTime lastFileWriteUtc = DateTime.UtcNow;
 
         public SimpleVTSFileOutput(MultiChannelInput<IDataChannel> mci, string path, int fftSize, bool createFileSeries = false) : base(mci, path)
         {
+            this.fileWriteThreshold = 0.0f;
             this.createFileSeries = createFileSeries;
             this.fftSize = fftSize;
 
@@ -122,18 +125,25 @@ namespace BBDDriver.Models.Output
 
         protected override void WriteDataFromBuffer(object stateInfo)
         {
+            if ((DateTime.UtcNow - lastFileWriteUtc).TotalMilliseconds < ((1000.0f * 60.0f) / maxFilesPerMinute)) return;
+
             if (!dataChanged) return;
             dataChanged = false;
 
+            int contentLength = 0;
             lock (filename)
             {
                 string content = header + pointData + cellData + points + footer;
+                contentLength = content.Length;
 
                 File.WriteAllText(Path.Combine(directory, filename + (createFileSeries ? "_" + fileSeriesIndex.ToString("00000") : "") + ".vts"), content);
                 fileSeriesIndex++;
 
+                lastFileWriteUtc = DateTime.UtcNow;
                 bytesWritten += content.Length;
             }
+
+            OnDataWritten(this, new DataWrittenEventArgs(filename, contentLength, bytesWritten, this.DataOverflowWarningCount));
         }
     }
 }
