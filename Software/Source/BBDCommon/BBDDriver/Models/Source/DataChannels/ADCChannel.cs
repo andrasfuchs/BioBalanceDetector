@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace BBDDriver.Models.Input
+namespace BBDDriver.Models.Source
 {
     public class ADCChannel : SinglePrecisionDataChannel
     {

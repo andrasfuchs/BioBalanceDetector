@@ -1,4 +1,5 @@
-﻿using BBDDriver.Models.Input;
+﻿using BBDDriver.Models.Source;
+using BBDDriver.Models.Mapper;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,9 +10,8 @@ namespace BBDDriver.Models.Output
 {
     public class SimpleVTSFileOutput : FileOutput
     {
-        private int xSize = 0;
-        private int ySize = 0;
         private int zSize = 0;
+        private int fftSize = 0;
 
         private string header;
         private string footer;
@@ -20,36 +20,27 @@ namespace BBDDriver.Models.Output
         private string points;
 
         private int channelCount;
-        private int[,] channelMapper;
 
         private StringBuilder sb;
+        private bool dataChanged;
 
         private bool createFileSeries = false;
-        private int fileSeriesIndex = 1;
+        private int fileSeriesIndex = 1;        
 
         public SimpleVTSFileOutput(MultiChannelInput<IDataChannel> mci, string path, int fftSize, bool createFileSeries = false) : base(mci, path)
         {
             this.createFileSeries = createFileSeries;
+            this.fftSize = fftSize;
 
-            int cellCount = ((mci.ChannelCount - 1) / 8) + 1;
-            double frequencyStep = ((double)mci.SamplesPerSecond / 2) / fftSize;
+            double frequencyStep = ((double)mci.SamplesPerSecond / 2) / (fftSize / 2);
 
-            xSize = cellCount * 3;
-            ySize = cellCount * 3;
-            zSize = (mci.SamplesPerSecond / 2);
+            PhysicalBoundaries boundaries = ChannelMapper.GetChannelInputBoundaries(mci);
+
+            zSize = fftSize / 2;
 
             channelCount = mci.ChannelCount;
-            channelMapper = new int[4, 4];
-            channelMapper[0, 0] = 0;
-            channelMapper[1, 0] = 1;
-            channelMapper[2, 0] = 2;
-            channelMapper[2, 1] = 3;
-            channelMapper[2, 2] = 4;
-            channelMapper[1, 2] = 5;
-            channelMapper[0, 2] = 6;
-            channelMapper[0, 1] = 7;
 
-            header = $"<VTKFile type=\"StructuredGrid\" version=\"1.0\" byte_order=\"LittleEndian\" header_type=\"UInt64\">{Environment.NewLine}<StructuredGrid WholeExtent=\"0 {xSize - 1} 0 {ySize - 1} 0 {zSize - 1}\">{Environment.NewLine}<Piece Extent=\"0 {xSize - 1} 0 {ySize - 1} 0 {zSize - 1}\">{Environment.NewLine}";
+            header = $"<VTKFile type=\"StructuredGrid\" version=\"1.0\" byte_order=\"LittleEndian\" header_type=\"UInt64\">{Environment.NewLine}<StructuredGrid WholeExtent=\"0 {channelCount-1} 0 0 0 {zSize-1}\">{Environment.NewLine}<Piece Extent=\"0 {channelCount - 1} 0 0 0 {zSize - 1}\">{Environment.NewLine}";
             footer = $"</Piece>{Environment.NewLine}</StructuredGrid>{Environment.NewLine}</VTKFile>{Environment.NewLine}";
             cellData = $"<CellData>{Environment.NewLine}</CellData>{Environment.NewLine}";
             
@@ -60,12 +51,11 @@ namespace BBDDriver.Models.Output
                 sb.AppendLine("<DataArray type=\"Float32\" Name=\"Points\" NumberOfComponents=\"3\" format=\"ascii\">");
                 for (int z = 0; z < zSize; z++)
                 {
-                    for (int y = 0; y < ySize; y++)
+                    for (int chIndex = 0; chIndex < channelCount; chIndex++)
                     {
-                        for (int x = 0; x < xSize; x++)
-                        {
-                            sb.AppendLine(x.ToString("0.0000000000") + " " + y.ToString("0.0000000000") + " " + (z * frequencyStep).ToString("0.0000000000"));
-                        }
+                        PhysicalPosition pp = ChannelMapper.GetChannelPosition(mci.GetChannel(chIndex));
+
+                        sb.AppendLine(pp.X.ToString("0.0000000000") + " " + pp.Y.ToString("0.0000000000") + " " + (pp.Z + (z * frequencyStep)).ToString("0.0000000000"));
                     }
                 }
                 sb.AppendLine("</DataArray>");
@@ -79,41 +69,26 @@ namespace BBDDriver.Models.Output
             lock (sb)
             {
                 sb.Clear();
-                sb.AppendLine("<PointData Scalars=\"Density\" Vectors=\"Momentum\">");
+                sb.AppendLine("<PointData Scalars=\"Energy\" Vectors=\"Momentum\">");
 
-                sb.Append("<DataArray type=\"Float32\" Name=\"Density\" format=\"ascii\">");
+                sb.Append("<DataArray type=\"Float32\" Name=\"Energy\" format=\"ascii\">");
                 long valuesWritten = 0;
                 for (int z = 0; z < zSize; z++)
                 {
-                    for (int y = 0; y < ySize; y++)
+                    for (int chIndex = 0; chIndex < channelCount; chIndex++)
                     {
-                        for (int x = 0; x < xSize; x++)
-                        {
-                            if (z % 2 == 1)
-                            {
-                                sb.Append("0.0000000000");
-                                continue;
-                            }
+                        float real = dataToWrite[chIndex][z * 2 + 0];
+                        float im = dataToWrite[chIndex][z * 2 + 1];
 
-                            int chIndex = channelMapper[x%4,y%4];
-                            if (chIndex >= channelCount) chIndex %= channelCount;
+                        //  Get the magnitude of the complex number sqrt((real * real) + (im * im))
+                        double magnitude = Math.Sqrt(real * real + im * im);
+                        magnitude /= fftSize;
 
-                            float real = dataToWrite[chIndex][z];
-                            float im = dataToWrite[chIndex][z + 1];
+                        if (valuesWritten % 6 == 0) sb.AppendLine();
+                        sb.Append(magnitude.ToString("0.0000000000"));
+                        sb.Append(' ');
 
-                            //  Get the magnitude of the complex number sqrt((real * real) + (im * im))
-                            double magnitude = Math.Sqrt(real * real + im * im);
-                            double energy = magnitude * magnitude;
-
-                            // energy /= fftSize
-
-
-                            if (valuesWritten % 6 == 0) sb.AppendLine();
-                            sb.Append(magnitude.ToString("0.0000000000"));
-                            sb.Append(' ');
-
-                            valuesWritten++;
-                        }
+                        valuesWritten++;
                     }
                 }
                 sb.AppendLine();
@@ -124,16 +99,13 @@ namespace BBDDriver.Models.Output
                 valuesWritten = 0;
                 for (int z = 0; z < zSize; z++)
                 {
-                    for (int y = 0; y < ySize; y++)
+                    for (int chIndex = 0; chIndex < channelCount; chIndex++)
                     {
-                        for (int x = 0; x < xSize; x++)
-                        {
-                            if (valuesWritten % 6 == 0) sb.AppendLine();
-                            sb.Append(fixedMomentum);
-                            sb.Append(' ');
+                        if (valuesWritten % 6 == 0) sb.AppendLine();
+                        sb.Append(fixedMomentum);
+                        sb.Append(' ');
 
-                            valuesWritten += 3;
-                        }
+                        valuesWritten += 3;
                     }
                 }
                 sb.AppendLine();
@@ -142,20 +114,22 @@ namespace BBDDriver.Models.Output
                 sb.AppendLine("</PointData>");
 
                 pointData = sb.ToString();
-            }
 
-            dataProcessed += dataCount;
+                dataProcessed += dataCount;
+                dataChanged = true;
+            }
         }
 
         protected override void WriteDataFromBuffer(object stateInfo)
         {
-            if (dataProcessed == 0) return;
+            if (!dataChanged) return;
+            dataChanged = false;
 
             lock (filename)
             {
                 string content = header + pointData + cellData + points + footer;
 
-                File.WriteAllText(Path.Combine(directory, filename + (createFileSeries ? "_" + fileSeriesIndex : "") + ".vts"), content);
+                File.WriteAllText(Path.Combine(directory, filename + (createFileSeries ? "_" + fileSeriesIndex.ToString("00000") : "") + ".vts"), content);
                 fileSeriesIndex++;
 
                 bytesWritten += content.Length;

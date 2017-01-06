@@ -1,4 +1,4 @@
-﻿using BBDDriver.Models.Input;
+﻿using BBDDriver.Models.Source;
 using System;
 
 namespace BBDDriver.Models.Filter

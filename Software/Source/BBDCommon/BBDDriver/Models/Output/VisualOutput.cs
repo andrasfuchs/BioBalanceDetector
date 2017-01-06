@@ -1,4 +1,4 @@
-﻿using BBDDriver.Models.Input;
+﻿using BBDDriver.Models.Source;
 using BBDDriver.Models.Mapper;
 using System;
 using System.Collections.Generic;
@@ -31,14 +31,15 @@ namespace BBDDriver.Models.Output
 
         private void DataChanged(object sender, DataChangedEventArgs e)
         {
-            int[] xyz = ChannelMapper.MapChannel(e.Channel);
+            PhysicalPosition pp = ChannelMapper.GetChannelPosition(e.Channel);
 
             float value = e.Channel.GetData(1)[0];
-            if (values[xyz[0], xyz[1], xyz[2]] != value)
-            {
-                values[xyz[0], xyz[1], xyz[2]] = value;
-                changedSinceLastRefresh = true;
-            }
+            //if (values[pp.X, pp[1], pp[2]] != value)
+            //{
+            //    values[pp[0], pp[1], pp[2]] = value;
+            //    changedSinceLastRefresh = true;
+            //}
+            changedSinceLastRefresh = true;
         }
 
         private void UpdateVisualOutput(object stateInfo)

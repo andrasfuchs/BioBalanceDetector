@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace BBDDriver.Models.Input
+namespace BBDDriver.Models.Source
 {
     public class MultiChannelInput<T> where T : IDataChannel
     {
@@ -44,6 +44,17 @@ namespace BBDDriver.Models.Input
                 if ((index < 0) || (index >= channels.Length)) throw new ArgumentOutOfRangeException("index", $"Since the input has {channels.Length} channels, the index must be between 0 and {channels.Length - 1}");
 
                 return channels[index];
+            }
+        }
+
+        public int GetChannelIndex(T channel)
+        {
+            lock (channels)
+            {
+                int index = Array.FindIndex<T>(channels, w => w.GetHashCode() == channel.GetHashCode());
+                if (index < 0) throw new ArgumentOutOfRangeException("channel", $"Channel '{channel.ChannelId}' was not found in the input.");
+
+                return index;
             }
         }
 

@@ -143,6 +143,8 @@
     <Compile Include="Models\SerialCommand.cs" />
     <Compile Include="Models\SessionsCache.cs" />
     <Compile Include="Models\Source\DataChannels\SinglePrecisionDataChannel.cs" />
+    <Compile Include="Models\Source\PhysicalBoundaries.cs" />
+    <Compile Include="Models\Source\PhysicalPosition.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

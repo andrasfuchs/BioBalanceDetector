@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BBDDriver.Models.Input
+namespace BBDDriver.Models.Source
 {
     public interface IDataChannel
     {

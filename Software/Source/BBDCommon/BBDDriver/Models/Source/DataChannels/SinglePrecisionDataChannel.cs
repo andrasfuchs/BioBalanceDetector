@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace BBDDriver.Models.Input
+namespace BBDDriver.Models.Source
 {
     /// <summary>
     /// General float-based data channel

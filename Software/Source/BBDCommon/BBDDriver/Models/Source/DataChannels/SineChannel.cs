@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace BBDDriver.Models.Input
+namespace BBDDriver.Models.Source
 {
     /// <summary>
     /// Data channel with a sine wave generator
