@@ -90,13 +90,7 @@ namespace BBDDriver.Models.Filter
 
         private void FFTDone(Task task)
         {
-            // convert the complex data
             complexOutput = mfout.GetData_Float();
-            //for (int i = 0; i < settings.FFTSampleCount; i++)
-            //{
-            //    frequencyDomainData[i] = complexOutput[i * 2];
-            //}
-
             this.Output.AppendData(complexOutput);
             isProcessing = false;
         }

@@ -30,7 +30,12 @@ namespace BBDDriver
         private static string arduinoPort = "COM3";
 
         private static float[,,] recentValues;
-        private static double recentChangesSensitivity = 1.00;
+        private static float recentChangesSensitivity = 1.00f;
+        private static float columnMin = 0.0f;
+        private static float columnMax = Single.MinValue;
+
+        private static int recentDiffsIndex = 0;
+        private static float[] recentDiffs = new float[32];
 
         private static DateTime firstActivity;
 
@@ -39,6 +44,9 @@ namespace BBDDriver
         private static WaveFileOutput wfo;
         private static VTKFileOutput vtkfo;
         private static SimpleVTSFileOutput vtsfo;
+
+        private static StringBuilder consoleSB;
+        private static int consoleRefreshAtY;
 
         private static int waveDataOverflowWarningCount = 0;
         private static long waveFileBytesWritten = 0;
@@ -62,7 +70,9 @@ namespace BBDDriver
 
         public static void StartSession()
         {
-            Console.SetOut(File.AppendText($"{workingDirectory}{SessionId}.log"));
+            consoleSB = new StringBuilder();
+
+            //Console.SetOut(File.AppendText($"{workingDirectory}{SessionId}.log"));
             Console.WriteLine($"Session '{SessionId}' starts at {DateTime.Now.ToString("yyyy-MM-dd HH\\:mm\\:sszzz")} ({DateTime.UtcNow.ToString("yyyy-MM-dd HH\\:mm\\:ss")} UTC)");
 
             try
@@ -73,7 +83,7 @@ namespace BBDDriver
             catch (System.IO.IOException)
             {
                 Console.WriteLine($"Arduino is not connected on port '{arduinoPort}', creating 8kHz 64ch sine signal generator as data-source.");
-                waveSource = new SineInput(8000, 16);
+                waveSource = new SineInput(8000, 4);
             }
 
             int fftSize = 1024;
@@ -87,14 +97,20 @@ namespace BBDDriver
 
             //vtkfo = new VTKFileOutput(filteredSource, $"{workingDirectory}{SessionId}.vts");
             //vtkfo.DataWritten += Wfo_DataWritten;
-            
-            vtsfo = new SimpleVTSFileOutput(filteredSource, $"{workingDirectory}{SessionId}.vts", fftSize, true);
-            vtsfo.DataWritten += Vtsfo_DataWritten;
 
-            VisualOutput vo = new VisualOutput(waveSource, 25, waveSource.ChannelCount);
+            //vtsfo = new SimpleVTSFileOutput(filteredSource, $"{workingDirectory}{SessionId}.vts", fftSize, true);
+            //vtsfo.DataWritten += Vtsfo_DataWritten;
+
+            //VisualOutput vo = new VisualOutput(waveSource, 25, VisualOutputMode.Waveform);
+            VisualOutput vo = new VisualOutput(filteredSource, 25, VisualOutputMode.Spectrum);
             vo.RefreshVisualOutput += Vo_RefreshVisualOutput;
 
             firstActivity = DateTime.UtcNow;
+
+            Console.OutputEncoding = System.Text.Encoding.Unicode;
+            Console.SetWindowSize(200, 60);
+            Console.SetBufferSize(200, 500);
+            consoleRefreshAtY = Console.CursorTop;
         }
 
         private static void Vtsfo_DataWritten(object sender, DataWrittenEventArgs e)
@@ -117,127 +133,22 @@ namespace BBDDriver
 
                 lock (SessionId)
                 {
-                    string[,,] valueStrings = new string[e.Dimensions[0], e.Dimensions[1], e.Dimensions[2]];
-                    double sum = 0;
-
-                    int equalsCount = 0;
-
-                    for (int z = 0; z < e.Dimensions[2]; z++)
+                    string consoleOutput = "";
+                    if (e.Mode == VisualOutputMode.Matrix)
                     {
-                        for (int y = 0; y < e.Dimensions[1]; y++)
-                        {
-                            for (int x = 0; x < e.Dimensions[0]; x++)
-                            {
-                                float value = e.Values[x, y, z];
-
-                                // A, show values
-                                valueStrings[x, y, z] = value.ToString("0.00");
-
-                                
-                                // B, show changes
-                                if (recentValues != null)
-                                {
-                                    if ((e.Values[x,y,z] == 0) || (recentValues[x, y, z] == 0))
-                                    {
-                                        valueStrings[x, y, z] = "o";
-                                    }
-                                    else
-                                    {
-                                        float diff = e.Values[x, y, z] - recentValues[x, y, z];
-
-                                        if (diff > recentChangesSensitivity * recentChangesSensitivity * recentChangesSensitivity)
-                                        {
-                                            valueStrings[x, y, z] = "+++";
-                                        }
-                                        else if (diff > recentChangesSensitivity * recentChangesSensitivity)
-                                        {
-                                            valueStrings[x, y, z] = "++";
-                                        }
-                                        else if (diff > recentChangesSensitivity)
-                                        {
-                                            valueStrings[x, y, z] = "+";
-                                        }
-
-                                        if (diff < -recentChangesSensitivity)
-                                        {
-                                            valueStrings[x, y, z] = "-";
-                                        }
-                                        else if (diff < -recentChangesSensitivity * recentChangesSensitivity)
-                                        {
-                                            valueStrings[x, y, z] = "--";
-                                        }
-                                        else if (diff < -recentChangesSensitivity * recentChangesSensitivity * recentChangesSensitivity)
-                                        {
-                                            valueStrings[x, y, z] = "---";
-                                        }
-
-                                        if ((diff > -recentChangesSensitivity) && (diff < recentChangesSensitivity))
-                                        {
-                                            valueStrings[x, y, z] = "";
-                                            equalsCount++;
-                                        }
-                                    }
-                                }
-
-                                sum += value;
-                            }
-                        }
+                        consoleOutput = GenerateMatrixOutput(e, false);
+                    } else if (e.Mode == VisualOutputMode.Waveform)
+                    {
+                        consoleOutput = GenerateWaveformOutput(e, 40, 9);
+                    }
+                    else if (e.Mode == VisualOutputMode.Spectrum)
+                    {
+                        consoleOutput = GenerateSpectrumOutput(e, 3, 10);
                     }
 
-                    sum /= e.Dimensions[0] * e.Dimensions[1] * e.Dimensions[2];
-
-                    Console.WriteLine();
-                    for (int z = 0; z < e.Dimensions[2]; z++)
-                    {
-                        Console.WriteLine($"---- layer {z} ----");
-                        for (int y = 0; y < e.Dimensions[1]; y++)
-                        {
-                            Console.Write("|");
-                            for (int x = 0; x < e.Dimensions[0]; x++)
-                            {
-                                Console.Write(String.Format("{0,5}|", valueStrings[x,y,z]));
-                            }
-                            Console.WriteLine();
-                        }
-                    }
-
-                    double timeElapsed = (DateTime.UtcNow - firstActivity).TotalSeconds;
-                    string consoleTitle = $"{SessionId} - sum: {sum.ToString("  0.000;-0.000")}";
-                    if (waveSource is BBDArduinoInput)
-                    {
-                        BBDArduinoInput bbdInput = (BBDArduinoInput)waveSource;
-
-                        consoleTitle += $" - {(bbdInput.COMPortBytesReceived / timeElapsed / 1024).ToString("0.00")} kbytes/sec - {((double)bbdInput.LLCommandReceived / timeElapsed).ToString("0.00")} fps";
-                    }
-                    if (recentValues != null)
-                    {
-                        consoleTitle += $" - sensibility { recentChangesSensitivity.ToString("0.0000")}";
-                    }
-
-                    if (wfo != null)
-                    {
-                        consoleTitle += $" - wav file: {(waveFileBytesWritten / 1024).ToString("#,0")} kbytes (jitter: {wfo.BufferJitter} samples, overflow warnings: {waveDataOverflowWarningCount})";
-                    }
-
-                    if (vtsfo != null)
-                    {
-                        consoleTitle += $" - vts file: {(vtsFileBytesWritten / 1024).ToString("#,0")} kbytes (overflow warnings: {vtsDataOverflowWarningCount})";
-                    }
-
-                    Console.Title = consoleTitle;
-
-
-                    // comment this line to disable the feature
-                    //recentValues = e.Values;
-                    if (equalsCount > 60)
-                    {
-                        recentChangesSensitivity /= 2.0;
-                    }
-
-                    if (equalsCount < 4)
-                    {
-                        recentChangesSensitivity *= 2.0;
-                    }
+                    Console.Title = GenerateConsoleTitle();
+                    Console.SetCursorPosition(0, consoleRefreshAtY);
+                    Console.Write(consoleOutput);
                 }
             }
             catch (System.Net.Http.HttpRequestException)
@@ -248,6 +159,246 @@ namespace BBDDriver
             {
                 Console.WriteLine("Thread was cancelled.");
             }
+        }
+
+        private static string GenerateSpectrumOutput(RefreshVisualOutputEventArgs e, int avgSampleCount, int height)
+        {
+            consoleSB.Clear();
+            for (int chIndex = 0; chIndex < e.Dimensions[0]; chIndex++)
+            {
+                int columnCount = (e.Dimensions[1]/2) / avgSampleCount;
+                float[] columnAvgs = new float[columnCount];                
+
+                for (int x = 0; x < columnCount; x++)
+                {
+                    for (int sampleIndex = 0; sampleIndex < avgSampleCount; sampleIndex++)
+                    {
+                        float value = e.Values[chIndex, e.Dimensions[1] - ((x + 1) * avgSampleCount) + sampleIndex, 0];
+                        if (value > columnMax) columnMax = value;
+                        columnAvgs[x] += value;
+                    }
+                    columnAvgs[x] /= avgSampleCount;
+                }
+
+                consoleSB.AppendLine($"=== channel {chIndex} ------ value range on y-axis: [{columnMin.ToString("0.0000")}->{columnMax.ToString("0.0000")}]");
+                for (int y = height - 1; y >= 0; y--)
+                {
+                    float maxValue = columnMin + (((columnMax-columnMin) / height) * (y + 1));
+                    float minValue = columnMin + (((columnMax-columnMin) / height) * (y));
+
+                    char[] line = new char[columnCount];
+                    for (int x = 0; x < columnCount; x++)
+                    {
+                        line[x] = (columnAvgs[x] <= minValue ? ' ' : '|');
+                        if ((columnAvgs[x] >= minValue) && (columnAvgs[x] <= maxValue)) line[x] = '^';
+                    }
+                    consoleSB.Append(line);
+                    consoleSB.AppendLine();
+                }
+            }
+
+            return consoleSB.ToString();
+
+        }
+
+        private static string GenerateWaveformOutput(RefreshVisualOutputEventArgs e, int avgSampleCount, int height)
+        {
+            consoleSB.Clear();
+            for (int chIndex = 0; chIndex < e.Dimensions[0]; chIndex++)
+            {
+                int columnCount = e.Dimensions[1] / avgSampleCount;
+                float[] columnMins = Enumerable.Repeat<float>(Single.MaxValue, columnCount).ToArray();
+                float[] columnMaxs = Enumerable.Repeat<float>(Single.MinValue, columnCount).ToArray();
+                float[] columnAvgs = new float[columnCount];
+
+                for (int x = 0; x < columnCount; x++)
+                {
+                    for (int sampleIndex = 0; sampleIndex < avgSampleCount; sampleIndex++)
+                    {
+                        float value = e.Values[chIndex, e.Dimensions[1] - ((x + 1) * avgSampleCount) + sampleIndex, 0];
+
+                        if (value < columnMins[x]) columnMins[x] = value;
+                        if (value > columnMaxs[x]) columnMaxs[x] = value;
+                        columnAvgs[x] += value;
+                    }
+                    columnAvgs[x] /= avgSampleCount;
+                }
+
+                consoleSB.AppendLine($"=== channel {chIndex}");
+                for (int y = height-1; y >= 0; y--)
+                {
+                    float maxValue = ((2.0f / height) * (y + 1)) - 1.0f;
+                    float minValue = ((2.0f / height) * (y)) - 1.0f;
+
+                    char[] line = new char[columnCount];
+                    for (int x = 0; x < columnCount; x++)
+                    {
+                        line[x] = ' ';
+                        if ((0 >= minValue) && (0 <= maxValue)) line[x] = '-';
+                        if ((columnMaxs[x] >= minValue) && (columnMins[x] <= maxValue)) line[x] = '|';
+                        //if ((columnMins[x] >= minValue) && (columnMins[x] <= maxValue)) line[x] = '-';
+                        //if ((columnMaxs[x] >= minValue) && (columnMaxs[x] <= maxValue)) line[x] = '+';
+                        if ((columnAvgs[x] >= minValue) && (columnAvgs[x] <= maxValue)) line[x] = '*';
+                    }
+                    consoleSB.Append(line);
+                    consoleSB.AppendLine();
+                }
+            }
+
+            return consoleSB.ToString();
+        }
+
+        private static string GenerateConsoleTitle()
+        {
+            // Console Title
+            double timeElapsed = (DateTime.UtcNow - firstActivity).TotalSeconds;
+            string consoleTitle = $"{SessionId}";
+            if (waveSource is BBDArduinoInput)
+            {
+                BBDArduinoInput bbdInput = (BBDArduinoInput)waveSource;
+
+                consoleTitle += $" - {(bbdInput.COMPortBytesReceived / timeElapsed / 1024).ToString("0.00")} kbytes/sec - {((double)bbdInput.LLCommandReceived / timeElapsed).ToString("0.00")} fps";
+            }
+            if (recentValues != null)
+            {
+                consoleTitle += $" - sensibility { recentChangesSensitivity.ToString("0.0000")}";
+            }
+
+            if (wfo != null)
+            {
+                consoleTitle += $" - wav file: {(waveFileBytesWritten / 1024).ToString("#,0")} kbytes (jitter: {wfo.BufferJitter} samples, overflow warnings: {waveDataOverflowWarningCount})";
+            }
+
+            if (vtsfo != null)
+            {
+                consoleTitle += $" - vts file: {(vtsFileBytesWritten / 1024).ToString("#,0")} kbytes (overflow warnings: {vtsDataOverflowWarningCount})";
+            }
+
+            return consoleTitle;
+        }
+
+        private static string GenerateMatrixOutput(RefreshVisualOutputEventArgs e, bool showChanges)
+        {
+            string[,,] valueStrings = new string[e.Dimensions[0], e.Dimensions[1], e.Dimensions[2]];
+            double sum = 0;
+
+            for (int z = 0; z < e.Dimensions[2]; z++)
+            {
+                for (int y = 0; y < e.Dimensions[1]; y++)
+                {
+                    for (int x = 0; x < e.Dimensions[0]; x++)
+                    {
+                        float value = e.Values[x, y, z];
+
+                        // A, show values
+                        valueStrings[x, y, z] = value.ToString(" +0.0000; -0.0000");
+
+
+                        // B, show changes
+                        if ((showChanges) && (recentValues != null))
+                        {
+                            if ((e.Values[x, y, z] == 0) || (recentValues[x, y, z] == 0))
+                            {
+                                valueStrings[x, y, z] = "o";
+                            }
+                            else
+                            {
+                                float diff = e.Values[x, y, z] - recentValues[x, y, z];
+                                recentDiffsIndex = (recentDiffsIndex + 1) % recentDiffs.Length;
+                                recentDiffs[recentDiffsIndex] = (diff < 0 ? -diff : diff);
+                                float diffAverage = recentDiffs.Average();
+
+                                if (diff > 3 * diffAverage)
+                                {
+                                    valueStrings[x, y, z] = "+++";
+                                }
+                                else if (diff > 2 * diffAverage)
+                                {
+                                    valueStrings[x, y, z] = "++";
+                                }
+                                else if (diff > 1 * diffAverage)
+                                {
+                                    valueStrings[x, y, z] = "+";
+                                }
+
+                                if (diff < -1 * diffAverage)
+                                {
+                                    valueStrings[x, y, z] = "-";
+                                }
+                                else if (diff < -2 * diffAverage)
+                                {
+                                    valueStrings[x, y, z] = "--";
+                                }
+                                else if (diff < -3 * diffAverage)
+                                {
+                                    valueStrings[x, y, z] = "---";
+                                }
+
+                                if ((diff > -1 * diffAverage) && (diff < diffAverage))
+                                {
+                                    valueStrings[x, y, z] = "";
+                                }
+                            }
+                        }
+
+                        sum += value;
+                    }
+                }
+            }
+
+            sum /= e.Dimensions[0] * e.Dimensions[1] * e.Dimensions[2];
+
+            // Console Content
+            consoleSB.Clear();
+            consoleSB.AppendLine($"Sum: {sum.ToString(" +0.0000; -0.0000")}");
+            for (int z = 0; z < e.Dimensions[2]; z++)
+            {
+                consoleSB.AppendLine($"=== layer {z}");
+                consoleSB.Append("+");
+                for (int x = 0; x < e.Dimensions[0]; x++)
+                {
+                    consoleSB.Append("--------+");
+                }
+                consoleSB.AppendLine();
+
+                for (int y = 0; y < e.Dimensions[1]; y++)
+                {
+                    consoleSB.Append("|");
+                    for (int x = 0; x < e.Dimensions[0]; x++)
+                    {
+                        consoleSB.Append(String.Format("{0,8}|", valueStrings[x, y, z]));
+                    }
+                    consoleSB.AppendLine();
+
+                    consoleSB.Append("+");
+                    for (int x = 0; x < e.Dimensions[0]; x++)
+                    {
+                        consoleSB.Append("--------+");
+                    }
+                    consoleSB.AppendLine();
+                }
+            }
+
+            if (showChanges)
+            {
+                if ((recentValues == null) || (recentValues.GetLength(0) != e.Values.GetLength(0)) || (recentValues.GetLength(1) != e.Values.GetLength(1)) || (recentValues.GetLength(2) != e.Values.GetLength(2)))
+                {
+                    recentValues = new float[e.Values.GetLength(0), e.Values.GetLength(1), e.Values.GetLength(2)];
+                }
+
+                for (int i = 0; i < e.Values.GetLength(0); i++)
+                {
+                    for (int j = 0; j < e.Values.GetLength(1); j++)
+                    {
+                        for (int k = 0; k < e.Values.GetLength(2); k++)
+                        {
+                            recentValues[i,j,k] = e.Values[i,j,k];
+                        }
+                    }
+                }
+            }
+
+            return consoleSB.ToString();
         }
 
         private static string RandomString(int length)

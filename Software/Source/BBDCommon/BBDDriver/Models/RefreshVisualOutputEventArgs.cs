@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BBDDriver.Models.Output;
+using System;
 
 namespace BBDDriver.Models
 {
@@ -6,12 +7,14 @@ namespace BBDDriver.Models
 
     public class RefreshVisualOutputEventArgs : EventArgs
     {
+        public VisualOutputMode Mode;
         public int[] Dimensions;
         public float[,,] Values;
         public bool ChangedSinceLastRefresh;
 
-        public RefreshVisualOutputEventArgs(int[] dimensions, float[,,] values, bool changedSinceLastRefresh)
+        public RefreshVisualOutputEventArgs(VisualOutputMode mode, int[] dimensions, float[,,] values, bool changedSinceLastRefresh)
         {
+            this.Mode = mode;
             this.Dimensions = dimensions;
             this.Values = values;
             this.ChangedSinceLastRefresh = changedSinceLastRefresh;

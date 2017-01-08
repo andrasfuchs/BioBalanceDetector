@@ -32,7 +32,7 @@ namespace BBDDriver.Models.Mapper
             int channelX = channelMapperMatrix[channelIndex, 0];
             int channelY = channelMapperMatrix[channelIndex, 1];
 
-            return new PhysicalPosition {X = (cellIndex * 3 + channelX) * scaleFactor, Y = (channelY) * scaleFactor };
+            return new PhysicalPosition { X = (cellIndex * 3 + channelX) * scaleFactor, Y = (channelY) * scaleFactor };
         }
 
         public static PhysicalBoundaries GetChannelInputBoundaries(MultiChannelInput<IDataChannel> mci)
@@ -50,6 +50,41 @@ namespace BBDDriver.Models.Mapper
                 if (pp.Y > result.MaxY) result.MaxY = pp.Y;
                 if (pp.Z < result.MinZ) result.MinZ = pp.Z;
                 if (pp.Z > result.MaxZ) result.MaxZ = pp.Z;
+            }
+
+            return result;
+        }
+
+        public static IDataChannel[,] Get2DChannelMatrix(MultiChannelInput<IDataChannel> mci)
+        {
+            IDataChannel[,] result;
+
+            HashSet<float> xCoordinates = new HashSet<float>();
+            HashSet<float> yCoordinates = new HashSet<float>();
+
+            for (int i = 0; i < mci.ChannelCount; i++)
+            {
+                IDataChannel ch = mci.GetChannel(i);
+                PhysicalPosition pp = ChannelMapper.GetChannelPosition(ch);
+
+                xCoordinates.Add(pp.X);
+                yCoordinates.Add(pp.Y);
+            }
+
+            result = new IDataChannel[xCoordinates.Count, yCoordinates.Count];
+            float[] xCoors = xCoordinates.ToArray();
+            float[] yCoors = yCoordinates.ToArray();
+            for (int i = 0; i < mci.ChannelCount; i++)
+            {
+                IDataChannel ch = mci.GetChannel(i);
+                PhysicalPosition pp = ChannelMapper.GetChannelPosition(ch);
+
+                int x = Array.IndexOf(xCoors, pp.X);
+                int y = Array.IndexOf(yCoors, pp.Y);
+
+                if (result[x, y] != null) throw new ArgumentException("Two channels would have the same x and y coordinates, so the 2D channel matrix can't be generated!");
+
+                result[x, y] = ch;
             }
 
             return result;
