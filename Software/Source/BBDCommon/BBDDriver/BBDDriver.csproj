@@ -59,6 +59,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Net.Http.Formatting, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
       <Private>True</Private>
@@ -112,11 +113,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helpers\ColorConverter.cs" />
     <Compile Include="Helpers\FilterManager.cs" />
     <Compile Include="Helpers\HighResolutionTimer.cs" />
     <Compile Include="Models\AllChannelsDataChangedEventArgs.cs" />
     <Compile Include="Models\DataWrittenEventArgs.cs" />
     <Compile Include="Models\Filter\BaseChannelFilter.cs" />
+    <Compile Include="Models\Filter\MovingAverageFilter.cs" />
     <Compile Include="Models\Filter\FFTWFilter.cs" />
     <Compile Include="Models\Filter\FillFilter.cs" />
     <Compile Include="Models\Filter\ByPassFilter.cs" />
