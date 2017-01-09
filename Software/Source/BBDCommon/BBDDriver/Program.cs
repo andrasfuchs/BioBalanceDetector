@@ -84,7 +84,7 @@ namespace BBDDriver
             catch (System.IO.IOException)
             {
                 Console.WriteLine($"Arduino is not connected on port '{arduinoPort}', so creating 8kHz 64ch sine signal generator as data-source.");
-                waveSource = new SineInput(8000, 64);
+                waveSource = new SineInput(8000, 1);
             }
 
             int fftSize = 1024 * 4;
@@ -93,6 +93,7 @@ namespace BBDDriver
             //MultiChannelInput<IDataChannel> filteredSource = FilterManager.ApplyFilters(waveSource, new ByPassFilter() { Settings = new ByPassFilterSettings() { Enabled = true } });
             //MultiChannelInput<IDataChannel> filteredSource = FilterManager.ApplyFilters(waveSource, new FillFilter() { Settings = new FillFilterSettings() { Enabled = true, ValueToFillWith = 0.75f } });
             MultiChannelInput<IDataChannel> filteredSource = FilterManager.ApplyFilters(waveSource, new FFTWFilter() { Settings = new FFTWFilterSettings() { Enabled = true, FFTSampleCount = fftSize, IsBackward = false, PlanningRigor = FFTPlanningRigor.Estimate, IsRealTime = true, Timeout = 300, OutputFormat = FFTOutputFormat.FrequencyMagnitudePair } });
+            MultiChannelInput<IDataChannel> averagedSource = FilterManager.ApplyFilters(filteredSource, new MovingAverageFilter() { Settings = new MovingAverageFilterSettings() { Enabled = true, InputDataDimensions = 2, MovingAverageLength = 10 } });
 
             //wfo = new WaveFileOutput(waveSource, $"{workingDirectory}{SessionId}.wav");
             //wfo.DataWritten += Wfo_DataWritten;
@@ -103,9 +104,9 @@ namespace BBDDriver
             //vtsfo = new SimpleVTSFileOutput(filteredSource, $"{workingDirectory}{SessionId}.vts", fftSize, true);
             //vtsfo.DataWritten += Vtsfo_DataWritten;
 
-            //VisualOutput vo = new VisualOutput(waveSource, 25, VisualOutputMode.Waveform);
+            //VisualOutput vo = new VisualOutput(filteredSource, 25, VisualOutputMode.Waveform);
             //VisualOutput vo = new VisualOutput(filteredSource, 25, VisualOutputMode.Spectrum);
-            VisualOutput vo = new VisualOutput(filteredSource, 25, VisualOutputMode.DominanceMatrix);
+            VisualOutput vo = new VisualOutput(averagedSource, 25, VisualOutputMode.DominanceMatrix);
             vo.RefreshVisualOutput += Vo_RefreshVisualOutput;
 
             firstActivity = DateTime.UtcNow;
@@ -152,7 +153,7 @@ namespace BBDDriver
                     }
                     else if (e.Mode == VisualOutputMode.DominanceMatrix)
                     {
-                        consoleOutput = GenerateDominanceMatrixOutput(e, 1);
+                        consoleOutput = GenerateDominanceMatrixOutput(e, 1, false);
                     }                    
 
                     Console.Title = GenerateConsoleTitle();
@@ -424,10 +425,10 @@ namespace BBDDriver
             return consoleSB.ToString();
         }
 
-        private static string GenerateDominanceMatrixOutput(RefreshVisualOutputEventArgs e, int maxLayers)
+        private static string GenerateDominanceMatrixOutput(RefreshVisualOutputEventArgs e, int maxLayers, bool colorDisplay)
         {
             string[,,] valueStrings = new string[e.Dimensions[0], e.Dimensions[1], e.Dimensions[2] / 2];
-            double sum = 0;
+            ConsoleColor[,,] valueColors = new ConsoleColor[e.Dimensions[0], e.Dimensions[1], e.Dimensions[2] / 2];
 
             for (int z = 0; z < e.Dimensions[2] / 2; z++)
             {
@@ -438,6 +439,12 @@ namespace BBDDriver
                         float frequency = e.Values[x, y, z * 2 + 0];
                         float value = e.Values[x, y, z * 2 + 1];
 
+                        if (colorDisplay)
+                        {
+                            byte[] rgb = ColorConverter.HSL2RGB(frequency / 2000.0f, 0.5, 0.5);
+                            valueColors[x, y, z] = ColorConverter.ClosestConsoleColor(rgb[0], rgb[1], rgb[2]);
+                        }
+
                         valueStrings[x, y, z] = $"{frequency.ToString("0.0")}Hz ({value.ToString(" +0.0000; -0.0000")})";
                     }
                 }
@@ -445,36 +452,67 @@ namespace BBDDriver
 
             // Console Content
             consoleSB.Clear();
+
             int displayLayers = Math.Min(maxLayers, e.Dimensions[2] / 2);
             for (int z = 0; z < displayLayers; z++)
             {
-                consoleSB.AppendLine($"=== top {z+1} frequency");
-                consoleSB.Append("+");
+                PrintDominanceMatrixUnit(consoleSB, $"=== top {z+1} frequency", true, colorDisplay);
+                PrintDominanceMatrixUnit(consoleSB, "+", false, colorDisplay);
                 for (int x = 0; x < e.Dimensions[0]; x++)
                 {
-                    consoleSB.Append("------------------------+");
+                    PrintDominanceMatrixUnit(consoleSB, "------------------------+", false, colorDisplay);
                 }
-                consoleSB.AppendLine();
+                PrintDominanceMatrixUnit(consoleSB, null, true, colorDisplay);
 
                 for (int y = 0; y < e.Dimensions[1]; y++)
                 {
-                    consoleSB.Append("|");
+                    PrintDominanceMatrixUnit(consoleSB, "|", false, colorDisplay);
                     for (int x = 0; x < e.Dimensions[0]; x++)
                     {
-                        consoleSB.Append(String.Format("{0,24}|", valueStrings[x, y, z]));
+                        PrintDominanceMatrixUnit(consoleSB, String.Format("{0,24}|", valueStrings[x, y, z]), false, colorDisplay, valueColors[x, y, z]);
                     }
-                    consoleSB.AppendLine();
+                    PrintDominanceMatrixUnit(consoleSB, null, true, colorDisplay);
 
-                    consoleSB.Append("+");
+                    PrintDominanceMatrixUnit(consoleSB, "+", false, colorDisplay);
                     for (int x = 0; x < e.Dimensions[0]; x++)
                     {
-                        consoleSB.Append("------------------------+");
+                        PrintDominanceMatrixUnit(consoleSB, "------------------------+", false, colorDisplay);
                     }
-                    consoleSB.AppendLine();
+                    PrintDominanceMatrixUnit(consoleSB, null, true, colorDisplay);
                 }
             }
 
             return consoleSB.ToString();
+        }
+
+        private static void PrintDominanceMatrixUnit(StringBuilder consoleSB, string s, bool addNewLine = false, bool colorDisplay = false, ConsoleColor? color = null)
+        {
+            if (!colorDisplay)
+            {
+                if (addNewLine)
+                {
+                    consoleSB.AppendLine(s);
+                }
+                else
+                {
+                    consoleSB.Append(s);
+                }
+            } else
+            {
+                ConsoleColor cc = Console.ForegroundColor;
+                if (color.HasValue) Console.ForegroundColor = color.Value;
+
+                if (addNewLine)
+                {
+                    Console.WriteLine(s);
+                }
+                else
+                {
+                    Console.Write(s);
+                }
+
+                Console.ForegroundColor = cc;
+            }
         }
 
         private static string RandomString(int length)

@@ -9,10 +9,12 @@ namespace BBDDriver.Models.Source
 {
     public class FilteredDataChannel : SinglePrecisionDataChannel
     {
+        public IDataChannel Input { get; private set; }
         public IChannelFilter Filter { get; private set; }
 
-        public FilteredDataChannel(int samplesPerSecond, int bufferSize, IChannelFilter filter) : base(samplesPerSecond, bufferSize)
+        public FilteredDataChannel(IDataChannel input, int samplesPerSecond, int bufferSize, IChannelFilter filter) : base(samplesPerSecond, bufferSize)
         {
+            this.Input = input;
             this.Filter = filter;
         }
     }

@@ -141,7 +141,7 @@ namespace BBDDriver.Models.Output
                     {
                         if (channels[x, y] != e.Channel) continue;
 
-                        var filter = ((FilteredDataChannel)(e.Channel)).Filter as FFTWFilter;
+                        var filter = Helpers.FilterManager.FindFilter<FFTWFilter>(e.Channel);
 
                         float[] frequencyValues = e.Channel.GetData(filter.OutputBlockSize);
 

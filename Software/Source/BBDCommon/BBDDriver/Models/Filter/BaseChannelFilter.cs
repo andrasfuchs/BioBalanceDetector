@@ -35,7 +35,7 @@ namespace BBDDriver.Models.Filter
 
         public IDataChannel Apply(IDataChannel input)
         {
-            FilteredDataChannel output = new FilteredDataChannel(input.SamplesPerSecond, input.BufferSize, this);
+            FilteredDataChannel output = new FilteredDataChannel(input, input.SamplesPerSecond, input.BufferSize, this);
 
             this.Input = input;
             this.Output = output;

@@ -28,5 +28,16 @@ namespace BBDDriver.Helpers
 
             return result;
         }
+
+        public static T FindFilter<T>(IDataChannel channel) where T : class, IChannelFilter
+        {
+            var filteredChannel = channel as FilteredDataChannel;
+
+            if (filteredChannel == null) return null;
+
+            if (filteredChannel.Filter is T) return filteredChannel.Filter as T;            
+
+            return FindFilter<T>(filteredChannel.Input);
+        }
     }
 }
