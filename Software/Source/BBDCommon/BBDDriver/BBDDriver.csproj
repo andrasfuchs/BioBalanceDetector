@@ -116,6 +116,7 @@
     <Compile Include="Helpers\ColorConverter.cs" />
     <Compile Include="Helpers\FilterManager.cs" />
     <Compile Include="Helpers\HighResolutionTimer.cs" />
+    <Compile Include="Helpers\libusbK.cs" />
     <Compile Include="Models\AllChannelsDataChangedEventArgs.cs" />
     <Compile Include="Models\DataWrittenEventArgs.cs" />
     <Compile Include="Models\Filter\BaseChannelFilter.cs" />
@@ -135,7 +136,8 @@
     <Compile Include="Models\Source\DataChannels\ADCChannel.cs" />
     <Compile Include="Models\ADCChannelValue.cs" />
     <Compile Include="Models\Source\DataChannels\FilteredDataChannel.cs" />
-    <Compile Include="Models\Source\Inputs\BBDArduinoInput.cs" />
+    <Compile Include="Models\Source\Inputs\BBDMercury16Input.cs" />
+    <Compile Include="Models\Source\Inputs\BBD8x8MatrixInput.cs" />
     <Compile Include="Models\Source\IDataChannel.cs" />
     <Compile Include="Models\Source\Inputs\MultiChannelInput.cs" />
     <Compile Include="Models\Mapper\ChannelMapper.cs" />

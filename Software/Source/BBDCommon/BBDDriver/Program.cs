@@ -78,13 +78,34 @@ namespace BBDDriver
 
             try
             {
-                Console.WriteLine($"Checking if Arduino is connected on port '{arduinoPort}', expecting The 8x8 Matrix as data-source.");
-                waveSource = new BBDArduinoInput(arduinoPort, 64);
+                Console.Write($"Checking if Mercury-16 is connected as PHDC USB device... ");
+                waveSource = new BBDMercury16Input();
+                Console.WriteLine("OK");
             }
             catch (System.IO.IOException)
             {
-                Console.WriteLine($"Arduino is not connected on port '{arduinoPort}', so creating 8kHz 64ch sine signal generator as data-source.");
+                Console.WriteLine("not connected");
+            }
+
+            if (waveSource == null)
+            {
+                try
+                {
+                    Console.Write($"Checking if Arduino is connected on port '{arduinoPort}', expecting The 8x8 Matrix as data-source... ");
+                    waveSource = new BBD8x8MatrixInput(arduinoPort, 64);
+                    Console.WriteLine("OK");
+                }
+                catch (System.IO.IOException)
+                {
+                    Console.WriteLine("not connected");                   
+                }
+            }
+
+            if (waveSource == null)
+            {
+                Console.Write($"No hardware source was detected, so creating an 8kHz 16ch sine signal generator as data-source... ");
                 waveSource = new SineInput(8000, 1);
+                Console.WriteLine("OK");
             }
 
             int fftSize = 1024 * 4;
@@ -277,9 +298,9 @@ namespace BBDDriver
             // Console Title
             double timeElapsed = (DateTime.UtcNow - firstActivity).TotalSeconds;
             string consoleTitle = $"{SessionId}";
-            if (waveSource is BBDArduinoInput)
+            if (waveSource is BBD8x8MatrixInput)
             {
-                BBDArduinoInput bbdInput = (BBDArduinoInput)waveSource;
+                BBD8x8MatrixInput bbdInput = (BBD8x8MatrixInput)waveSource;
 
                 consoleTitle += $" - {(bbdInput.COMPortBytesReceived / timeElapsed / 1024).ToString("0.00")} kbytes/sec - {((double)bbdInput.LLCommandReceived / timeElapsed).ToString("0.00")} fps";
             }

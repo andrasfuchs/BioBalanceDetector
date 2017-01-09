@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BBDDriver.Models.Source
 {
-    internal class BBDArduinoInput : MultiChannelInput<IDataChannel>, IDisposable
+    internal class BBD8x8MatrixInput : MultiChannelInput<IDataChannel>, IDisposable
     {
         private SerialPort arduinoCOMPort;
 
@@ -20,7 +20,7 @@ namespace BBDDriver.Models.Source
         private HighResolutionTimer timer = new HighResolutionTimer();
 
 
-        public BBDArduinoInput(string arduinoPort, int baudrate = 1843200, int channelCount = 16) : base(8000, channelCount)
+        public BBD8x8MatrixInput(string arduinoPort, int baudrate = 1843200, int channelCount = 16) : base(8000, channelCount)
         {
             // Set up the serial port communication with the Arduino
             arduinoCOMPort = new SerialPort(arduinoPort) { BaudRate = baudrate };
