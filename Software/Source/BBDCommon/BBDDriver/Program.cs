@@ -32,7 +32,8 @@ namespace BBDDriver
         private static float[,,] recentValues;
         private static float recentChangesSensitivity = 1.00f;
         private static float columnMin = 0.0f;
-        private static float columnMax = Single.MinValue;
+        private static float columnMax = 1.0f;
+        private static float frequencyStep = 1.0f;
 
         private static int recentDiffsIndex = 0;
         private static float[] recentDiffs = new float[32];
@@ -77,20 +78,21 @@ namespace BBDDriver
 
             try
             {
-                Console.WriteLine($"Arduino is connected on port '{arduinoPort}', expecting 8x8 Matrix as data-source.");
+                Console.WriteLine($"Checking if Arduino is connected on port '{arduinoPort}', expecting The 8x8 Matrix as data-source.");
                 waveSource = new BBDArduinoInput(arduinoPort, 64);
             }
             catch (System.IO.IOException)
             {
-                Console.WriteLine($"Arduino is not connected on port '{arduinoPort}', creating 8kHz 64ch sine signal generator as data-source.");
-                waveSource = new SineInput(8000, 4);
+                Console.WriteLine($"Arduino is not connected on port '{arduinoPort}', so creating 8kHz 64ch sine signal generator as data-source.");
+                waveSource = new SineInput(8000, 64);
             }
 
-            int fftSize = 1024;
+            int fftSize = 1024 * 4;
+            frequencyStep = (float)waveSource.SamplesPerSecond / fftSize;
 
             //MultiChannelInput<IDataChannel> filteredSource = FilterManager.ApplyFilters(waveSource, new ByPassFilter() { Settings = new ByPassFilterSettings() { Enabled = true } });
             //MultiChannelInput<IDataChannel> filteredSource = FilterManager.ApplyFilters(waveSource, new FillFilter() { Settings = new FillFilterSettings() { Enabled = true, ValueToFillWith = 0.75f } });
-            MultiChannelInput<IDataChannel> filteredSource = FilterManager.ApplyFilters(waveSource, new FFTWFilter() { Settings = new FFTWFilterSettings() { Enabled = true, FFTSampleCount = fftSize, IsBackward = false, PlanningRigor = FFTPlanningRigor.Estimate, IsRealTime = true, Timeout = 300 } });
+            MultiChannelInput<IDataChannel> filteredSource = FilterManager.ApplyFilters(waveSource, new FFTWFilter() { Settings = new FFTWFilterSettings() { Enabled = true, FFTSampleCount = fftSize, IsBackward = false, PlanningRigor = FFTPlanningRigor.Estimate, IsRealTime = true, Timeout = 300, OutputFormat = FFTOutputFormat.FrequencyMagnitudePair } });
 
             //wfo = new WaveFileOutput(waveSource, $"{workingDirectory}{SessionId}.wav");
             //wfo.DataWritten += Wfo_DataWritten;
@@ -102,14 +104,15 @@ namespace BBDDriver
             //vtsfo.DataWritten += Vtsfo_DataWritten;
 
             //VisualOutput vo = new VisualOutput(waveSource, 25, VisualOutputMode.Waveform);
-            VisualOutput vo = new VisualOutput(filteredSource, 25, VisualOutputMode.Spectrum);
+            //VisualOutput vo = new VisualOutput(filteredSource, 25, VisualOutputMode.Spectrum);
+            VisualOutput vo = new VisualOutput(filteredSource, 25, VisualOutputMode.DominanceMatrix);
             vo.RefreshVisualOutput += Vo_RefreshVisualOutput;
 
             firstActivity = DateTime.UtcNow;
 
             Console.OutputEncoding = System.Text.Encoding.Unicode;
             Console.SetWindowSize(200, 60);
-            Console.SetBufferSize(200, 500);
+            Console.SetBufferSize(700, 500);
             consoleRefreshAtY = Console.CursorTop;
         }
 
@@ -127,64 +130,81 @@ namespace BBDDriver
 
         private static void Vo_RefreshVisualOutput(object sender, RefreshVisualOutputEventArgs e)
         {
-            try
-            {
-                if (!e.ChangedSinceLastRefresh) return;
+            if (!e.ChangedSinceLastRefresh) return;
 
-                lock (SessionId)
+            lock (SessionId)
+            {
+                try
                 {
+
                     string consoleOutput = "";
                     if (e.Mode == VisualOutputMode.Matrix)
                     {
                         consoleOutput = GenerateMatrixOutput(e, false);
-                    } else if (e.Mode == VisualOutputMode.Waveform)
+                    }
+                    else if (e.Mode == VisualOutputMode.Waveform)
                     {
                         consoleOutput = GenerateWaveformOutput(e, 40, 9);
                     }
                     else if (e.Mode == VisualOutputMode.Spectrum)
                     {
-                        consoleOutput = GenerateSpectrumOutput(e, 3, 10);
+                        consoleOutput = GenerateSpectrumOutput(e, 3 * 4, 10);
                     }
+                    else if (e.Mode == VisualOutputMode.DominanceMatrix)
+                    {
+                        consoleOutput = GenerateDominanceMatrixOutput(e, 1);
+                    }                    
 
                     Console.Title = GenerateConsoleTitle();
                     Console.SetCursorPosition(0, consoleRefreshAtY);
                     Console.Write(consoleOutput);
                 }
-            }
-            catch (System.Net.Http.HttpRequestException)
-            {
-                Console.WriteLine("Communication error.");
-            }
-            catch (System.Threading.Tasks.TaskCanceledException)
-            {
-                Console.WriteLine("Thread was cancelled.");
+                catch (System.Net.Http.HttpRequestException)
+                {
+                    Console.WriteLine("Communication error.");
+                }
+                catch (System.Threading.Tasks.TaskCanceledException)
+                {
+                    Console.WriteLine("Thread was cancelled.");
+                }
             }
         }
 
         private static string GenerateSpectrumOutput(RefreshVisualOutputEventArgs e, int avgSampleCount, int height)
         {
             consoleSB.Clear();
+
+            float chColumnMax = 0.0f;
             for (int chIndex = 0; chIndex < e.Dimensions[0]; chIndex++)
             {
-                int columnCount = (e.Dimensions[1]/2) / avgSampleCount;
-                float[] columnAvgs = new float[columnCount];                
+                int columnCount = e.Dimensions[1] / avgSampleCount;
+                float[] columnAvgs = new float[columnCount];
 
+                float dominantValue = 0.0f;
+                float dominantIndex = 0.0f;
                 for (int x = 0; x < columnCount; x++)
                 {
                     for (int sampleIndex = 0; sampleIndex < avgSampleCount; sampleIndex++)
                     {
-                        float value = e.Values[chIndex, e.Dimensions[1] - ((x + 1) * avgSampleCount) + sampleIndex, 0];
-                        if (value > columnMax) columnMax = value;
+                        int valueIndex = x * avgSampleCount + sampleIndex;
+                        float value = e.Values[chIndex, valueIndex, 0];
                         columnAvgs[x] += value;
+
+                        if (value > dominantValue)
+                        {
+                            dominantValue = value;
+                            dominantIndex = valueIndex;
+                        }
                     }
                     columnAvgs[x] /= avgSampleCount;
+                    if (columnAvgs[x] > chColumnMax) chColumnMax = columnAvgs[x];
                 }
 
-                consoleSB.AppendLine($"=== channel {chIndex} ------ value range on y-axis: [{columnMin.ToString("0.0000")}->{columnMax.ToString("0.0000")}]");
+                consoleSB.AppendLine($"=== channel {chIndex} ------ value range on y-axis: [{columnMin.ToString("0.0000")}->{columnMax.ToString("0.0000")}], dominant value: {dominantValue.ToString("0.0000")} at {(frequencyStep * dominantIndex).ToString("#,##0.0")}Hz-{(frequencyStep * (dominantIndex + 1)).ToString("#,##0.0")}Hz       ");
                 for (int y = height - 1; y >= 0; y--)
                 {
-                    float maxValue = columnMin + (((columnMax-columnMin) / height) * (y + 1));
-                    float minValue = columnMin + (((columnMax-columnMin) / height) * (y));
+                    float maxValue = columnMin + (((columnMax - columnMin) / height) * (y + 1));
+                    float minValue = columnMin + (((columnMax - columnMin) / height) * (y));
 
                     char[] line = new char[columnCount];
                     for (int x = 0; x < columnCount; x++)
@@ -196,6 +216,9 @@ namespace BBDDriver
                     consoleSB.AppendLine();
                 }
             }
+
+            if (chColumnMax > columnMax) columnMax *= 1.1f;
+            if (chColumnMax < columnMax * 0.6f) columnMax *= 0.9f;
 
             return consoleSB.ToString();
 
@@ -225,7 +248,7 @@ namespace BBDDriver
                 }
 
                 consoleSB.AppendLine($"=== channel {chIndex}");
-                for (int y = height-1; y >= 0; y--)
+                for (int y = height - 1; y >= 0; y--)
                 {
                     float maxValue = ((2.0f / height) * (y + 1)) - 1.0f;
                     float minValue = ((2.0f / height) * (y)) - 1.0f;
@@ -392,9 +415,62 @@ namespace BBDDriver
                     {
                         for (int k = 0; k < e.Values.GetLength(2); k++)
                         {
-                            recentValues[i,j,k] = e.Values[i,j,k];
+                            recentValues[i, j, k] = e.Values[i, j, k];
                         }
                     }
+                }
+            }
+
+            return consoleSB.ToString();
+        }
+
+        private static string GenerateDominanceMatrixOutput(RefreshVisualOutputEventArgs e, int maxLayers)
+        {
+            string[,,] valueStrings = new string[e.Dimensions[0], e.Dimensions[1], e.Dimensions[2] / 2];
+            double sum = 0;
+
+            for (int z = 0; z < e.Dimensions[2] / 2; z++)
+            {
+                for (int y = 0; y < e.Dimensions[1]; y++)
+                {
+                    for (int x = 0; x < e.Dimensions[0]; x++)
+                    {
+                        float frequency = e.Values[x, y, z * 2 + 0];
+                        float value = e.Values[x, y, z * 2 + 1];
+
+                        valueStrings[x, y, z] = $"{frequency.ToString("0.0")}Hz ({value.ToString(" +0.0000; -0.0000")})";
+                    }
+                }
+            }
+
+            // Console Content
+            consoleSB.Clear();
+            int displayLayers = Math.Min(maxLayers, e.Dimensions[2] / 2);
+            for (int z = 0; z < displayLayers; z++)
+            {
+                consoleSB.AppendLine($"=== top {z+1} frequency");
+                consoleSB.Append("+");
+                for (int x = 0; x < e.Dimensions[0]; x++)
+                {
+                    consoleSB.Append("------------------------+");
+                }
+                consoleSB.AppendLine();
+
+                for (int y = 0; y < e.Dimensions[1]; y++)
+                {
+                    consoleSB.Append("|");
+                    for (int x = 0; x < e.Dimensions[0]; x++)
+                    {
+                        consoleSB.Append(String.Format("{0,24}|", valueStrings[x, y, z]));
+                    }
+                    consoleSB.AppendLine();
+
+                    consoleSB.Append("+");
+                    for (int x = 0; x < e.Dimensions[0]; x++)
+                    {
+                        consoleSB.Append("------------------------+");
+                    }
+                    consoleSB.AppendLine();
                 }
             }
 

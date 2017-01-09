@@ -131,6 +131,7 @@
     <Compile Include="Models\DataChangedEventArgs.cs" />
     <Compile Include="Models\Source\DataChannels\ADCChannel.cs" />
     <Compile Include="Models\ADCChannelValue.cs" />
+    <Compile Include="Models\Source\DataChannels\FilteredDataChannel.cs" />
     <Compile Include="Models\Source\Inputs\BBDArduinoInput.cs" />
     <Compile Include="Models\Source\IDataChannel.cs" />
     <Compile Include="Models\Source\Inputs\MultiChannelInput.cs" />

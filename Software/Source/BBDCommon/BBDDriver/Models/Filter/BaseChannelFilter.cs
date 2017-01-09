@@ -35,7 +35,7 @@ namespace BBDDriver.Models.Filter
 
         public IDataChannel Apply(IDataChannel input)
         {
-            SinglePrecisionDataChannel output = new SinglePrecisionDataChannel(input.SamplesPerSecond, input.BufferSize);
+            FilteredDataChannel output = new FilteredDataChannel(input.SamplesPerSecond, input.BufferSize, this);
 
             this.Input = input;
             this.Output = output;
@@ -55,6 +55,11 @@ namespace BBDDriver.Models.Filter
             IChannelFilter clone = (IChannelFilter)Activator.CreateInstance(this.GetType());
             clone.Settings = this.settings;
             return clone;
+        }
+
+        public T GetSettings()
+        {
+            return settings;
         }
 
         protected virtual void OnSettingsChanged(SettingsChangedEventArgs e)
