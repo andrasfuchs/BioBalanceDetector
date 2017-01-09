@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 namespace BBDDriver.Models.Filter
 {
     public enum FFTPlanningRigor { Estimate, Measure, Patient }
+    public enum FFTOutputFormat { Raw, RealImaginaryPair, RealOnly, Magnitude, FrequencyMagnitudePair }
 
     public class FFTWFilterSettings : ChannelFilterSettings
     {
@@ -19,6 +20,7 @@ namespace BBDDriver.Models.Filter
         public FFTPlanningRigor PlanningRigor { get; set; }
         public int Timeout { get; set; }
         public bool IsRealTime { get; set; }
+        public FFTOutputFormat OutputFormat { get; set; }
     }
 
     public class FFTWFilter : BaseChannelFilter<FFTWFilterSettings>
@@ -38,17 +40,22 @@ namespace BBDDriver.Models.Filter
         private bool isProcessing = false;
 
         public int TimeoutCount { get; private set; }
+        public int OutputBlockSize { get; private set; }
+        public float FrequencyStep { get; private set; }
 
         protected override void InputDataChanged(object sender, DataChangedEventArgs e)
         {
             if (plan == null) return;
+
+            this.FrequencyStep = (float)Input.SamplesPerSecond / settings.FFTSampleCount;
 
             lock (plan)
             {
                 if (settings.IsRealTime)
                 {
                     dataToProcess = settings.FFTSampleCount;
-                } else
+                }
+                else
                 {
                     dataToProcess += e.DataCount;
                 }
@@ -77,7 +84,7 @@ namespace BBDDriver.Models.Filter
             }
 
             // fill the complexInput after the plan
-            for (int i=0; i<settings.FFTSampleCount; i++)
+            for (int i = 0; i < settings.FFTSampleCount; i++)
             {
                 complexInput[i * 2] = timeDomainData[i];
             }
@@ -85,13 +92,73 @@ namespace BBDDriver.Models.Filter
             // execute the plan
             isProcessing = true;
             mfin.SetData(complexInput);
-            Task.Run(() => plan.Execute()).ContinueWith(t => FFTDone(t));                
+            Task.Run(() => plan.Execute()).ContinueWith(t => FFTDone(t));
         }
 
         private void FFTDone(Task task)
         {
             complexOutput = mfout.GetData_Float();
-            this.Output.AppendData(complexOutput);
+
+            if (settings.OutputFormat == FFTOutputFormat.Raw)
+            {
+                this.Output.AppendData(complexOutput);
+            }
+            else if (settings.OutputFormat == FFTOutputFormat.RealImaginaryPair)
+            {
+                float[] realAndImaginary = new float[complexOutput.Length / 2];
+
+                for (int i = 0; i < complexOutput.Length / 2; i++)
+                {
+                    realAndImaginary[i] = complexOutput[i];
+                }
+
+                this.Output.AppendData(realAndImaginary);
+            }
+            else if (settings.OutputFormat == FFTOutputFormat.RealOnly)
+            {
+                float[] realOnly = new float[complexOutput.Length / 4];
+
+                for (int i = 0; i < complexOutput.Length / 4; i++)
+                {
+                    realOnly[i] = complexOutput[i * 2];
+                }
+
+                this.Output.AppendData(realOnly);
+            }
+            else if ((settings.OutputFormat == FFTOutputFormat.Magnitude) || (settings.OutputFormat == FFTOutputFormat.FrequencyMagnitudePair))
+            {
+                float[] magnitude = new float[complexOutput.Length / 4];
+
+                for (int i = 0; i < complexOutput.Length / 4; i++)
+                {
+                    float real = complexOutput[i * 2 + 0];
+                    float im = complexOutput[i * 2 + 1];
+
+                    //  Get the magnitude of the complex number sqrt((real * real) + (im * im))
+                    magnitude[i] = (float)Math.Sqrt(real * real + im * im) / settings.FFTSampleCount;
+                }
+
+                if (settings.OutputFormat == FFTOutputFormat.Magnitude)
+                {
+                    this.Output.AppendData(magnitude);
+                }
+                else
+                {
+                    float[] frequencyAndMagnitude = new float[magnitude.Length * 2];
+                    for (int i = 0; i < magnitude.Length; i++)
+                    {
+                        frequencyAndMagnitude[i * 2 + 0] = this.FrequencyStep * i;
+                        frequencyAndMagnitude[i * 2 + 1] = magnitude[i];
+                    }
+
+                    this.Output.AppendData(frequencyAndMagnitude);
+                }
+            }
+            else
+            {
+                throw new Exception($"FFT output format '{settings.OutputFormat}' is not supported.");
+            }
+
             isProcessing = false;
         }
 
@@ -111,7 +178,33 @@ namespace BBDDriver.Models.Filter
             mfin = new fftwf_complexarray(complexInput);
             mfout = new fftwf_complexarray(complexOutput);
 
-            plan = fftwf_plan.dft_1d(n, mfin, mfout, settings.IsBackward ? fftw_direction.Backward : fftw_direction.Forward, fftw_flags.Measure);
+            plan = fftwf_plan.dft_1d(n, mfin, mfout, 
+                settings.IsBackward ? fftw_direction.Backward : fftw_direction.Forward, 
+                settings.PlanningRigor == FFTPlanningRigor.Estimate ? fftw_flags.Estimate :
+                settings.PlanningRigor == FFTPlanningRigor.Measure ? fftw_flags.Measure : 
+                settings.PlanningRigor == FFTPlanningRigor.Patient ? fftw_flags.Patient :
+                fftw_flags.Estimate);
+
+            switch (settings.OutputFormat)
+            {
+                case FFTOutputFormat.Raw:
+                    this.OutputBlockSize = settings.FFTSampleCount * 2;
+                    break;
+                case FFTOutputFormat.RealImaginaryPair:
+                    this.OutputBlockSize = settings.FFTSampleCount;
+                    break;
+                case FFTOutputFormat.RealOnly:
+                    this.OutputBlockSize = settings.FFTSampleCount / 2;
+                    break;
+                case FFTOutputFormat.Magnitude:
+                    this.OutputBlockSize = settings.FFTSampleCount / 2;
+                    break;
+                case FFTOutputFormat.FrequencyMagnitudePair:
+                    this.OutputBlockSize = settings.FFTSampleCount;
+                    break;
+                default:
+                    throw new ArgumentException("The FFT's output format is not supported.", "FFTOutputFormat");
+            }
         }
     }
 }
