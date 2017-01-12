@@ -14,8 +14,8 @@ namespace BBDDriver.Models.Source
             for (int i = 0; i < channelCount; i++)
             {
                 //this.SetChannel(i, new SineChannel(samplesPerSecond, 555, 555, 5.0f));
-                //this.SetChannel(i, new SineChannel(samplesPerSecond, (i+1) * 100, (i+1) * 100, 5.0f));
-                this.SetChannel(i, new SineChannel(samplesPerSecond, i * 100, (i + 5) * 100, 5.0f));
+                //this.SetChannel(i, new SineChannel(samplesPerSecond, i * 25 + 1000, i * 25 + 1000, 5.0f));
+                this.SetChannel(i, new SineChannel(samplesPerSecond, i * 250, (i + 5) * 250, 5.0f));
             }
 
             //this.channels[0].DataChanged += SineInput_DataChanged;

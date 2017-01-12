@@ -42,12 +42,16 @@ namespace BBDDriver.Models.Filter
         public int TimeoutCount { get; private set; }
         public int OutputBlockSize { get; private set; }
         public float FrequencyStep { get; private set; }
+        public float ValidFrequencyMin { get; private set; }
+        public float ValidFrequencyMax { get; private set; }
 
         protected override void InputDataChanged(object sender, DataChangedEventArgs e)
         {
             if (plan == null) return;
 
             this.FrequencyStep = (float)Input.SamplesPerSecond / settings.FFTSampleCount;
+            this.ValidFrequencyMin = this.FrequencyStep;
+            this.ValidFrequencyMax = (float)Input.SamplesPerSecond / 2.0f;
 
             lock (plan)
             {
@@ -129,14 +133,20 @@ namespace BBDDriver.Models.Filter
             {
                 float[] magnitude = new float[complexOutput.Length / 4];
 
-                for (int i = 0; i < complexOutput.Length / 4; i++)
+                // we need to skip the first value because that's always invalid (see ValidFrequencyMin)
+                for (int i = 1; i < complexOutput.Length / 4; i++)
                 {
                     float real = complexOutput[i * 2 + 0];
                     float im = complexOutput[i * 2 + 1];
 
                     //  Get the magnitude of the complex number sqrt((real * real) + (im * im))
-                    magnitude[i] = (float)Math.Sqrt(real * real + im * im) / settings.FFTSampleCount;
+                    magnitude[i] = (float)Math.Sqrt(real * real + im * im) / (settings.FFTSampleCount / 2);
+                    if (magnitude[i] > 1.0f) magnitude[i] = 1.0f;
                 }
+
+                // the excess (not-measured) magnitude is stored at the position 0
+                magnitude[0] = 1.0f - magnitude.Sum();
+                if (magnitude[0] < 0) magnitude[0] = 0;
 
                 if (settings.OutputFormat == FFTOutputFormat.Magnitude)
                 {
@@ -145,7 +155,7 @@ namespace BBDDriver.Models.Filter
                 else
                 {
                     float[] frequencyAndMagnitude = new float[magnitude.Length * 2];
-                    for (int i = 0; i < magnitude.Length; i++)
+                    for (int i = 1; i < magnitude.Length; i++)
                     {
                         frequencyAndMagnitude[i * 2 + 0] = this.FrequencyStep * i;
                         frequencyAndMagnitude[i * 2 + 1] = magnitude[i];

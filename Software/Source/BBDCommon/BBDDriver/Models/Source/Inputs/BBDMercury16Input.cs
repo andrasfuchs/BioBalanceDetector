@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using libusbK;
+using LibUsbDotNet;
 
 namespace BBDDriver.Models.Source
 {
@@ -20,6 +21,7 @@ namespace BBDDriver.Models.Source
         {
             string expectedDeviceID = $"USB\\VID_{DEVICE_VID}&PID_{DEVICE_PID}";
 
+            // libusbK implementation
             int deviceCount = 0;
             KLST_DEVINFO_HANDLE deviceInfo;
             LstK lst = new LstK(KLST_FLAG.NONE);
@@ -39,6 +41,13 @@ namespace BBDDriver.Models.Source
             }
 
             lst.Free();
+
+            // DotNetLibUsb
+            var deviceList = LibUsbDotNet.LibUsb.LibUsbDevice.AllDevices;
+            foreach (var deviceInfoLUDN in deviceList)
+            {
+            }
+
         }
 
         void IDisposable.Dispose()

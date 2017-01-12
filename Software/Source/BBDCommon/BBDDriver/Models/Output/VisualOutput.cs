@@ -7,6 +7,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using BBDDriver.Models.Filter;
+using BBDDriver.Helpers;
+using System.IO;
 
 namespace BBDDriver.Models.Output
 {
@@ -56,9 +58,10 @@ namespace BBDDriver.Models.Output
                 {
                     channels[i, 0] = mci.GetChannel(i);
 
-                    if (!(channels[i, 0] is FilteredDataChannel)) throw new Exception("Spectrum visual output mode is only available for frequency-domain channels.");
-                    var filter = ((FilteredDataChannel)(channels[i, 0])).Filter as FFTWFilter;
-                    if (filter == null) throw new Exception("Spectrum visual output mode supports FFTWFilter only.");
+                    var filter = FilterManager.FindFilter<FFTWFilter>(channels[i, 0]);
+                    if (filter == null) throw new Exception("VisualOutput's Spectrum mode supports FFTWFilter only.");
+                    var filterSettings = filter.GetSettings();
+                    if (filterSettings.OutputFormat != FFTOutputFormat.Magnitude) throw new InvalidDataException($"VisualOutput's Spectrum mode needs and FFT output format of 'Magnitude'. Your FFT filter has '{filterSettings.OutputFormat}'.");
 
                     if (!blockSize.HasValue)
                     {
@@ -72,6 +75,12 @@ namespace BBDDriver.Models.Output
             else if (mode == VisualOutputMode.DominanceMatrix)
             {
                 channels = ChannelMapper.Get2DChannelMatrix(mci);
+
+                var filter = FilterManager.FindFilter<FFTWFilter>(channels[0, 0]);
+                if (filter == null) throw new Exception("VisualOutput's DominanceMatrix mode supports FFTWFilter only.");
+                var filterSettings = filter.GetSettings();
+                if (filterSettings.OutputFormat != FFTOutputFormat.FrequencyMagnitudePair) throw new InvalidDataException($"VisualOutput's DominanceMatrix mode needs and FFT output format of 'FrequencyMagnitudePair'. Your FFT filter has '{filterSettings.OutputFormat}'.");
+
                 dimensions = new int[3] { channels.GetLength(0), channels.GetLength(1), 5 * 2 };    // will containg the top 5 frequencies and their strength
                 values = new float[channels.GetLength(0), channels.GetLength(1), 5 * 2];
             }
@@ -125,7 +134,7 @@ namespace BBDDriver.Models.Output
                     if (channels[x, 0] != e.Channel) continue;
 
                     float[] chValues = e.Channel.GetData(dimensions[1]);
-                    for (int i = 0; i < chValues.Length / 4; i++)
+                    for (int i = 0; i < chValues.Length; i++)
                     {
                         values[x, i, 0] = chValues[i];
                     }

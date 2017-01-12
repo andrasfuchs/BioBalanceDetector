@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using BBDDriver.Helpers;
+using BBDDriver.Models.Filter;
 
 namespace BBDDriver.Models.Output
 {
@@ -29,16 +31,18 @@ namespace BBDDriver.Models.Output
         private float maxFilesPerMinute = 300;
         private DateTime lastFileWriteUtc = DateTime.UtcNow;
 
-        public SimpleVTSFileOutput(MultiChannelInput<IDataChannel> mci, string path, int fftSize, bool createFileSeries = false) : base(mci, path)
+        public SimpleVTSFileOutput(MultiChannelInput<IDataChannel> mci, string path, bool createFileSeries = false) : base(mci, path)
         {
             this.fileWriteThreshold = 0.0f;
             this.createFileSeries = createFileSeries;
-            this.fftSize = fftSize;
-
-            double frequencyStep = ((double)mci.SamplesPerSecond / 2) / (fftSize / 2);
 
             PhysicalBoundaries boundaries = ChannelMapper.GetChannelInputBoundaries(mci);
+            var filter = FilterManager.FindFilter<FFTWFilter>(mci.GetChannel(0));
+            if (filter == null) throw new Exception("SimpleVTSFileOutput supports FFTWFilter only.");
+            var filterSettings = filter.GetSettings();
+            if (filterSettings.OutputFormat != FFTOutputFormat.Magnitude) throw new InvalidDataException($"SimpleVTSFileOutput needs and FFT output format of 'Magnitude'. Your FFT filter has '{filterSettings.OutputFormat}'.");
 
+            this.fftSize = filterSettings.FFTSampleCount;
             zSize = fftSize / 2;
 
             channelCount = mci.ChannelCount;
@@ -58,7 +62,7 @@ namespace BBDDriver.Models.Output
                     {
                         PhysicalPosition pp = ChannelMapper.GetChannelPosition(mci.GetChannel(chIndex));
 
-                        sb.AppendLine(pp.X.ToString("0.0000000000") + " " + pp.Y.ToString("0.0000000000") + " " + (pp.Z + (z * frequencyStep)).ToString("0.0000000000"));
+                        sb.AppendLine(pp.X.ToString("0.0000000000") + " " + pp.Y.ToString("0.0000000000") + " " + (pp.Z + (z * filter.FrequencyStep)).ToString("0.0000000000"));
                     }
                 }
                 sb.AppendLine("</DataArray>");
@@ -80,12 +84,13 @@ namespace BBDDriver.Models.Output
                 {
                     for (int chIndex = 0; chIndex < channelCount; chIndex++)
                     {
-                        float real = dataToWrite[chIndex][z * 2 + 0];
-                        float im = dataToWrite[chIndex][z * 2 + 1];
+                        //float real = dataToWrite[chIndex][z * 2 + 0];
+                        //float im = dataToWrite[chIndex][z * 2 + 1];
 
-                        //  Get the magnitude of the complex number sqrt((real * real) + (im * im))
-                        double magnitude = Math.Sqrt(real * real + im * im);
-                        magnitude /= fftSize;
+                        ////  Get the magnitude of the complex number sqrt((real * real) + (im * im))
+                        //double magnitude = Math.Sqrt(real * real + im * im);
+                        //magnitude /= fftSize;
+                        float magnitude = dataToWrite[chIndex][z];
 
                         if (valuesWritten % 6 == 0) sb.AppendLine();
                         sb.Append(magnitude.ToString("0.0000000000"));
