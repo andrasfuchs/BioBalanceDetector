@@ -1,11 +1,8 @@
 ﻿using BBDDriver.Models.Source;
 using BBDDriver.Models.Mapper;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using BBDDriver.Models.Filter;
 using BBDDriver.Helpers;
 using System.IO;

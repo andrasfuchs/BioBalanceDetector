@@ -10,8 +10,8 @@
       "runtime": {
         "../packages/Activiz.NET.x64.5.8.0/lib/net20/Kitware.VTK.dll": {},
         "../packages/Activiz.NET.x64.5.8.0/lib/net20/Kitware.mummy.Runtime.dll": {},
+        "../packages/CoreCompat.LibUsbDotNet.2.2.8-r101/lib/net45/CoreCompat.LibUsbDotNet.dll": {},
         "../packages/FFTW.3.3.5/fftwlib.dll": {},
-        "../packages/LibUsbDotNet.2.2.8/lib/LibUsbDotNet.dll": {},
         "../packages/Microsoft.AspNet.Cors.5.2.3/lib/net45/System.Web.Cors.dll": {},
         "../packages/Microsoft.AspNet.Mvc.5.2.3/lib/net45/System.Web.Mvc.dll": {},
         "../packages/Microsoft.AspNet.Razor.3.2.3/lib/net45/System.Web.Razor.dll": {},
@@ -25,6 +25,7 @@
         "../packages/Microsoft.AspNet.WebPages.3.2.3/lib/net45/System.Web.WebPages.dll": {},
         "../packages/Microsoft.Web.Infrastructure.1.0.0.0/lib/net40/Microsoft.Web.Infrastructure.dll": {},
         "../packages/Newtonsoft.Json.9.0.1/lib/net45/Newtonsoft.Json.dll": {},
+        "../packages/WinUSBNet.1.0/lib/net40/WinUSBNet.dll": {},
         "bin/Debug/BBDDriver.dll": {}
       },
       "contentFiles": {
