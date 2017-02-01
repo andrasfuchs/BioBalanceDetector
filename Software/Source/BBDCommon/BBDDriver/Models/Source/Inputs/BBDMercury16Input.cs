@@ -23,12 +23,19 @@ namespace BBDDriver.Models.Source
         //private LibUsbDotNet.UsbEndpointReader reader;
         //private LibUsbDotNet.UsbEndpointWriter writer;
 
+        public List<DataRateBenchmarkEntry> BenchmarkEntries = new List<DataRateBenchmarkEntry>();
+
         private USBDevice usbDevice;
         private USBInterface usbInterface;
 
         private Timer refreshUSBInputTimer;
 
-        public BBDMercury16Input(USBDeviceInfo selectedDevice = null) : base(1000, 16)
+        public int CPUClockSpeedMhz { get; set; } = 32;
+        public int ADCSampleRatekMhz { get; set; } = 100;
+        public float ADCReferenceV { get; set; } = 1.0f;
+        public int ADCGain { get; set; } = 1;
+
+        public BBDMercury16Input(USBDeviceInfo selectedDevice = null) : base(1000, 8)
         {
             // string expectedDeviceID = $"USB\\VID_{DEVICE_VID}&PID_{DEVICE_PID}";
 
@@ -90,6 +97,14 @@ namespace BBDDriver.Models.Source
             usbDevice = new USBDevice(selectedDevice);
             usbInterface = usbDevice.Interfaces.Find(USBBaseClass.PersonalHealthcare);
 
+            // TODO: get the number of channels on the device and their sample rate
+            int channelCount = 8;
+            int samplesPerSecond = 1000;
+            for (int i = 0; i < channelCount; i++)
+            {
+                this.SetChannel(i, new SinglePrecisionDataChannel(samplesPerSecond, samplesPerSecond * 5));
+            }
+
             refreshUSBInputTimer = new Timer(PollUSBData, this, 0, 50);
         }
 
@@ -105,19 +120,27 @@ namespace BBDDriver.Models.Source
 
             if (readBytes == 0) return;
 
-            // TODO: process the data received from USB
-            //float[] floats = new float[readBytes / 4];
-            //for (int i = 0; i < floats.Length; i++)
-            //{
-            //    floats[i] = System.BitConverter.ToSingle(rawDataFromUSB, i * 4);
-            //}
-
             short[] shorts = new short[readBytes / 2];
             for (int i = 0; i < shorts.Length; i++)
             {
                 shorts[i] = System.BitConverter.ToInt16(rawDataFromUSB, i * 2);
             }
 
+            float[] floats = new float[shorts.Length / channels.Length];
+            for (int i = 0; i < channels.Length; i++)
+            {
+                if (channels[i] == null) continue;
+
+                for (int j = 0; j < floats.Length; j++)
+                {
+                    floats[j] = (shorts[j * channels.Length + i] / 65536.0f) * ADCReferenceV;
+                }
+
+                channels[i].AppendData(floats);
+            }
+
+            BenchmarkEntries.Add(new DataRateBenchmarkEntry() { TimeStamp = DateTime.UtcNow, IsRead = true, BytesTransferred = readBytes, SamplesTransferred = floats.Length });
+            BenchmarkEntries.RemoveAll(drbe => drbe.TimeStamp < DateTime.UtcNow.AddSeconds(-5));
         }
 
         public override float[] GetValues()

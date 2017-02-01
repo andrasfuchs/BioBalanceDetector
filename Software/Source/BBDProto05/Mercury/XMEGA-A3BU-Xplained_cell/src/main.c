@@ -177,19 +177,22 @@ int main( void )
 	/* Start USB stack to authorize VBus monitoring */
 	udc_start();
 	
-	/* Initialize ST7565R controller and LCD display */
+	///* Initialize ST7565R controller and LCD display */
 	gfx_mono_init();
 
 	/* Display headings on LCD for oversampled result */
-	gfx_mono_draw_string("Oversampled", 0, 0, &sysfont);
+	//gfx_mono_draw_string("Oversampled", 0, 0, &sysfont);
 
 	/* Display headings on LCD for normal result */
-	gfx_mono_draw_string("Normal", 80, 0, &sysfont);
+	//gfx_mono_draw_string("Normal", 80, 0, &sysfont);
+
+	/* We need some time here to USB initialization */
+	delay_ms(100);
 
 	/* Initialize ADC ,to read ADC offset and configure ADC for oversampling
 	**/
 	init_adc(&ADCA);
-	//init_adc(&ADCB);
+	init_adc(&ADCB);
 
 	init_tc();
 
@@ -205,23 +208,10 @@ int main( void )
 	/* Continuous Execution Loop */
 	while (true) {
 		sleepmgr_enter_sleep();
-		/*
-		 * Check if number of sample reached to  total Number of
-		 * oversample required by checking status of
-		 * adc_oversampled_flag
-		 */
-		//if (adc_oversampled_flag == true) {
-			///* Reset the adc_oversampled_flag */
-			//adc_oversampled_flag = false;
-//
-			///* Process all received ADC samples and calculate analog
-			 //* input */
-			//adc_oversampled();
-		//}
-
-		loopcounter++;
-		convert_to_ascii(&loopcounter_ascii_buf[ASCII_BUFFER_SIZE - 1], loopcounter);
-		gfx_mono_draw_string(loopcounter_ascii_buf, 0, 10, &sysfont);
+		
+		//loopcounter++;
+		//convert_to_ascii(&loopcounter_ascii_buf[ASCII_BUFFER_SIZE - 1], loopcounter);
+		//gfx_mono_draw_string(loopcounter_ascii_buf, 0, 10, &sysfont);
 
 		delay_ms(300);
 		ioport_set_pin_high(LED0_GPIO);

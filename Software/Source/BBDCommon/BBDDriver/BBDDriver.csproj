@@ -123,6 +123,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Helpers\ColorConverter.cs" />
+    <Compile Include="Helpers\DataRateBenchmarkEntry.cs" />
     <Compile Include="Helpers\FilterManager.cs" />
     <Compile Include="Helpers\HighResolutionTimer.cs" />
     <Compile Include="Helpers\libusbK.cs" />

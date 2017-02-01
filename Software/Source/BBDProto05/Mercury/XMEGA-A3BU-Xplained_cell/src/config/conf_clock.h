@@ -50,6 +50,7 @@
 /* ! Configuration using On-Chip RC oscillator at 48MHz */
 /* ! The RC oscillator is calibrated via USB Start Of Frame */
 /* ! Clk USB     = 48MHz (used by USB) */
+/* ! Clk PLL     = 48MHz */
 /* ! Clk sys     = 48MHz */
 /* ! Clk cpu/per = 12MHz */
 #define CONFIG_USBCLK_SOURCE     USBCLK_SRC_RCOSC
@@ -57,25 +58,20 @@
 
 #define CONFIG_OSC_AUTOCAL_RC32MHZ_REF_OSC  OSC_ID_USBSOF
 
-#define CONFIG_SYSCLK_SOURCE     SYSCLK_SRC_RC32MHZ
-#define CONFIG_SYSCLK_PSADIV     SYSCLK_PSADIV_2
-#define CONFIG_SYSCLK_PSBCDIV    SYSCLK_PSBCDIV_1_2
+//#define CONFIG_SYSCLK_SOURCE        SYSCLK_SRC_RC32MHZ
 
-/*
- * Use external board OSC (8MHz)
- * Clk pll     = 48MHz (used by USB)
- * Clk sys     = 48MHz
- * Clk cpu/per = 12MHz
- *
- * #define CONFIG_PLL0_SOURCE       PLL_SRC_XOSC
- * #define CONFIG_PLL0_MUL          6
- * #define CONFIG_PLL0_DIV          1
- *
- * #define CONFIG_USBCLK_SOURCE     USBCLK_SRC_PLL
- *
- * #define CONFIG_SYSCLK_SOURCE     SYSCLK_SRC_PLL
- * #define CONFIG_SYSCLK_PSADIV     SYSCLK_PSADIV_2
- * #define CONFIG_SYSCLK_PSBCDIV    SYSCLK_PSBCDIV_1_2
- */
+// Clk sys = Clk pll0
+#define CONFIG_SYSCLK_SOURCE        SYSCLK_SRC_PLL
+
+#define CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ
+
+// Clk pll0 = (2MHz * PLL_MUL) / PLL_DIV
+#define CONFIG_PLL0_SOURCE          PLL_SRC_RC2MHZ
+#define CONFIG_PLL0_MUL             24
+#define CONFIG_PLL0_DIV             1
+
+// Clk cpu/per = Clk sys / (2 ^ BUS_div)
+#define CONFIG_SYSCLK_PSADIV        SYSCLK_PSADIV_2
+#define CONFIG_SYSCLK_PSBCDIV       SYSCLK_PSBCDIV_1_2
 
 #endif /* CONF_CLOCK_H_INCLUDED */

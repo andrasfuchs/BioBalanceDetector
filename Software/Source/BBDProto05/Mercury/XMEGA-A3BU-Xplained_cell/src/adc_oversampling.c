@@ -108,10 +108,10 @@ volatile bool adc_oversampled_flag = false;
  */
 static uint8_t v_input_ascii_buf[ASCII_BUFFER_SIZE] = {"+1.123456"};
 
-static volatile int16_t adc_ch_results[8] = { 0 };
+static volatile uint16_t adc_ch_results[8] = { 0 };
 
 #define ADC_RESULT_BUFFER_SIZE 64
-static int16_t adc_values[8 * ADC_RESULT_BUFFER_SIZE] = { 0 };
+static uint16_t adc_values[8 * ADC_RESULT_BUFFER_SIZE] = { 0 };
 
 static bool dataLEDState = false;
 
@@ -230,7 +230,8 @@ void init_adc_channel(ADC_t *adc, uint8_t ch_mask, enum adcch_positive_input pos
 
 	adcch_read_configuration(adc, ch_mask, &adc_ch_conf);
 	adcch_set_interrupt_mode(&adc_ch_conf, ADCCH_MODE_COMPLETE);
-	adcch_enable_interrupt(&adc_ch_conf);
+	//adcch_enable_interrupt(&adc_ch_conf);
+	adcch_disable_interrupt(&adc_ch_conf);
 	adcch_set_input(&adc_ch_conf, pos, ADCCH_NEG_NONE, 1);
 	adcch_write_configuration(adc, ch_mask, &adc_ch_conf);
 }
@@ -246,14 +247,15 @@ void init_adc(ADC_t *adc)
 
 	// In differential mode without gain all ADC inputs can be used for the positive input of the ADC but only the lower four pins can be used as the negative input.	
 	adc_set_conversion_parameters(&adc_conf, ADC_SIGN_OFF, ADC_RES_12, ADC_REFSEL_INT1V_gc);
-	adc_set_clock_rate(&adc_conf, 1000UL);
+	// Set ADC clock rate to 10kHz or less: The driver attempts to set the ADC clock rate to the fastest possible without exceeding the specified limit.
+	adc_set_clock_rate(&adc_conf, 10000UL);
 	// all four ADC_CHx should be sampled in sweeping mode (nr_of_ch value from Atmel doc8331 table 28-6)
 	adc_set_conversion_trigger(&adc_conf, ADC_TRIG_FREERUN_SWEEP, 4, 0);
 	adc_set_current_limit(&adc_conf, ADC_CURRENT_LIMIT_NO);
 	adc_set_gain_impedance_mode(&adc_conf, ADC_GAIN_HIGHIMPEDANCE);
 	adc_enable_internal_input(&adc_conf, ADC_INT_BANDGAP);
 	adc_write_configuration(adc, &adc_conf);
-	adc_set_callback(adc, adca_handler);
+	//adc_set_callback(adc, adca_handler);
 
 	init_adc_channel(adc, ADC_CH0, ADCCH_POS_PIN8);
 	init_adc_channel(adc, ADC_CH1, ADCCH_POS_PIN9);
@@ -265,25 +267,28 @@ void init_adc(ADC_t *adc)
 
 static void data_sent_ack(udd_ep_status_t status, iram_size_t nb_send, udd_ep_id_t ep)
 {
-	// TODO: this doesn't work
-	//dataLEDState = !dataLEDState;
-	//if (dataLEDState)
-	//{
-		//ioport_set_pin_low(LED1_GPIO);
-	//} else 
-	//{
-		//ioport_set_pin_high(LED1_GPIO);
-	//}
+	dataLEDState = !dataLEDState;
+	if (dataLEDState)
+	{
+		ioport_set_pin_low(LED1_GPIO);
+	} else 
+	{
+		ioport_set_pin_high(LED1_GPIO);
+	}
 }
 
-static void my_callback(void)
+static void pick_a_sample_callback(void)
 {
 	int offset = adc_samplecount * 8;
-	for (int i=0; i<8; i++)
-	{
-		adc_values[offset + i] = adc_ch_results[i];
-	}
-
+	adc_values[offset + 0] = ADCA.CH0RES;
+	adc_values[offset + 1] = ADCA.CH1RES;
+	adc_values[offset + 2] = ADCA.CH2RES;
+	adc_values[offset + 3] = ADCA.CH3RES;
+	adc_values[offset + 4] = ADCB.CH0RES;
+	adc_values[offset + 5] = ADCB.CH1RES;
+	adc_values[offset + 6] = ADCB.CH2RES;
+	adc_values[offset + 7] = ADCB.CH3RES;
+	
 	adc_samplecount++;
 	if (adc_samplecount >= ADC_RESULT_BUFFER_SIZE)
 	{
@@ -301,12 +306,12 @@ static void my_callback(void)
 void init_tc()
 {
 	tc_enable(&TCC0);
-	tc_set_overflow_interrupt_callback(&TCC0, my_callback);
+	tc_set_overflow_interrupt_callback(&TCC0, pick_a_sample_callback);
 	tc_set_wgm(&TCC0, TC_WG_NORMAL);
-	tc_write_period(&TCC0, 1000);
-	tc_set_overflow_interrupt_level(&TCC0, TC_INT_LVL_LO);
+	tc_write_period(&TCC0, 100);  // 100 + TC0_DIV1024 produces 129Hz output (if the CPU runs at 12MHz [2MHz * 24 / 2 / 1 / 2])
+	tc_set_overflow_interrupt_level(&TCC0, TC_INT_LVL_HI);
 	cpu_irq_enable();
-	tc_write_clock_source(&TCC0, TC_TC0_CLKSEL_DIV1_gc);
+	tc_write_clock_source(&TCC0, TC_TC0_CLKSEL_DIV1024_gc);
 }
 
 /**

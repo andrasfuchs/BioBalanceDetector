@@ -129,7 +129,8 @@ namespace BBDDriver
             //VisualOutput vo = new VisualOutput(filteredSource, 25, VisualOutputMode.Waveform);
             //VisualOutput vo = new VisualOutput(filteredSource, 25, VisualOutputMode.Spectrum);
             //VisualOutput vo = new VisualOutput(averagedSource, 25, VisualOutputMode.DominanceMatrix);
-            //vo.RefreshVisualOutput += Vo_RefreshVisualOutput;
+            VisualOutput vo = new VisualOutput(waveSource, 25, VisualOutputMode.Waveform);
+            vo.RefreshVisualOutput += Vo_RefreshVisualOutput;
 
             firstActivity = DateTime.UtcNow;
 
@@ -254,7 +255,7 @@ namespace BBDDriver
         private static string GenerateWaveformOutput(RefreshVisualOutputEventArgs e, int avgSampleCount, int height)
         {
             consoleSB.Clear();
-            for (int chIndex = 0; chIndex < e.Dimensions[0]; chIndex++)
+            for (int chIndex = 0; chIndex < Math.Min(4, e.Dimensions[0]); chIndex++)
             {
                 int columnCount = e.Dimensions[1] / avgSampleCount;
                 float[] columnMins = Enumerable.Repeat<float>(Single.MaxValue, columnCount).ToArray();
@@ -308,6 +309,15 @@ namespace BBDDriver
                 BBD8x8MatrixInput bbdInput = (BBD8x8MatrixInput)waveSource;
 
                 consoleTitle += $" - {(bbdInput.COMPortBytesReceived / timeElapsed / 1024).ToString("0.00")} kbytes/sec - {((double)bbdInput.LLCommandReceived / timeElapsed).ToString("0.00")} fps";
+            }
+            if (waveSource is BBDMercury16Input)
+            {
+                BBDMercury16Input bbdInput = (BBDMercury16Input)waveSource;
+
+                double time = (bbdInput.BenchmarkEntries.Max(be => be.TimeStamp) - bbdInput.BenchmarkEntries.Min(be => be.TimeStamp)).TotalSeconds;
+                double speed = (time <= 0 ? 0 : bbdInput.BenchmarkEntries.Sum(be => be.BytesTransferred) / time);
+                int samples = bbdInput.BenchmarkEntries.Sum(be => be.SamplesTransferred);
+                consoleTitle += $" - {(speed / 1024).ToString("0.00")} kbytes/sec - {(samples / time / 1000).ToString("0.000")} kHz";
             }
             if (recentValues != null)
             {
