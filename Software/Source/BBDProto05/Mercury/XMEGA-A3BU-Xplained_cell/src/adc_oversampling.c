@@ -108,35 +108,10 @@ volatile bool adc_oversampled_flag = false;
  */
 static uint8_t v_input_ascii_buf[ASCII_BUFFER_SIZE] = {"+1.123456"};
 
-static volatile uint16_t adc_ch_results[8] = { 0 };
-
-#define ADC_RESULT_BUFFER_SIZE 64
+#define ADC_RESULT_BUFFER_SIZE 900
 static uint16_t adc_values[8 * ADC_RESULT_BUFFER_SIZE] = { 0 };
 
 static bool dataLEDState = false;
-
-static void set_adc_results(ADC_t *adc, int index_offset)
-{
-	adc_ch_results[index_offset+0] = adc_get_result(adc, 0);
-	adc_ch_results[index_offset+1] = adc_get_result(adc, 1);
-	adc_ch_results[index_offset+2] = adc_get_result(adc, 2);
-	adc_ch_results[index_offset+3] = adc_get_result(adc, 3);
-}
-
-static void adca_handler(ADC_t *adc, uint8_t ch_mask, adc_result_t result)
-{
-	irqflags_t flags = cpu_irq_save();
-	
-	int offset = 0;
-	if (adc == &ADCB)
-	{
-		offset += 4;
-	}
-
-	set_adc_results(adc, offset);
-
-	cpu_irq_restore(flags);
-}
 
 /**
  * \brief This Function converts a decimal value to ASCII
@@ -179,52 +154,7 @@ void convert_to_ascii(uint8_t *buf_index, uint64_t dec_val)
 	}
 }
 
-/**
- * \brief This Function Display ADC count on LCD
- *  - It will extract each digit from ADC count and convert to ASCII
- *  - Use GFX service for displaying each character
- * \param adc_rawcount ADC raw count value to be displayed.
- * \param x_cordinate X-coordinate where display should end.
- * \param sign_flag Sign of ADC count.If negative sign_flag is set.
- */
-void display_adccount( uint64_t adc_rawcount, uint8_t x_cordinate,
-		uint8_t sign_flag)
-{
-	uint8_t digit_count = 0;
-	uint8_t adc_count_digit = 0;
-	uint8_t sign_digit = '+';
-
-	/* Loop through all digits to convert to ASCII */
-	for (digit_count = 0; digit_count <= NUMBER_OF_DIGITS_IN_ADCCOUNT;
-			digit_count++) {
-		/* Extract each digit from raw ADC count and convert to ASCII
-		 * - The Last digit will be extracted first and displayed
-		 */
-		adc_count_digit =   (adc_rawcount % 10)  + 48;
-
-		/* Display the extracted character on LCD */
-		gfx_mono_draw_char((const char)adc_count_digit, x_cordinate, 23,
-				&sysfont);
-
-		/* Point to x-coordinate for display of next digit */
-		x_cordinate = (x_cordinate - 7);
-
-		/* Remove extracted digit from raw count by doing divide
-		 * with 10
-		 */
-		adc_rawcount = (adc_rawcount / 10);
-	}
-
-	/* If sign_flag is set display negative symbol */
-	if (sign_flag) {
-		sign_digit = '-';
-	}
-
-	/* Display the sign character on LCD */
-	gfx_mono_draw_char((const char)sign_digit, x_cordinate, 23, &sysfont);
-}
-
-void init_adc_channel(ADC_t *adc, uint8_t ch_mask, enum adcch_positive_input pos)
+void init_adc_channel(ADC_t *adc, uint8_t ch_mask, enum adcch_positive_input pos, uint8_t gain)
 {
 	struct adc_channel_config adc_ch_conf;
 
@@ -232,23 +162,51 @@ void init_adc_channel(ADC_t *adc, uint8_t ch_mask, enum adcch_positive_input pos
 	adcch_set_interrupt_mode(&adc_ch_conf, ADCCH_MODE_COMPLETE);
 	//adcch_enable_interrupt(&adc_ch_conf);
 	adcch_disable_interrupt(&adc_ch_conf);
-	adcch_set_input(&adc_ch_conf, pos, ADCCH_NEG_NONE, 1);
+	adcch_set_input(&adc_ch_conf, pos, ADCCH_NEG_NONE, gain);
 	adcch_write_configuration(adc, ch_mask, &adc_ch_conf);
 }
 
-void init_adc(ADC_t *adc)
+void init_adc(ADC_t *adc, CellSettings_t *settings)
 {
 	struct adc_config adc_conf;
-
-	//adc_disable(adc);
-
+	
 	/* Initialize configuration structures */
 	adc_read_configuration(adc, &adc_conf);
 
 	// In differential mode without gain all ADC inputs can be used for the positive input of the ADC but only the lower four pins can be used as the negative input.	
-	adc_set_conversion_parameters(&adc_conf, ADC_SIGN_OFF, ADC_RES_12, ADC_REFSEL_INT1V_gc);
-	// Set ADC clock rate to 10kHz or less: The driver attempts to set the ADC clock rate to the fastest possible without exceeding the specified limit.
-	adc_set_clock_rate(&adc_conf, 10000UL);
+	adc_set_conversion_parameters(&adc_conf, ADC_SIGN_OFF, ADC_RES_12_LEFT, settings->adc_ref);
+	
+	// Set ADC clock rate to 2MHz or less: The driver attempts to set the ADC clock rate to the fastest possible without exceeding the specified limit.
+	adc_set_clock_rate(&adc_conf, settings->clk_adc);	
+
+	switch (adc_conf.prescaler)
+	{
+		case ADC_PRESCALER_DIV4_gc:
+			settings->clk_adc = settings->clk_sys / 4;
+			break;
+		case ADC_PRESCALER_DIV8_gc:
+			settings->clk_adc = settings->clk_sys / 8;
+			break;
+		case ADC_PRESCALER_DIV16_gc:
+			settings->clk_adc = settings->clk_sys / 16;
+			break;
+		case ADC_PRESCALER_DIV32_gc:
+			settings->clk_adc = settings->clk_sys / 32;
+			break;
+		case ADC_PRESCALER_DIV64_gc:
+			settings->clk_adc = settings->clk_sys / 64;
+			break;
+		case ADC_PRESCALER_DIV128_gc:
+			settings->clk_adc = settings->clk_sys / 128;
+			break;
+		case ADC_PRESCALER_DIV256_gc:
+			settings->clk_adc = settings->clk_sys / 256;
+			break;
+		case ADC_PRESCALER_DIV512_gc:
+			settings->clk_adc = settings->clk_sys / 512;
+			break;
+	}
+
 	// all four ADC_CHx should be sampled in sweeping mode (nr_of_ch value from Atmel doc8331 table 28-6)
 	adc_set_conversion_trigger(&adc_conf, ADC_TRIG_FREERUN_SWEEP, 4, 0);
 	adc_set_current_limit(&adc_conf, ADC_CURRENT_LIMIT_NO);
@@ -257,10 +215,10 @@ void init_adc(ADC_t *adc)
 	adc_write_configuration(adc, &adc_conf);
 	//adc_set_callback(adc, adca_handler);
 
-	init_adc_channel(adc, ADC_CH0, ADCCH_POS_PIN8);
-	init_adc_channel(adc, ADC_CH1, ADCCH_POS_PIN9);
-	init_adc_channel(adc, ADC_CH2, ADCCH_POS_PIN10);
-	init_adc_channel(adc, ADC_CH3, ADCCH_POS_PIN11);
+	init_adc_channel(adc, ADC_CH0, ADCCH_POS_PIN8 , settings->adc_gain);
+	init_adc_channel(adc, ADC_CH1, ADCCH_POS_PIN9 , settings->adc_gain);
+	init_adc_channel(adc, ADC_CH2, ADCCH_POS_PIN10, settings->adc_gain);
+	init_adc_channel(adc, ADC_CH3, ADCCH_POS_PIN11, settings->adc_gain);
 
 	adc_enable(adc);
 }
@@ -302,16 +260,50 @@ static void pick_a_sample_callback(void)
 	tc_clear_overflow(&TCC0);
 }
 
-
-void init_tc()
+// '!' indicates that the speed is less than expected
+//  100 + TC0_DIV1024 produces    129Hz output (if the CPU runs at 12MHz [32MHz->48Mhz / 2 / 1 / 2])
+//  100 + TC0_DIV1024 produces    132Hz output (if the CPU runs at 12MHz [2MHz * 24 / 2 / 1 / 2])
+//  100 + TC0_DIV1024 produces    251Hz output (if the CPU runs at 24MHz [2MHz * 24 / 1 / 1 / 2])
+//  100 + TC0_DIV1024 produces    132Hz output (if the CPU runs at 12MHz [2MHz * 12 / 1 / 1 / 2])
+//  100 + TC0_DIV1024 produces    251Hz output (if the CPU runs at 24MHz [2MHz * 12 / 1 / 1 / 1]) 
+//  100 + TC0_DIV1024 produces    331Hz output (if the CPU runs at 32MHz [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE  64
+//  100 + TC0_DIV1024 produces    344Hz output (if the CPU runs at 32MHz [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE 128
+//  100 + TC0_DIV1024 produces    333Hz output (if the CPU runs at 32MHz [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE 128, CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ
+//   50 + TC0_DIV1024 produces    635Hz output (if the CPU runs at 32MHz [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE 128, CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ
+//   50 + TC0_DIV256  produces  2'462Hz output (if the CPU runs at 32MHz [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE 128, CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ
+//!  50 + TC0_DIV64   produces  7'200Hz output (if the CPU runs at 32MHz [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE 128, CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ
+//   50 + TC0_DIV64   produces  9'800Hz output (if the CPU runs at 32MHz [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE 256, CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ
+//  400 + TC0_DIV8    produces  9'960Hz output (if the CPU runs at 32MHz [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE 256, CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ
+//  800 + TC0_DIV2    produces 19'900Hz output (if the CPU runs at 32MHz [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE 512, CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ
+//! 400 + TC0_DIV2    produces 29'800Hz output (if the CPU runs at 32MHz [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE 512, CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ
+//  800 + TC0_DIV2    produces 20'000Hz output (if the CPU runs at 32MHz [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE 900, CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ
+//  800 + TC0_DIV1    produces 39'800Hz output (if the CPU runs at 32MHz [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE 900, CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ
+//! 400 + TC0_DIV1    produces 39'800Hz output (if the CPU runs at 32MHz [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE 900, CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ
+// 1200 + TC0_DIV1    produces 26'600Hz output (if the CPU runs at 32MHz [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE 900, CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ
+//   12 + TC0_DIV64   produces 38'380Hz output (if the CPU runs at 32MHz [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE 900, CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ
+//   10 + TC0_DIV64   produces 45'320Hz output (if the CPU runs at 32MHz [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE 900, CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ
+//!   8 + TC0_DIV64   produces 27'700Hz output (if the CPU runs at 32MHz [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE 900, CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ
+//!   8 + TC0_DIV64   produces 28'400Hz output (if the CPU runs at 32MHz [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE 900, CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ, udd_ep_run|shortpacket=false
+//    9 + TC0_DIV64   produces 49'800Hz output (if the CPU runs at 32MHz [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE 900, CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ, udd_ep_run|shortpacket=true
+//    9 + TC0_DIV64   produces 50'480Hz output (if the CPU runs at 32MHz [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE 900, CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ, udd_ep_run|shortpacket=false
+//!  72 + TC0_DIV8    produces 28'050Hz output (if the CPU runs at 32MHz [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE 900, CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ, udd_ep_run|shortpacket=false
+//   80 + TC0_DIV8    produces 49'850Hz output (if the CPU runs at 32MHz [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE 900, CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ, udd_ep_run|shortpacket=false
+//   78 + TC0_DIV8    produces 51'090Hz output (if the CPU runs at 32MHz [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE 900, CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ, udd_ep_run|shortpacket=false
+//  550 + TC0_DIV8    produces  8'000Hz output (if the CPU runs at 32MHz [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE 900, CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ, udd_ep_run|shortpacket=false
+//  507 + TC0_DIV8    produces  8'010Hz output (if the CPU runs at 32MHz [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE 900, CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ, udd_ep_run|shortpacket=true
+//  508 + TC0_DIV8    produces  7'994Hz output (if the CPU runs at 32MHz [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE 900, CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ, udd_ep_run|shortpacket=true
+void init_tc(CellSettings_t *settings)
 {
+	uint16_t effective_per_value = (settings->clk_sys / 8 / settings->sample_rate) + settings->per_value_compensation;
+	settings->sample_rate = settings->clk_sys / 8 / effective_per_value;
+
 	tc_enable(&TCC0);
 	tc_set_overflow_interrupt_callback(&TCC0, pick_a_sample_callback);
 	tc_set_wgm(&TCC0, TC_WG_NORMAL);
-	tc_write_period(&TCC0, 100);  // 100 + TC0_DIV1024 produces 129Hz output (if the CPU runs at 12MHz [2MHz * 24 / 2 / 1 / 2])
+	tc_write_period(&TCC0, effective_per_value);
 	tc_set_overflow_interrupt_level(&TCC0, TC_INT_LVL_HI);
 	cpu_irq_enable();
-	tc_write_clock_source(&TCC0, TC_TC0_CLKSEL_DIV1024_gc);
+	tc_write_clock_source(&TCC0, TC_TC0_CLKSEL_DIV8_gc);
 }
 
 /**

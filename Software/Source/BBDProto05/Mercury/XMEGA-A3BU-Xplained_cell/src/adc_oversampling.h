@@ -59,6 +59,44 @@
 
 #include <adc.h>
 
+
+typedef struct CellSettings_struct
+{
+	// reset | enabled
+	uint8_t device_status;
+
+	// unknown | cell | organizer
+	uint8_t device_type;
+
+	// MPCM index
+	uint8_t device_index;
+
+	// unique ID
+	uint32_t device_id;
+
+	// system clock speed in Hz
+	uint32_t clk_sys;
+
+	// ADC clock speed in Hz
+	uint32_t clk_adc;
+
+	// ADC reference
+	enum adc_reference adc_ref;
+
+	// ADC gain
+	uint8_t adc_gain;
+
+	// sampling timer rate in Hz
+	uint32_t sample_rate;
+
+	// compesation of the timer (sligthly changes the speed)
+	int16_t per_value_compensation;
+
+	// number of channels
+	uint32_t channel_count;
+} CellSettings_t;
+
+
 /**
  * \brief Static variable/flag to indicate that one set of oversampling is
  *        done for start processing
@@ -77,9 +115,9 @@ void convert_to_ascii(uint8_t *buf_index, uint64_t dec_val);
 void display_adccount( uint64_t adc_rawcount, uint8_t x_cordinate, uint8_t sign_flag);
 
 /*! \brief Function to initialize the ADC */
-extern void init_adc(ADC_t *adc);
+extern void init_adc(ADC_t *adc, CellSettings_t *settings);
 
-void init_tc();
+void init_tc(CellSettings_t *settings);
 
 /*! \brief Function to process sampled ADC values */
 extern void adc_oversampled(void);

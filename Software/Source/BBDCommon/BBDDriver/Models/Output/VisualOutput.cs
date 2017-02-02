@@ -9,7 +9,7 @@ using System.IO;
 
 namespace BBDDriver.Models.Output
 {
-    public enum VisualOutputMode { NotSet, Waveform, Matrix, Spectrum, DominanceMatrix };
+    public enum VisualOutputMode { None, Waveform, Matrix, Spectrum, DominanceMatrix };
 
     public struct FrequencyValue
     {
@@ -89,7 +89,11 @@ namespace BBDDriver.Models.Output
 
         private void DataChanged(object sender, DataChangedEventArgs e)
         {
-            if (mode == VisualOutputMode.Matrix)
+            if (mode == VisualOutputMode.None)
+            {
+                changedSinceLastRefresh = true;
+            }
+            else if (mode == VisualOutputMode.Matrix)
             {
                 for (int x = 0; x < dimensions[0]; x++)
                 {

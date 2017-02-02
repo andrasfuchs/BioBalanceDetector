@@ -31,11 +31,12 @@ namespace BBDDriver.Models.Source
         private Timer refreshUSBInputTimer;
 
         public int CPUClockSpeedMhz { get; set; } = 32;
-        public int ADCSampleRatekMhz { get; set; } = 100;
+        public int ADCSpeedkMhz { get; set; } = 2;
         public float ADCReferenceV { get; set; } = 1.0f;
         public int ADCGain { get; set; } = 1;
+        public int SampleRatekMhz { get; set; } = 8;
 
-        public BBDMercury16Input(USBDeviceInfo selectedDevice = null) : base(1000, 8)
+        public BBDMercury16Input(USBDeviceInfo selectedDevice = null) : base(8000, 8)
         {
             // string expectedDeviceID = $"USB\\VID_{DEVICE_VID}&PID_{DEVICE_PID}";
 
@@ -99,10 +100,9 @@ namespace BBDDriver.Models.Source
 
             // TODO: get the number of channels on the device and their sample rate
             int channelCount = 8;
-            int samplesPerSecond = 1000;
             for (int i = 0; i < channelCount; i++)
             {
-                this.SetChannel(i, new SinglePrecisionDataChannel(samplesPerSecond, samplesPerSecond * 5));
+                this.SetChannel(i, new SinglePrecisionDataChannel(this.SamplesPerSecond, this.SamplesPerSecond * 5));
             }
 
             refreshUSBInputTimer = new Timer(PollUSBData, this, 0, 50);
@@ -120,11 +120,14 @@ namespace BBDDriver.Models.Source
 
             if (readBytes == 0) return;
 
-            short[] shorts = new short[readBytes / 2];
+            ushort[] shorts = new ushort[readBytes / 2];
             for (int i = 0; i < shorts.Length; i++)
             {
-                shorts[i] = System.BitConverter.ToInt16(rawDataFromUSB, i * 2);
+                shorts[i] = System.BitConverter.ToUInt16(rawDataFromUSB, i * 2);
             }
+
+            DataRateBenchmarkEntry drbe = new DataRateBenchmarkEntry() { TimeStamp = DateTime.UtcNow, IsRead = true, BytesTransferred = readBytes, SamplesTransferred = shorts.Length / channels.Length };
+            ushort prevShortValue = 0;
 
             float[] floats = new float[shorts.Length / channels.Length];
             for (int i = 0; i < channels.Length; i++)
@@ -133,14 +136,29 @@ namespace BBDDriver.Models.Source
 
                 for (int j = 0; j < floats.Length; j++)
                 {
-                    floats[j] = (shorts[j * channels.Length + i] / 65536.0f) * ADCReferenceV;
+                    ushort shortValue = shorts[j * channels.Length + i];
+                    if (j == 0) prevShortValue = shortValue;
+
+                    floats[j] = (shortValue / 65536.0f) * ADCReferenceV;
+
+                    ushort valueChange = (ushort)Math.Abs(shortValue - prevShortValue);
+                    if (valueChange > drbe.MaxJumpBetweenSampleValues) drbe.MaxJumpBetweenSampleValues = valueChange;
+
+                    // 12 bit samples are shifted to left by 4 bits, so we need check if the change is higher than 256 << 4 = 4096
+                    if (valueChange >= 4096) drbe.EightBitChangeOverflowCount++;
+                    if ((j > 0) && (valueChange == 0)) drbe.SameValueWarningCount++;
+
+                    prevShortValue = shortValue;
                 }
 
                 channels[i].AppendData(floats);
             }
 
-            BenchmarkEntries.Add(new DataRateBenchmarkEntry() { TimeStamp = DateTime.UtcNow, IsRead = true, BytesTransferred = readBytes, SamplesTransferred = floats.Length });
-            BenchmarkEntries.RemoveAll(drbe => drbe.TimeStamp < DateTime.UtcNow.AddSeconds(-5));
+            lock (BenchmarkEntries)
+            {
+                BenchmarkEntries.Add(drbe);
+                BenchmarkEntries.RemoveAll(be => be.TimeStamp < DateTime.UtcNow.AddSeconds(-5));
+            }
         }
 
         public override float[] GetValues()

@@ -145,8 +145,6 @@ static void data_sent_ack(udd_ep_status_t status, iram_size_t nb_send, udd_ep_id
 {
 }
 
-
-
 /**
  * \brief Main application routine
  *  - Initializes the board and LCD display
@@ -187,23 +185,33 @@ int main( void )
 	//gfx_mono_draw_string("Normal", 80, 0, &sysfont);
 
 	/* We need some time here to USB initialization */
-	delay_ms(100);
+	delay_ms(250);
+
+	CellSettings_t settings;
+	//settings.device_id = Get_debug_register(AVR32_DID);
+	settings.clk_sys = sysclk_get_per_hz();
+	settings.clk_adc = 2000000UL;
+	settings.adc_ref = ADC_REFSEL_INT1V_gc;
+	settings.adc_gain = 1;
+	settings.sample_rate = 8000;
+	settings.per_value_compensation = 7;
+	settings.channel_count = 8;
 
 	/* Initialize ADC ,to read ADC offset and configure ADC for oversampling
 	**/
-	init_adc(&ADCA);
-	init_adc(&ADCB);
+	init_adc(&ADCA, &settings);
+	init_adc(&ADCB, &settings);
 
-	init_tc();
+	init_tc(&settings);
 
 	/* Enable global interrupt */
 	//cpu_irq_enable();
 
 	/* Switch ON LCD back light */
-	ioport_set_pin_high(NHD_C12832A1Z_BACKLIGHT);
+	//ioport_set_pin_high(NHD_C12832A1Z_BACKLIGHT);
 
 	/* Set LCD contrast */
-	st7565r_set_contrast(ST7565R_DISPLAY_CONTRAST_MIN);
+	//st7565r_set_contrast(ST7565R_DISPLAY_CONTRAST_MIN);
 
 	/* Continuous Execution Loop */
 	while (true) {

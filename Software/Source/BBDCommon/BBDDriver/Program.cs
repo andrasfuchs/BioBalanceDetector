@@ -108,12 +108,12 @@ namespace BBDDriver
                 Console.WriteLine("OK");
             }
 
-            int fftSize = 1024;
+            int fftSize = 4096;
             frequencyStep = (float)waveSource.SamplesPerSecond / fftSize;
 
             //MultiChannelInput<IDataChannel> filteredSource = FilterManager.ApplyFilters(waveSource, new ByPassFilter() { Settings = new ByPassFilterSettings() { Enabled = true } });
             //MultiChannelInput<IDataChannel> filteredSource = FilterManager.ApplyFilters(waveSource, new FillFilter() { Settings = new FillFilterSettings() { Enabled = true, ValueToFillWith = 0.75f } });
-            //MultiChannelInput<IDataChannel> filteredSource = FilterManager.ApplyFilters(waveSource, new FFTWFilter() { Settings = new FFTWFilterSettings() { Enabled = true, FFTSampleCount = fftSize, IsBackward = false, PlanningRigor = FFTPlanningRigor.Estimate, IsRealTime = true, Timeout = 300, OutputFormat = FFTOutputFormat.Magnitude } });
+            MultiChannelInput<IDataChannel> filteredSource = FilterManager.ApplyFilters(waveSource, new FFTWFilter() { Settings = new FFTWFilterSettings() { Enabled = true, FFTSampleCount = fftSize, IsBackward = false, PlanningRigor = FFTPlanningRigor.Estimate, IsRealTime = true, Timeout = 300, OutputFormat = FFTOutputFormat.Magnitude } });
             //MultiChannelInput<IDataChannel> filteredSource = FilterManager.ApplyFilters(waveSource, new FFTWFilter() { Settings = new FFTWFilterSettings() { Enabled = true, FFTSampleCount = fftSize, IsBackward = false, PlanningRigor = FFTPlanningRigor.Estimate, IsRealTime = true, Timeout = 300, OutputFormat = FFTOutputFormat.FrequencyMagnitudePair } });
             //MultiChannelInput<IDataChannel> averagedSource = FilterManager.ApplyFilters(filteredSource, new MovingAverageFilter() { Settings = new MovingAverageFilterSettings() { Enabled = true, InputDataDimensions = 2, MovingAverageLength = 10 } });
 
@@ -126,10 +126,11 @@ namespace BBDDriver
             //vtsfo = new SimpleVTSFileOutput(filteredSource, $"{workingDirectory}{SessionId}.vts", true);
             //vtsfo.DataWritten += Vtsfo_DataWritten;
 
+            VisualOutput vo = new VisualOutput(filteredSource, 25, VisualOutputMode.None);
             //VisualOutput vo = new VisualOutput(filteredSource, 25, VisualOutputMode.Waveform);
             //VisualOutput vo = new VisualOutput(filteredSource, 25, VisualOutputMode.Spectrum);
             //VisualOutput vo = new VisualOutput(averagedSource, 25, VisualOutputMode.DominanceMatrix);
-            VisualOutput vo = new VisualOutput(waveSource, 25, VisualOutputMode.Waveform);
+            //VisualOutput vo = new VisualOutput(waveSource, 25, VisualOutputMode.Waveform);
             vo.RefreshVisualOutput += Vo_RefreshVisualOutput;
 
             firstActivity = DateTime.UtcNow;
@@ -172,7 +173,7 @@ namespace BBDDriver
                     }
                     else if (e.Mode == VisualOutputMode.Spectrum)
                     {
-                        consoleOutput = GenerateSpectrumOutput(e, 4, 10);
+                        consoleOutput = GenerateSpectrumOutput(e, 16, 10);
                     }
                     else if (e.Mode == VisualOutputMode.DominanceMatrix)
                     {
@@ -200,7 +201,7 @@ namespace BBDDriver
 
             float chColumnMax = 0.0f;
             float[] chExcess = new float[e.Dimensions[0]];
-            for (int chIndex = 0; chIndex < e.Dimensions[0]; chIndex++)
+            for (int chIndex = 0; chIndex < Math.Min(4, e.Dimensions[0]); chIndex++)
             {
                 int columnCount = e.Dimensions[1] / avgSampleCount;
                 float[] columnAvgs = new float[columnCount];
@@ -314,10 +315,16 @@ namespace BBDDriver
             {
                 BBDMercury16Input bbdInput = (BBDMercury16Input)waveSource;
 
-                double time = (bbdInput.BenchmarkEntries.Max(be => be.TimeStamp) - bbdInput.BenchmarkEntries.Min(be => be.TimeStamp)).TotalSeconds;
-                double speed = (time <= 0 ? 0 : bbdInput.BenchmarkEntries.Sum(be => be.BytesTransferred) / time);
-                int samples = bbdInput.BenchmarkEntries.Sum(be => be.SamplesTransferred);
-                consoleTitle += $" - {(speed / 1024).ToString("0.00")} kbytes/sec - {(samples / time / 1000).ToString("0.000")} kHz";
+                lock (bbdInput.BenchmarkEntries)
+                {
+                    double time = (bbdInput.BenchmarkEntries.Max(be => be.TimeStamp) - bbdInput.BenchmarkEntries.Min(be => be.TimeStamp)).TotalSeconds;
+                    double speed = (time <= 0 ? 0 : bbdInput.BenchmarkEntries.Sum(be => be.BytesTransferred) / time);
+                    int samples = bbdInput.BenchmarkEntries.Sum(be => be.SamplesTransferred);
+                    ushort maxJump = bbdInput.BenchmarkEntries.Max(be => be.MaxJumpBetweenSampleValues);
+                    float overflowCount = (float)bbdInput.BenchmarkEntries.Sum(be => be.EightBitChangeOverflowCount) / samples / bbdInput.ChannelCount;
+                    float sameValueCount = (float)bbdInput.BenchmarkEntries.Sum(be => be.SameValueWarningCount) / samples / bbdInput.ChannelCount;
+                    consoleTitle += $" - {(speed / 1024).ToString("0.00")} kbytes/sec - {(samples / time).ToString("#,0")} Hz - maxJump: {maxJump} (of: {overflowCount.ToString("0.00%")}, sv: {sameValueCount.ToString("0.00%")})";
+                }
             }
             if (recentValues != null)
             {
