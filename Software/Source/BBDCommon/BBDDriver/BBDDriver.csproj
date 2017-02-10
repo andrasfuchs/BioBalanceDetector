@@ -130,6 +130,7 @@
     <Compile Include="Models\AllChannelsDataChangedEventArgs.cs" />
     <Compile Include="Models\DataWrittenEventArgs.cs" />
     <Compile Include="Models\Filter\BaseChannelFilter.cs" />
+    <Compile Include="Models\Filter\NormalizerFilter.cs" />
     <Compile Include="Models\Filter\ThresholdFilter.cs" />
     <Compile Include="Models\Filter\MovingAverageFilter.cs" />
     <Compile Include="Models\Filter\FFTWFilter.cs" />
