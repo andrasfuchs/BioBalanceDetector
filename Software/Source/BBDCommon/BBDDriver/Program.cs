@@ -115,10 +115,11 @@ namespace BBDDriver
             //MultiChannelInput<IDataChannel> filteredSource = FilterManager.ApplyFilters(waveSource, new FillFilter() { Settings = new FillFilterSettings() { Enabled = true, ValueToFillWith = 0.75f } });
             MultiChannelInput<IDataChannel> filteredSource = FilterManager.ApplyFilters(waveSource, new FFTWFilter() { Settings = new FFTWFilterSettings() { Enabled = true, FFTSampleCount = fftSize, IsBackward = false, PlanningRigor = FFTPlanningRigor.Estimate, IsRealTime = true, Timeout = 300, OutputFormat = FFTOutputFormat.Magnitude } });
             //MultiChannelInput<IDataChannel> filteredSource = FilterManager.ApplyFilters(waveSource, new FFTWFilter() { Settings = new FFTWFilterSettings() { Enabled = true, FFTSampleCount = fftSize, IsBackward = false, PlanningRigor = FFTPlanningRigor.Estimate, IsRealTime = true, Timeout = 300, OutputFormat = FFTOutputFormat.FrequencyMagnitudePair } });
-            //MultiChannelInput<IDataChannel> averagedSource = FilterManager.ApplyFilters(filteredSource, new MovingAverageFilter() { Settings = new MovingAverageFilterSettings() { Enabled = true, InputDataDimensions = 2, MovingAverageLength = 10 } });
+            MultiChannelInput<IDataChannel> thresholdedSource = FilterManager.ApplyFilters(filteredSource, new ThresholdFilter() { Settings = new ThresholdFilterSettings() { Enabled = true, MinValue = 0.001f, MaxValue = Single.MaxValue } });
+            MultiChannelInput<IDataChannel> averagedSource = FilterManager.ApplyFilters(thresholdedSource, new MovingAverageFilter() { Settings = new MovingAverageFilterSettings() { Enabled = true, InputDataDimensions = 2, MovingAverageLength = 10 } });
 
-            //wfo = new WaveFileOutput(waveSource, $"{workingDirectory}{SessionId}.wav");
-            //wfo.DataWritten += Wfo_DataWritten;
+            wfo = new WaveFileOutput(waveSource, $"{workingDirectory}{SessionId}.wav");
+            wfo.DataWritten += Wfo_DataWritten;
 
             //vtkfo = new VTKFileOutput(filteredSource, $"{workingDirectory}{SessionId}.vts");
             //vtkfo.DataWritten += Wfo_DataWritten;
@@ -126,9 +127,9 @@ namespace BBDDriver
             //vtsfo = new SimpleVTSFileOutput(filteredSource, $"{workingDirectory}{SessionId}.vts", true);
             //vtsfo.DataWritten += Vtsfo_DataWritten;
 
-            VisualOutput vo = new VisualOutput(filteredSource, 25, VisualOutputMode.None);
+            //VisualOutput vo = new VisualOutput(filteredSource, 25, VisualOutputMode.None);
             //VisualOutput vo = new VisualOutput(filteredSource, 25, VisualOutputMode.Waveform);
-            //VisualOutput vo = new VisualOutput(filteredSource, 25, VisualOutputMode.Spectrum);
+            VisualOutput vo = new VisualOutput(averagedSource, 25, VisualOutputMode.Spectrum);
             //VisualOutput vo = new VisualOutput(averagedSource, 25, VisualOutputMode.DominanceMatrix);
             //VisualOutput vo = new VisualOutput(waveSource, 25, VisualOutputMode.Waveform);
             vo.RefreshVisualOutput += Vo_RefreshVisualOutput;
