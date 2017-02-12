@@ -17,6 +17,7 @@ namespace BBDDriver.Models.Source
         private const int DEVICE_VID = 0x03EB;
         private const int DEVICE_PID = 0x2405;
         private const string DEVICE_DESC = "Mercury-16";
+        private const int targetFPS = 30;
 
         //private KLST_DEVINFO_HANDLE deviceInfo;
         //private LibUsbDotNet.Main.UsbRegistry deviceInfo;
@@ -28,13 +29,12 @@ namespace BBDDriver.Models.Source
         private USBDevice usbDevice;
         private USBInterface usbInterface;
 
-        private Timer refreshUSBInputTimer;
-
         public int CPUClockSpeedMhz { get; set; } = 32;
         public int ADCSpeedkMhz { get; set; } = 2;
         public float ADCReferenceV { get; set; } = 1.0f;
         public int ADCGain { get; set; } = 1;
-        public int SampleRatekMhz { get; set; } = 8;
+        public int SampleRatekHz { get; set; } = 8;
+        public int BufferSize { get; set; } = 32 * 1024;
 
         public BBDMercury16Input(USBDeviceInfo selectedDevice = null) : base(8000, 8)
         {
@@ -105,7 +105,12 @@ namespace BBDDriver.Models.Source
                 this.SetChannel(i, new SinglePrecisionDataChannel(this.SamplesPerSecond, this.SamplesPerSecond * 5));
             }
 
-            refreshUSBInputTimer = new Timer(PollUSBData, this, 0, 50);
+            this.BufferSize = Math.Max(this.BufferSize, this.SamplesPerSecond * this.ChannelCount * 2 / targetFPS);
+
+            Task usbPollTask = Task.Run(() =>
+            {
+                while (PollUSBData(this)) {}
+            });
         }
 
         public static USBDeviceInfo[] GetAllConnectedDevices()
@@ -113,11 +118,38 @@ namespace BBDDriver.Models.Source
             return USBDevice.GetDevices(DEVICE_GUID);
         }
 
-        private void PollUSBData(object stateInfo)
+        private bool PollUSBData(object stateInfo)
         {
-            byte[] rawDataFromUSB = new byte[1024 * 64];
-            int readBytes = usbInterface.InPipe.Read(rawDataFromUSB);
+            byte[] rawDataFromUSB = new byte[this.BufferSize];
+            int readBytes = 0;
 
+            try
+            {
+                readBytes = usbInterface.InPipe.Read(rawDataFromUSB);
+            }
+            catch
+            {
+                return false;
+            }
+
+            DataRateBenchmarkEntry drbe = new DataRateBenchmarkEntry() { TimeStamp = DateTime.UtcNow, IsRead = true, BytesTransferred = readBytes, SamplesTransferred = readBytes / 2 / channels.Length };
+
+            Task processUsbDataTask = Task.Run(() =>
+            {
+                ProcessUSBData(rawDataFromUSB, readBytes, drbe);
+            });
+
+            lock (BenchmarkEntries)
+            {
+                BenchmarkEntries.Add(drbe);
+                BenchmarkEntries.RemoveAll(be => be.TimeStamp < DateTime.UtcNow.AddSeconds(-5));
+            }
+
+            return true;
+        }
+
+        private void ProcessUSBData(byte[] rawDataFromUSB, int readBytes, DataRateBenchmarkEntry drbe)
+        {
             if (readBytes == 0) return;
 
             ushort[] shorts = new ushort[readBytes / 2];
@@ -126,7 +158,6 @@ namespace BBDDriver.Models.Source
                 shorts[i] = System.BitConverter.ToUInt16(rawDataFromUSB, i * 2);
             }
 
-            DataRateBenchmarkEntry drbe = new DataRateBenchmarkEntry() { TimeStamp = DateTime.UtcNow, IsRead = true, BytesTransferred = readBytes, SamplesTransferred = shorts.Length / channels.Length };
             ushort prevShortValue = 0;
 
             float[] floats = new float[shorts.Length / channels.Length];
@@ -152,12 +183,6 @@ namespace BBDDriver.Models.Source
                 }
 
                 channels[i].AppendData(floats);
-            }
-
-            lock (BenchmarkEntries)
-            {
-                BenchmarkEntries.Add(drbe);
-                BenchmarkEntries.RemoveAll(be => be.TimeStamp < DateTime.UtcNow.AddSeconds(-5));
             }
         }
 

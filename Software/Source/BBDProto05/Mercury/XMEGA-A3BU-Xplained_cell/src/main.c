@@ -196,6 +196,8 @@ int main( void )
 	settings.sample_rate = 8000;
 	settings.per_value_compensation = 7;
 	settings.channel_count = 8;
+	settings.usb_address = udd_getaddress();
+	settings.usb_high_speed = udd_is_high_speed();
 
 	/* Initialize ADC ,to read ADC offset and configure ADC for oversampling
 	**/

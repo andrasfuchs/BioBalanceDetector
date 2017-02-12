@@ -108,7 +108,7 @@ volatile bool adc_oversampled_flag = false;
  */
 static uint8_t v_input_ascii_buf[ASCII_BUFFER_SIZE] = {"+1.123456"};
 
-#define ADC_RESULT_BUFFER_SIZE 900
+#define ADC_RESULT_BUFFER_SIZE 896
 static uint16_t adc_values[8 * ADC_RESULT_BUFFER_SIZE] = { 0 };
 
 static bool dataLEDState = false;
@@ -251,7 +251,7 @@ static void pick_a_sample_callback(void)
 	if (adc_samplecount >= ADC_RESULT_BUFFER_SIZE)
 	{
 		// send data to USB
-		udd_ep_run(UDI_PHDC_EP_BULK_IN, true, &adc_values, sizeof(adc_values), data_sent_ack);
+		udd_ep_run(UDI_PHDC_EP_BULK_IN, false, &adc_values, sizeof(adc_values), data_sent_ack);
 
 		adc_samplecount = 0;
 	}
@@ -287,11 +287,39 @@ static void pick_a_sample_callback(void)
 //    9 + TC0_DIV64   produces 49'800Hz output (if the CPU runs at 32MHz [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE 900, CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ, udd_ep_run|shortpacket=true
 //    9 + TC0_DIV64   produces 50'480Hz output (if the CPU runs at 32MHz [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE 900, CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ, udd_ep_run|shortpacket=false
 //!  72 + TC0_DIV8    produces 28'050Hz output (if the CPU runs at 32MHz [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE 900, CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ, udd_ep_run|shortpacket=false
+//!  72 + TC0_DIV8    produces 27'200Hz output (if the CPU runs at 32MHz [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE 800, CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ, udd_ep_run|shortpacket=true - 430 kbytes/s, .NET Task
 //   80 + TC0_DIV8    produces 49'850Hz output (if the CPU runs at 32MHz [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE 900, CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ, udd_ep_run|shortpacket=false
-//   78 + TC0_DIV8    produces 51'090Hz output (if the CPU runs at 32MHz [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE 900, CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ, udd_ep_run|shortpacket=false
 //  550 + TC0_DIV8    produces  8'000Hz output (if the CPU runs at 32MHz [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE 900, CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ, udd_ep_run|shortpacket=false
 //  507 + TC0_DIV8    produces  8'010Hz output (if the CPU runs at 32MHz [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE 900, CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ, udd_ep_run|shortpacket=true
 //  508 + TC0_DIV8    produces  7'994Hz output (if the CPU runs at 32MHz [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE 900, CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ, udd_ep_run|shortpacket=true
+//   78 + TC0_DIV8    produces 51'090Hz output (if the CPU runs at 32MHz [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE 900, CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ, udd_ep_run|shortpacket=false
+//   39 + TC0_DIV8    produces 51'500Hz output (if the CPU runs at 32MHz [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE 896, CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ, udd_ep_run|shortpacket=false - 795 kbytes/s, .NET Task (no processing), 256k buffer
+//   78 + TC0_DIV8    produces 51'500Hz output (if the CPU runs at 32MHz [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE 896, CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ, udd_ep_run|shortpacket=false - 795 kbytes/s, .NET Task (no processing), 256k buffer
+//   78 + TC0_DIV8    produces 50'500Hz output (if the CPU runs at 32MHz [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE 896, CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ, udd_ep_run|shortpacket=false - 787 kbytes/s, .NET Task (all processing on a separate thread), 256k buffer
+//   78 + TC0_DIV8    produces 50'100Hz output (if the CPU runs at 32MHz [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE 896, CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ, udd_ep_run|shortpacket=false - 782 kbytes/s, .NET Task (all processing on a separate thread), 64k buffer
+//   78 + TC0_DIV8    produces 49'000Hz output (if the CPU runs at 32MHz [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE 896, CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ, udd_ep_run|shortpacket=true  - 768 kbytes/s, .NET Task (all processing on a separate thread)
+//   78 + TC0_DIV8    produces 50'080Hz output (if the CPU runs at 32MHz [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE 896, CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ, udd_ep_run|shortpacket=true  - 785 kbytes/s, .NET Task (no processing)
+//   78 + TC0_DIV8    produces 41'000Hz output (if the CPU runs at 32MHz [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE 896, CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ, udd_ep_run|shortpacket=true  - 645 kbytes/s, .NET Task
+//   78 + TC0_DIV8    produces 50'430Hz output (if the CPU runs at 32MHz [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE 800, CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ, udd_ep_run|shortpacket=true  - 788 kbytes/s, .NET Timer
+//!  78 + TC0_DIV8    produces 40'100Hz output (if the CPU runs at 32MHz [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE 800, CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ, udd_ep_run|shortpacket=true  - 620 kbytes/s, .NET Task
+//!  78 + TC0_DIV8    produces 33'100Hz output (if the CPU runs at 32MHz [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE 800, CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ, udd_ep_run|shortpacket=true  - 520 kbytes/s, .NET Task
+//!  78 + TC0_DIV8    produces 30'700Hz output (if the CPU runs at 32MHz [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE  80, CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ, udd_ep_run|shortpacket=true  - 480 kbytes/s, .NET Task
+//!  78 + TC0_DIV8    produces  5'040Hz output (if the CPU runs at 32MHz [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE  80, CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ, udd_ep_run|shortpacket=true  -  79 kbytes/s, .NET Timer
+//
+// below this, the followings are fixed: TC0_DIV8, CPU@32Mhz, [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE 896, CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ, udd_ep_run|shortpacket=false
+// variables: effective_per_value, .NET implementation
+//   268 kbytes/s - epv: 256, .NET Task (no processing), 512k buffer
+//   268 kbytes/s - epv: 256, .NET Task (no processing), 512k buffer
+//   634 kbytes/s - epv:  96, .NET Task (no processing), 512k buffer
+//   634 kbytes/s - epv:  16, .NET Task (no processing), 512k buffer
+//   794 kbytes/s - epv:  39, .NET Task (no processing), 512k buffer
+//   795 kbytes/s - epv:  39, .NET Task (no processing), 256k buffer
+//   795 kbytes/s - epv:  78, .NET Task (no processing), 256k buffer
+//   787 kbytes/s - epv:  78, .NET Task (all processing on a separate thread), 256k buffer
+//   782 kbytes/s - epv:  78, .NET Task (all processing on a separate thread), 64k buffer
+//
+// conclusion: at least 32k buffer is needed and the 795 kbytes/s seems to be a barrier on XMEGA
+
 void init_tc(CellSettings_t *settings)
 {
 	uint16_t effective_per_value = (settings->clk_sys / 8 / settings->sample_rate) + settings->per_value_compensation;

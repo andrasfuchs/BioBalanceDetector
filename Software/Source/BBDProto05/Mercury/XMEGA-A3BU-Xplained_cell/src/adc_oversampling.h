@@ -89,11 +89,15 @@ typedef struct CellSettings_struct
 	// sampling timer rate in Hz
 	uint32_t sample_rate;
 
-	// compesation of the timer (sligthly changes the speed)
+	// compensation of the timer (slightly changes the speed)
 	int16_t per_value_compensation;
 
 	// number of channels
 	uint32_t channel_count;
+
+	uint8_t usb_address;
+
+	bool usb_high_speed;
 } CellSettings_t;
 
 
