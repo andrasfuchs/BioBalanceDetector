@@ -1,0 +1,608 @@
+
+task2.elf:     file format elf32-avr
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         0000045c  00000000  00000000  00000074  2**1
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .data         00000000  00802000  00802000  000004d0  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  2 .bss          0000012c  00802000  00802000  000004d0  2**0
+                  ALLOC
+  3 .comment      00000030  00000000  00000000  000004d0  2**0
+                  CONTENTS, READONLY
+  4 .note.gnu.avr.deviceinfo 00000044  00000000  00000000  00000500  2**2
+                  CONTENTS, READONLY
+  5 .debug_aranges 000000e8  00000000  00000000  00000544  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  6 .debug_info   000050c3  00000000  00000000  0000062c  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  7 .debug_abbrev 00003526  00000000  00000000  000056ef  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  8 .debug_line   00000976  00000000  00000000  00008c15  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  9 .debug_frame  00000244  00000000  00000000  0000958c  2**2
+                  CONTENTS, READONLY, DEBUGGING
+ 10 .debug_str    00003a1d  00000000  00000000  000097d0  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 11 .debug_loc    00000585  00000000  00000000  0000d1ed  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 12 .debug_ranges 000000c8  00000000  00000000  0000d772  2**0
+                  CONTENTS, READONLY, DEBUGGING
+
+Disassembly of section .text:
+
+00000000 <__vectors>:
+   0:	0c 94 fe 00 	jmp	0x1fc	; 0x1fc <__ctors_end>
+   4:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+   8:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+   c:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  10:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  14:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  18:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  1c:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  20:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  24:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  28:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  2c:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  30:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  34:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  38:	0c 94 14 01 	jmp	0x228	; 0x228 <__vector_14>
+  3c:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  40:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  44:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  48:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  4c:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  50:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  54:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  58:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  5c:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  60:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  64:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  68:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  6c:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  70:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  74:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  78:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  7c:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  80:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  84:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  88:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  8c:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  90:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  94:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  98:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  9c:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  a0:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  a4:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  a8:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  ac:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  b0:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  b4:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  b8:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  bc:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  c0:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  c4:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  c8:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  cc:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  d0:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  d4:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  d8:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  dc:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  e0:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  e4:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  e8:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  ec:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  f0:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  f4:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  f8:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+  fc:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 100:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 104:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 108:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 10c:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 110:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 114:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 118:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 11c:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 120:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 124:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 128:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 12c:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 130:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 134:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 138:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 13c:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 140:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 144:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 148:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 14c:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 150:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 154:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 158:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 15c:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 160:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 164:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 168:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 16c:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 170:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 174:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 178:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 17c:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 180:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 184:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 188:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 18c:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 190:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 194:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 198:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 19c:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 1a0:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 1a4:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 1a8:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 1ac:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 1b0:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 1b4:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 1b8:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 1bc:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 1c0:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 1c4:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 1c8:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 1cc:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 1d0:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 1d4:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 1d8:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 1dc:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 1e0:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 1e4:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 1e8:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 1ec:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 1f0:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 1f4:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+ 1f8:	0c 94 12 01 	jmp	0x224	; 0x224 <__bad_interrupt>
+
+000001fc <__ctors_end>:
+ 1fc:	11 24       	eor	r1, r1
+ 1fe:	1f be       	out	0x3f, r1	; 63
+ 200:	cf ef       	ldi	r28, 0xFF	; 255
+ 202:	cd bf       	out	0x3d, r28	; 61
+ 204:	df e5       	ldi	r29, 0x5F	; 95
+ 206:	de bf       	out	0x3e, r29	; 62
+ 208:	00 e0       	ldi	r16, 0x00	; 0
+ 20a:	0c bf       	out	0x3c, r16	; 60
+
+0000020c <__do_clear_bss>:
+ 20c:	21 e2       	ldi	r18, 0x21	; 33
+ 20e:	a0 e0       	ldi	r26, 0x00	; 0
+ 210:	b0 e2       	ldi	r27, 0x20	; 32
+ 212:	01 c0       	rjmp	.+2      	; 0x216 <.do_clear_bss_start>
+
+00000214 <.do_clear_bss_loop>:
+ 214:	1d 92       	st	X+, r1
+
+00000216 <.do_clear_bss_start>:
+ 216:	ac 32       	cpi	r26, 0x2C	; 44
+ 218:	b2 07       	cpc	r27, r18
+ 21a:	e1 f7       	brne	.-8      	; 0x214 <.do_clear_bss_loop>
+ 21c:	0e 94 a2 01 	call	0x344	; 0x344 <main>
+ 220:	0c 94 2c 02 	jmp	0x458	; 0x458 <_exit>
+
+00000224 <__bad_interrupt>:
+ 224:	0c 94 00 00 	jmp	0	; 0x0 <__vectors>
+
+00000228 <__vector_14>:
+// called. However, we do not have to do anything inside the handler itself.
+// That is why we need an empty handler below.
+
+
+ISR(TCC0_OVF_vect)
+{
+ 228:	1f 92       	push	r1
+ 22a:	0f 92       	push	r0
+ 22c:	0f b6       	in	r0, 0x3f	; 63
+ 22e:	0f 92       	push	r0
+ 230:	11 24       	eor	r1, r1
+    nop();
+ 232:	00 00       	nop
+}
+ 234:	0f 90       	pop	r0
+ 236:	0f be       	out	0x3f, r0	; 63
+ 238:	0f 90       	pop	r0
+ 23a:	1f 90       	pop	r1
+ 23c:	18 95       	reti
+
+0000023e <SetupReadChannel>:
+
+// Setup parameters for the channel that read switch states. The channel is
+// configured to reload original destination address when the data block is finished.
+// Single-shot is enabled so that only one byte gets copyed for every timer overflow.
+void SetupReadChannel( DMA_CH_t * dmaChannel )
+{
+ 23e:	8f 92       	push	r8
+ 240:	af 92       	push	r10
+ 242:	bf 92       	push	r11
+ 244:	cf 92       	push	r12
+ 246:	ef 92       	push	r14
+ 248:	0f 93       	push	r16
+ 24a:	1f 93       	push	r17
+ 24c:	cf 93       	push	r28
+ 24e:	df 93       	push	r29
+ 250:	ec 01       	movw	r28, r24
+	DMA_SetupBlock( 
+ 252:	1f 92       	push	r1
+ 254:	1f 92       	push	r1
+ 256:	81 2c       	mov	r8, r1
+ 258:	0f 2e       	mov	r0, r31
+ 25a:	fc e2       	ldi	r31, 0x2C	; 44
+ 25c:	af 2e       	mov	r10, r31
+ 25e:	bb 24       	eor	r11, r11
+ 260:	b3 94       	inc	r11
+ 262:	f0 2d       	mov	r31, r0
+ 264:	cc 24       	eor	r12, r12
+ 266:	c3 94       	inc	r12
+ 268:	68 94       	set
+ 26a:	ee 24       	eor	r14, r14
+ 26c:	e2 f8       	bld	r14, 2
+ 26e:	00 e0       	ldi	r16, 0x00	; 0
+ 270:	10 e2       	ldi	r17, 0x20	; 32
+ 272:	20 e0       	ldi	r18, 0x00	; 0
+ 274:	40 e0       	ldi	r20, 0x00	; 0
+ 276:	68 ea       	ldi	r22, 0xA8	; 168
+ 278:	76 e0       	ldi	r23, 0x06	; 6
+ 27a:	0e 94 f6 01 	call	0x3ec	; 0x3ec <DMA_SetupBlock>
+                    DMA_CH_BURSTLEN_1BYTE_gc, 
+                    0,
+                    false
+                );
+	
+    DMA_EnableSingleShot( dmaChannel );
+ 27e:	ce 01       	movw	r24, r28
+ 280:	0e 94 24 02 	call	0x448	; 0x448 <DMA_EnableSingleShot>
+	DMA_SetTriggerSource( dmaChannel, DMA_CH_TRIGSRC_TCC0_OVF_gc ); // TCC0 Overflow as trigger source.
+ 284:	60 e4       	ldi	r22, 0x40	; 64
+ 286:	ce 01       	movw	r24, r28
+ 288:	0e 94 29 02 	call	0x452	; 0x452 <DMA_SetTriggerSource>
+ 28c:	0f 90       	pop	r0
+ 28e:	0f 90       	pop	r0
+}
+ 290:	df 91       	pop	r29
+ 292:	cf 91       	pop	r28
+ 294:	1f 91       	pop	r17
+ 296:	0f 91       	pop	r16
+ 298:	ef 90       	pop	r14
+ 29a:	cf 90       	pop	r12
+ 29c:	bf 90       	pop	r11
+ 29e:	af 90       	pop	r10
+ 2a0:	8f 90       	pop	r8
+ 2a2:	08 95       	ret
+
+000002a4 <SetupWriteChannel>:
+// configured to reload orignal source address when the data block is finished.
+// It is also configured to repeat the block copy operation indefinitely, by setting
+// the Repeat Counter to 0 initially.
+// Single-shot is enabled so that only one byte gets copyed for every timer overflow.
+void SetupWriteChannel( DMA_CH_t * dmaChannel  )
+{
+ 2a4:	8f 92       	push	r8
+ 2a6:	af 92       	push	r10
+ 2a8:	bf 92       	push	r11
+ 2aa:	cf 92       	push	r12
+ 2ac:	ef 92       	push	r14
+ 2ae:	0f 93       	push	r16
+ 2b0:	1f 93       	push	r17
+ 2b2:	cf 93       	push	r28
+ 2b4:	df 93       	push	r29
+ 2b6:	ec 01       	movw	r28, r24
+	DMA_SetupBlock( 
+ 2b8:	81 e0       	ldi	r24, 0x01	; 1
+ 2ba:	8f 93       	push	r24
+ 2bc:	1f 92       	push	r1
+ 2be:	81 2c       	mov	r8, r1
+ 2c0:	0f 2e       	mov	r0, r31
+ 2c2:	fc e2       	ldi	r31, 0x2C	; 44
+ 2c4:	af 2e       	mov	r10, r31
+ 2c6:	bb 24       	eor	r11, r11
+ 2c8:	b3 94       	inc	r11
+ 2ca:	f0 2d       	mov	r31, r0
+ 2cc:	c1 2c       	mov	r12, r1
+ 2ce:	e1 2c       	mov	r14, r1
+ 2d0:	04 ee       	ldi	r16, 0xE4	; 228
+ 2d2:	17 e0       	ldi	r17, 0x07	; 7
+ 2d4:	20 e1       	ldi	r18, 0x10	; 16
+ 2d6:	40 e4       	ldi	r20, 0x40	; 64
+ 2d8:	60 e0       	ldi	r22, 0x00	; 0
+ 2da:	70 e2       	ldi	r23, 0x20	; 32
+ 2dc:	ce 01       	movw	r24, r28
+ 2de:	0e 94 f6 01 	call	0x3ec	; 0x3ec <DMA_SetupBlock>
+                    SAMPLE_COUNT, 
+                    DMA_CH_BURSTLEN_1BYTE_gc, 
+                    0,
+                    true
+                );
+	DMA_EnableSingleShot( dmaChannel );
+ 2e2:	ce 01       	movw	r24, r28
+ 2e4:	0e 94 24 02 	call	0x448	; 0x448 <DMA_EnableSingleShot>
+	DMA_SetTriggerSource( dmaChannel, DMA_CH_TRIGSRC_TCC0_OVF_gc ); // TCC0 Overflow as trigger source.
+ 2e8:	60 e4       	ldi	r22, 0x40	; 64
+ 2ea:	ce 01       	movw	r24, r28
+ 2ec:	0e 94 29 02 	call	0x452	; 0x452 <DMA_SetTriggerSource>
+ 2f0:	0f 90       	pop	r0
+ 2f2:	0f 90       	pop	r0
+}
+ 2f4:	df 91       	pop	r29
+ 2f6:	cf 91       	pop	r28
+ 2f8:	1f 91       	pop	r17
+ 2fa:	0f 91       	pop	r16
+ 2fc:	ef 90       	pop	r14
+ 2fe:	cf 90       	pop	r12
+ 300:	bf 90       	pop	r11
+ 302:	af 90       	pop	r10
+ 304:	8f 90       	pop	r8
+ 306:	08 95       	ret
+
+00000308 <SetupSampleTimer>:
+// Setup a timer to give overflow interrupts at the desired sample rate.
+// The default setup is to have no prescaling and full period time, which
+// means a sample rate of 2MHz / 2^16 = approx. 30Hz.
+void SetupSampleTimer( void )
+{
+	TCC0.CTRLA = TC_CLKSEL_DIV1_gc;
+ 308:	e0 e0       	ldi	r30, 0x00	; 0
+ 30a:	f8 e0       	ldi	r31, 0x08	; 8
+ 30c:	81 e0       	ldi	r24, 0x01	; 1
+ 30e:	80 83       	st	Z, r24
+	TCC0.PER = 0xffff;
+ 310:	2f ef       	ldi	r18, 0xFF	; 255
+ 312:	3f ef       	ldi	r19, 0xFF	; 255
+ 314:	26 a3       	std	Z+38, r18	; 0x26
+ 316:	37 a3       	std	Z+39, r19	; 0x27
+	TCC0.INTCTRLA = TC_OVFINTLVL_LO_gc;
+ 318:	86 83       	std	Z+6, r24	; 0x06
+	PMIC.CTRL |= PMIC_LOLVLEN_bm;
+ 31a:	e0 ea       	ldi	r30, 0xA0	; 160
+ 31c:	f0 e0       	ldi	r31, 0x00	; 0
+ 31e:	82 81       	ldd	r24, Z+2	; 0x02
+ 320:	81 60       	ori	r24, 0x01	; 1
+ 322:	82 83       	std	Z+2, r24	; 0x02
+ 324:	08 95       	ret
+
+00000326 <BlinkLEDs>:
+
+// Provide a visible indication to the user that the application is ready
+// to record, finished with recording etc.
+void BlinkLEDs( void )
+{
+	LEDPORT.OUT = 0x00;
+ 326:	e0 ee       	ldi	r30, 0xE0	; 224
+ 328:	f7 e0       	ldi	r31, 0x07	; 7
+ 32a:	14 82       	std	Z+4, r1	; 0x04
+	#else
+		//round up by default
+		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
+	#endif
+
+	__builtin_avr_delay_cycles(__ticks_dc);
+ 32c:	2f e7       	ldi	r18, 0x7F	; 127
+ 32e:	8a e1       	ldi	r24, 0x1A	; 26
+ 330:	96 e0       	ldi	r25, 0x06	; 6
+ 332:	21 50       	subi	r18, 0x01	; 1
+ 334:	80 40       	sbci	r24, 0x00	; 0
+ 336:	90 40       	sbci	r25, 0x00	; 0
+ 338:	e1 f7       	brne	.-8      	; 0x332 <BlinkLEDs+0xc>
+ 33a:	00 c0       	rjmp	.+0      	; 0x33c <BlinkLEDs+0x16>
+ 33c:	00 00       	nop
+	delay_us( 1000000 ); // Wait one second
+	LEDPORT.OUT = 0xff;		
+ 33e:	8f ef       	ldi	r24, 0xFF	; 255
+ 340:	84 83       	std	Z+4, r24	; 0x04
+ 342:	08 95       	ret
+
+00000344 <main>:
+    DMA_CH_t * ReadChannel = &DMA.CH0;
+    // The DMA channel to use for writing data to LEDs.
+    DMA_CH_t * WriteChannel = &DMA.CH1;
+
+    // Setup IO ports.
+	PORTCFG.MPCMASK = 0xff;
+ 344:	8f ef       	ldi	r24, 0xFF	; 255
+ 346:	80 93 b0 00 	sts	0x00B0, r24	; 0x8000b0 <__TEXT_REGION_LENGTH__+0x7000b0>
+	SWITCHPORT.PIN1CTRL = PORT_OPC_PULLUP_gc;
+ 34a:	e0 ea       	ldi	r30, 0xA0	; 160
+ 34c:	f6 e0       	ldi	r31, 0x06	; 6
+ 34e:	98 e1       	ldi	r25, 0x18	; 24
+ 350:	91 8b       	std	Z+17, r25	; 0x11
+	SWITCHPORT.PIN2CTRL = PORT_OPC_PULLUP_gc;
+ 352:	92 8b       	std	Z+18, r25	; 0x12
+
+    SWITCHPORT.DIR = 0x00;
+ 354:	10 82       	st	Z, r1
+    LEDPORT.DIR = 0xff;
+ 356:	80 93 e0 07 	sts	0x07E0, r24	; 0x8007e0 <__TEXT_REGION_LENGTH__+0x7007e0>
+	
+    // Prepare DMA and sample timer tick.	
+    DMA_Enable();
+ 35a:	e0 e0       	ldi	r30, 0x00	; 0
+ 35c:	f1 e0       	ldi	r31, 0x01	; 1
+ 35e:	80 81       	ld	r24, Z
+ 360:	80 68       	ori	r24, 0x80	; 128
+ 362:	80 83       	st	Z, r24
+    SetupReadChannel(ReadChannel);
+ 364:	80 e1       	ldi	r24, 0x10	; 16
+ 366:	91 e0       	ldi	r25, 0x01	; 1
+ 368:	0e 94 1f 01 	call	0x23e	; 0x23e <SetupReadChannel>
+    SetupWriteChannel(WriteChannel);
+ 36c:	80 e2       	ldi	r24, 0x20	; 32
+ 36e:	91 e0       	ldi	r25, 0x01	; 1
+ 370:	0e 94 52 01 	call	0x2a4	; 0x2a4 <SetupWriteChannel>
+    SetupSampleTimer();	
+ 374:	0e 94 84 01 	call	0x308	; 0x308 <SetupSampleTimer>
+    // Enable interrupts;
+    sei();
+ 378:	78 94       	sei
+
+    while(1)
+    {
+		// Blink, wait for user to press a switch, blink again.
+		BlinkLEDs();
+		do {} while (SWITCHPORT.IN == 0xff);		
+ 37a:	c0 ea       	ldi	r28, 0xA0	; 160
+ 37c:	d6 e0       	ldi	r29, 0x06	; 6
+    sei();
+
+    while(1)
+    {
+		// Blink, wait for user to press a switch, blink again.
+		BlinkLEDs();
+ 37e:	0e 94 93 01 	call	0x326	; 0x326 <BlinkLEDs>
+		do {} while (SWITCHPORT.IN == 0xff);		
+ 382:	88 85       	ldd	r24, Y+8	; 0x08
+ 384:	8f 3f       	cpi	r24, 0xFF	; 255
+ 386:	e9 f3       	breq	.-6      	; 0x382 <main+0x3e>
+		BlinkLEDs();
+ 388:	0e 94 93 01 	call	0x326	; 0x326 <BlinkLEDs>
+		
+		// Record switch state until buffer is full, then blink LEDs.
+		DMA_EnableChannel( ReadChannel );
+ 38c:	80 e1       	ldi	r24, 0x10	; 16
+ 38e:	91 e0       	ldi	r25, 0x01	; 1
+ 390:	0e 94 ec 01 	call	0x3d8	; 0x3d8 <DMA_EnableChannel>
+		DMA_ReturnStatus_blocking( ReadChannel );
+ 394:	80 e1       	ldi	r24, 0x10	; 16
+ 396:	91 e0       	ldi	r25, 0x01	; 1
+ 398:	0e 94 e5 01 	call	0x3ca	; 0x3ca <DMA_ReturnStatus_blocking>
+		BlinkLEDs();
+ 39c:	0e 94 93 01 	call	0x326	; 0x326 <BlinkLEDs>
+		
+		// Wait for user to press a switch, then blink LEDs.
+		do {} while (SWITCHPORT.IN == 0xff);
+ 3a0:	88 85       	ldd	r24, Y+8	; 0x08
+ 3a2:	8f 3f       	cpi	r24, 0xFF	; 255
+ 3a4:	e9 f3       	breq	.-6      	; 0x3a0 <main+0x5c>
+		BlinkLEDs();
+ 3a6:	0e 94 93 01 	call	0x326	; 0x326 <BlinkLEDs>
+
+		// Play back switch samples on LEDs over and over again, until
+		// user presses a switch.
+		DMA_EnableChannel( WriteChannel );
+ 3aa:	80 e2       	ldi	r24, 0x20	; 32
+ 3ac:	91 e0       	ldi	r25, 0x01	; 1
+ 3ae:	0e 94 ec 01 	call	0x3d8	; 0x3d8 <DMA_EnableChannel>
+		do {} while (SWITCHPORT.IN == 0xff);
+ 3b2:	88 85       	ldd	r24, Y+8	; 0x08
+ 3b4:	8f 3f       	cpi	r24, 0xFF	; 255
+ 3b6:	e9 f3       	breq	.-6      	; 0x3b2 <main+0x6e>
+		DMA_DisableChannel( WriteChannel );
+ 3b8:	80 e2       	ldi	r24, 0x20	; 32
+ 3ba:	91 e0       	ldi	r25, 0x01	; 1
+ 3bc:	0e 94 f1 01 	call	0x3e2	; 0x3e2 <DMA_DisableChannel>
+		
+		// Setup write channel again, in case (very likely) the playback
+		// was interrupted by the user in the middle of the buffer, which would
+		// leave the channel in an unknown state.
+		SetupWriteChannel(WriteChannel);
+ 3c0:	80 e2       	ldi	r24, 0x20	; 32
+ 3c2:	91 e0       	ldi	r25, 0x01	; 1
+ 3c4:	0e 94 52 01 	call	0x2a4	; 0x2a4 <SetupWriteChannel>
+	}
+ 3c8:	da cf       	rjmp	.-76     	; 0x37e <main+0x3a>
+
+000003ca <DMA_ReturnStatus_blocking>:
+ *
+ *  \param  channel  The channel to configure.
+ */
+void DMA_DisableSingleShot( volatile DMA_CH_t * channel )
+{
+	channel->CTRLA &= ~DMA_CH_SINGLE_bm;
+ 3ca:	fc 01       	movw	r30, r24
+ 3cc:	81 81       	ldd	r24, Z+1	; 0x01
+ 3ce:	80 73       	andi	r24, 0x30	; 48
+ 3d0:	e9 f3       	breq	.-6      	; 0x3cc <DMA_ReturnStatus_blocking+0x2>
+ 3d2:	90 e3       	ldi	r25, 0x30	; 48
+ 3d4:	91 83       	std	Z+1, r25	; 0x01
+ 3d6:	08 95       	ret
+
+000003d8 <DMA_EnableChannel>:
+ 3d8:	fc 01       	movw	r30, r24
+ 3da:	90 81       	ld	r25, Z
+ 3dc:	90 68       	ori	r25, 0x80	; 128
+ 3de:	90 83       	st	Z, r25
+ 3e0:	08 95       	ret
+
+000003e2 <DMA_DisableChannel>:
+ 3e2:	fc 01       	movw	r30, r24
+ 3e4:	90 81       	ld	r25, Z
+ 3e6:	9f 77       	andi	r25, 0x7F	; 127
+ 3e8:	90 83       	st	Z, r25
+ 3ea:	08 95       	ret
+
+000003ec <DMA_SetupBlock>:
+ 3ec:	8f 92       	push	r8
+ 3ee:	af 92       	push	r10
+ 3f0:	bf 92       	push	r11
+ 3f2:	cf 92       	push	r12
+ 3f4:	ef 92       	push	r14
+ 3f6:	0f 93       	push	r16
+ 3f8:	1f 93       	push	r17
+ 3fa:	cf 93       	push	r28
+ 3fc:	df 93       	push	r29
+ 3fe:	cd b7       	in	r28, 0x3d	; 61
+ 400:	de b7       	in	r29, 0x3e	; 62
+ 402:	fc 01       	movw	r30, r24
+ 404:	60 87       	std	Z+8, r22	; 0x08
+ 406:	71 87       	std	Z+9, r23	; 0x09
+ 408:	12 86       	std	Z+10, r1	; 0x0a
+ 40a:	04 87       	std	Z+12, r16	; 0x0c
+ 40c:	15 87       	std	Z+13, r17	; 0x0d
+ 40e:	16 86       	std	Z+14, r1	; 0x0e
+ 410:	ce 28       	or	r12, r14
+ 412:	2c 29       	or	r18, r12
+ 414:	42 2b       	or	r20, r18
+ 416:	42 83       	std	Z+2, r20	; 0x02
+ 418:	a4 82       	std	Z+4, r10	; 0x04
+ 41a:	b5 82       	std	Z+5, r11	; 0x05
+ 41c:	80 81       	ld	r24, Z
+ 41e:	8c 7d       	andi	r24, 0xDC	; 220
+ 420:	88 29       	or	r24, r8
+ 422:	9e 85       	ldd	r25, Y+14	; 0x0e
+ 424:	99 23       	and	r25, r25
+ 426:	29 f0       	breq	.+10     	; 0x432 <__LOCK_REGION_LENGTH__+0x32>
+ 428:	80 62       	ori	r24, 0x20	; 32
+ 42a:	80 83       	st	Z, r24
+ 42c:	8d 85       	ldd	r24, Y+13	; 0x0d
+ 42e:	86 83       	std	Z+6, r24	; 0x06
+ 430:	01 c0       	rjmp	.+2      	; 0x434 <__LOCK_REGION_LENGTH__+0x34>
+ 432:	80 83       	st	Z, r24
+ 434:	df 91       	pop	r29
+ 436:	cf 91       	pop	r28
+ 438:	1f 91       	pop	r17
+ 43a:	0f 91       	pop	r16
+ 43c:	ef 90       	pop	r14
+ 43e:	cf 90       	pop	r12
+ 440:	bf 90       	pop	r11
+ 442:	af 90       	pop	r10
+ 444:	8f 90       	pop	r8
+ 446:	08 95       	ret
+
+00000448 <DMA_EnableSingleShot>:
+ 448:	fc 01       	movw	r30, r24
+ 44a:	90 81       	ld	r25, Z
+ 44c:	94 60       	ori	r25, 0x04	; 4
+ 44e:	90 83       	st	Z, r25
+ 450:	08 95       	ret
+
+00000452 <DMA_SetTriggerSource>:
+ *  \param  channel  The channel to configure.
+ *  \param  trigger  The trigger source ID.
+ */
+void DMA_SetTriggerSource( volatile DMA_CH_t * channel, uint8_t trigger )
+{
+	channel->TRIGSRC = trigger;
+ 452:	fc 01       	movw	r30, r24
+ 454:	63 83       	std	Z+3, r22	; 0x03
+ 456:	08 95       	ret
+
+00000458 <_exit>:
+ 458:	f8 94       	cli
+
+0000045a <__stop_program>:
+ 45a:	ff cf       	rjmp	.-2      	; 0x45a <__stop_program>

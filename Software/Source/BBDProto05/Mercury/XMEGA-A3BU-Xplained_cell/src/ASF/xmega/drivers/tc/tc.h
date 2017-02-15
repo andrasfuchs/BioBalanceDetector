@@ -135,6 +135,14 @@ typedef enum TC_CMD_enum {
 	TC_CMD_RESET_gc = (0b11)
 } TC_CMD_t;
 
+/* Interrupt levels from Table 12-1. Interrupt levels. */
+typedef enum TC_OVFINTLVL_enum {
+	TC_OVFINTLVL_OFF_gc = (0b00),
+	TC_OVFINTLVL_LO_gc = (0b01),
+	TC_OVFINTLVL_MED_gc = (0b10),
+	TC_OVFINTLVL_HI_gc = (0b11)
+} TC_OVFINTLVL_t;
+
 //! Timer Counter Capture Compare Channel index
 enum tc_cc_channel_t {
 	//! Channel A
