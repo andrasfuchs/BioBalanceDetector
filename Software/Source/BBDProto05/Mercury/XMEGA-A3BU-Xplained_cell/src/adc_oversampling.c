@@ -106,7 +106,7 @@ volatile bool adc_oversampled_flag = false;
  * \brief Static buffer variable to store ASCII value of calculated input
  *        voltage for display
  */
-static uint8_t v_input_ascii_buf[ASCII_BUFFER_SIZE] = {"+1.123456"};
+static char v_input_ascii_buf[ASCII_BUFFER_SIZE] = {"+1.123456"};
 
 #define ADC_RESULT_BUFFER_SIZE 896
 static uint16_t adc_values[8 * ADC_RESULT_BUFFER_SIZE] = { 0 };
@@ -121,7 +121,7 @@ static bool dataLEDState = false;
  * \param buf_index Pointer to buffer used to store ASCII value.
  * \param dec_val Decimal to be converted as ASCII.
  */
-void convert_to_ascii(uint8_t *buf_index, uint64_t dec_val)
+void convert_to_ascii(char *buf_index, uint64_t dec_val)
 {
 	uint8_t digit_count = 0;
 
@@ -228,10 +228,10 @@ static void data_sent_ack(udd_ep_status_t status, iram_size_t nb_send, udd_ep_id
 	dataLEDState = !dataLEDState;
 	if (dataLEDState)
 	{
-		ioport_set_pin_low(LED1_GPIO);
+		//ioport_set_pin_low(LED1_GPIO);
 	} else 
 	{
-		ioport_set_pin_high(LED1_GPIO);
+		//ioport_set_pin_high(LED1_GPIO);
 	}
 }
 
@@ -251,7 +251,7 @@ static void pick_a_sample_callback(void)
 	if (adc_samplecount >= ADC_RESULT_BUFFER_SIZE)
 	{
 		// send data to USB
-		udd_ep_run(UDI_PHDC_EP_BULK_IN, false, &adc_values, sizeof(adc_values), data_sent_ack);
+		//udd_ep_run(UDI_PHDC_EP_BULK_IN, false, &adc_values, sizeof(adc_values), data_sent_ack);		
 
 		adc_samplecount = 0;
 	}

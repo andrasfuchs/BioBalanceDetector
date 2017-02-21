@@ -108,7 +108,13 @@
 
 static volatile bool main_b_phdc_enable = false;
 static int64_t loopcounter = 0;
-static uint8_t loopcounter_ascii_buf[ASCII_BUFFER_SIZE] = {"+1.123456"};
+static char loopcounter_ascii_buf[ASCII_BUFFER_SIZE] = {"+1.123456"};
+
+static uint8_t read_data[32] = { 0 };
+static bool success = false;
+
+static CellSettings_t settings;
+
 
 void main_suspend_action(void)
 {
@@ -143,6 +149,18 @@ void main_phdc_disable(void)
 
 static void data_sent_ack(udd_ep_status_t status, iram_size_t nb_send, udd_ep_id_t ep)
 {
+	loopcounter += 100000;
+	convert_to_ascii(&loopcounter_ascii_buf[ASCII_BUFFER_SIZE - 1], loopcounter);
+	gfx_mono_draw_string(loopcounter_ascii_buf, 0, 10, &sysfont);
+}
+
+static void data_received_ack(udd_ep_status_t status, iram_size_t nb_received, udd_ep_id_t ep)
+{
+	loopcounter += 10000;
+	convert_to_ascii(&loopcounter_ascii_buf[ASCII_BUFFER_SIZE - 1], loopcounter);
+	gfx_mono_draw_string(loopcounter_ascii_buf, 0, 10, &sysfont);
+
+	//udd_ep_run(UDI_PHDC_EP_BULK_IN, false, &settings, sizeof(settings), data_sent_ack);
 }
 
 /**
@@ -175,6 +193,9 @@ int main( void )
 	/* Start USB stack to authorize VBus monitoring */
 	udc_start();
 	
+	/* We need some time here to USB initialization */
+	delay_ms(500);
+
 	///* Initialize ST7565R controller and LCD display */
 	gfx_mono_init();
 
@@ -184,13 +205,11 @@ int main( void )
 	/* Display headings on LCD for normal result */
 	//gfx_mono_draw_string("Normal", 80, 0, &sysfont);
 
-	/* We need some time here to USB initialization */
-	delay_ms(250);
-
-	CellSettings_t settings;
 	//settings.device_id = Get_debug_register(AVR32_DID);
 	settings.clk_sys = sysclk_get_per_hz();
 	settings.clk_adc = 2000000UL;
+	settings.adca_enabled = adc_is_enabled(&ADCA);
+	settings.adcb_enabled = adc_is_enabled(&ADCB);
 	settings.adc_ref = ADC_REFSEL_INT1V_gc;
 	settings.adc_gain = 1;
 	settings.sample_rate = 8000;
@@ -210,10 +229,12 @@ int main( void )
 	//cpu_irq_enable();
 
 	/* Switch ON LCD back light */
-	//ioport_set_pin_high(NHD_C12832A1Z_BACKLIGHT);
+	ioport_set_pin_high(NHD_C12832A1Z_BACKLIGHT);
 
 	/* Set LCD contrast */
-	//st7565r_set_contrast(ST7565R_DISPLAY_CONTRAST_MIN);
+	st7565r_set_contrast(ST7565R_DISPLAY_CONTRAST_MIN);
+
+	//main_phdc_enable();
 
 	/* Continuous Execution Loop */
 	while (true) {
@@ -224,54 +245,74 @@ int main( void )
 		//gfx_mono_draw_string(loopcounter_ascii_buf, 0, 10, &sysfont);
 
 		delay_ms(300);
-		ioport_set_pin_high(LED0_GPIO);
+		ioport_set_pin_high(LED1_GPIO);
 		delay_ms(1100);
-		ioport_set_pin_low(LED0_GPIO);
-	}
-}
+		ioport_set_pin_low(LED1_GPIO);
 
-int __main(void)
-{
-	irq_initialize_vectors();
-	cpu_irq_enable();
+		//uint8_t* buffer = read_data;
+//
+		//success = udd_ep_run(UDI_PHDC_EP_BULK_OUT, true, buffer, sizeof(read_data), data_received_ack);
+		//if (success == true) {
+			//delay_ms(300);
+			//ioport_set_pin_low(LED2_GPIO);
+			//delay_ms(300);
+			//ioport_set_pin_high(LED2_GPIO);
+		//}
 
-	/* Initialize the sleep manager */
-	sleepmgr_init();
-#if !SAM0
-	sysclk_init();
-	board_init();
-#else
-	system_init();
-#endif
-	//ui_init();
-	//ui_powerdown();
-
-	/* Start USB stack to authorize VBus monitoring */
-	udc_start();
-
-	short dataToSend[1024 * 4];
-	for (int i=0; i < 1024 * 4; i++) dataToSend[i] = i;
-
-	/* The main loop manages only the power mode
-	 * because the USB management is done by interrupt
-	 */
-	while (true) {
-		sleepmgr_enter_sleep();
 		if (main_b_phdc_enable) {
 			if (ieee11073_skeleton_process()) {
 				//ui_association(true); /* Association Ok */
 			} else {
 				//ui_association(false); /* No association */
 			}
-
-			//ieee11073_send_association();
-			//ieee11073_send_mesure(155);
-			//ieee11073_skeleton_send_measure_1();
-			//ieee11073_skeleton_send_measure_2();
-			if (!udd_ep_run(UDI_PHDC_EP_BULK_IN, true, &dataToSend, sizeof(dataToSend), data_sent_ack)) 
-			{
-				//return false;
-			}
 		}
+				
 	}
 }
+
+//
+//int __main(void)
+//{
+	//irq_initialize_vectors();
+	//cpu_irq_enable();
+//
+	///* Initialize the sleep manager */
+	//sleepmgr_init();
+//#if !SAM0
+	//sysclk_init();
+	//board_init();
+//#else
+	//system_init();
+//#endif
+	////ui_init();
+	////ui_powerdown();
+//
+	///* Start USB stack to authorize VBus monitoring */
+	//udc_start();
+//
+	//short dataToSend[1024 * 4];
+	//for (int i=0; i < 1024 * 4; i++) dataToSend[i] = i;
+//
+	///* The main loop manages only the power mode
+	 //* because the USB management is done by interrupt
+	 //*/
+	//while (true) {
+		//sleepmgr_enter_sleep();
+		//if (main_b_phdc_enable) {
+			//if (ieee11073_skeleton_process()) {
+				////ui_association(true); /* Association Ok */
+			//} else {
+				////ui_association(false); /* No association */
+			//}
+//
+			////ieee11073_send_association();
+			////ieee11073_send_mesure(155);
+			////ieee11073_skeleton_send_measure_1();
+			////ieee11073_skeleton_send_measure_2();
+			//if (!udd_ep_run(UDI_PHDC_EP_BULK_IN, true, &dataToSend, sizeof(dataToSend), data_sent_ack)) 
+			//{
+				////return false;
+			//}
+		//}
+	//}
+//}

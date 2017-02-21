@@ -13,7 +13,8 @@ namespace BBDDriver.Models.Source
 {
     internal class BBDMercury16Input : MultiChannelInput<IDataChannel>, IDisposable
     {
-        private const string DEVICE_GUID = "{f43f6f28-6c4a-4f5c-9fd4-5b95cc84e3a7}";
+        // warning: interface guid changes when the driver is regenerated (by zadig)
+        private const string DEVICE_INTERFACE_GUID = "{45e6adab-0529-4678-bd5f-4b9fed0a9c40}";
         private const int DEVICE_VID = 0x03EB;
         private const int DEVICE_PID = 0x2405;
         private const string DEVICE_DESC = "Mercury-16";
@@ -38,7 +39,7 @@ namespace BBDDriver.Models.Source
 
         public BBDMercury16Input(USBDeviceInfo selectedDevice = null) : base(8000, 8)
         {
-            // string expectedDeviceID = $"USB\\VID_{DEVICE_VID}&PID_{DEVICE_PID}";
+            string expectedDeviceID = $"USB\\VID_{DEVICE_VID}&PID_{DEVICE_PID}";
 
             // libusbK implementation
             //int deviceCount = 0;
@@ -48,29 +49,18 @@ namespace BBDDriver.Models.Source
             //lst.Count(ref deviceCount);
             //while (lst.MoveNext(out deviceInfo))
             //{
-            //    if (deviceInfo.DeviceID.StartsWith(expectedDeviceID) && (deviceInfo.DeviceDesc.Contains(DEVICE_DESC)))
-            //    {
-            //        this.deviceInfo = deviceInfo;
-            //    }
-            //}
-
-            //if (this.deviceInfo.DeviceID == null)
-            //{
-            //    throw new System.IO.IOException("There is no BBD Mercury-16 connected on any of the USB ports.");
+            //    Console.WriteLine("libusbk: " + deviceInfo.DeviceInterfaceGUID.ToLower());
             //}
 
             //lst.Free();
 
 
             // DotNetLibUsb
-            //var deviceList = LibUsbDotNet.LibUsb.LibUsbDevice.AllDevices.ToArray();
-            //foreach (var deviceInfoLUDN in deviceList)
-            //{
-            //    if ((deviceInfoLUDN.Vid == DEVICE_VID) && (deviceInfoLUDN.Pid == DEVICE_PID) && (deviceInfoLUDN.Name.Contains(DEVICE_DESC)))
-            //    {
-            //        this.deviceInfo = deviceInfoLUDN;
-            //    }
-            //}
+            var deviceList = LibUsbDotNet.LibUsb.LibUsbDevice.AllDevices.ToArray();
+            foreach (var deviceInfoLUDN in deviceList)
+            {
+                Console.WriteLine("libusb: " + deviceInfoLUDN.DeviceInterfaceGuids[0].ToString().ToLower() + " - " + deviceInfoLUDN.Device.Info.ProductString);
+            }
 
             //if (this.deviceInfo == null)
             //{
@@ -87,7 +77,7 @@ namespace BBDDriver.Models.Source
             if (selectedDevice == null)
             {
                 // GUID is an example, specify your own unique GUID in the .inf file
-                USBDeviceInfo[] connectedDevices = GetAllConnectedDevices();
+                USBDeviceInfo[] connectedDevices = USBDevice.GetDevices(DEVICE_INTERFACE_GUID);
 
                 if (connectedDevices.Length == 0) throw new System.IO.IOException("There is no BBD Mercury-16 connected on any of the USB ports.");
 
@@ -97,7 +87,29 @@ namespace BBDDriver.Models.Source
             // Find your device in the array
             usbDevice = new USBDevice(selectedDevice);
             usbInterface = usbDevice.Interfaces.Find(USBBaseClass.PersonalHealthcare);
+            
 
+
+            byte[] rawDataFromUSB = null; 
+            Console.WriteLine();
+            while (true)
+            {
+                usbInterface.OutPipe.Write(new byte[] 
+                {
+                    0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA,
+                    0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA,
+                    0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA,
+                    0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA
+                });
+                
+                rawDataFromUSB = ReadAllFromPipe(usbInterface.InPipe);
+                if (rawDataFromUSB.Length > 0) Console.WriteLine(FormatRawData(rawDataFromUSB));
+
+                Thread.Sleep(5000);
+            }
+
+            
+            
             // TODO: get the number of channels on the device and their sample rate
             int channelCount = 8;
             for (int i = 0; i < channelCount; i++)
@@ -113,10 +125,32 @@ namespace BBDDriver.Models.Source
             });
         }
 
-        public static USBDeviceInfo[] GetAllConnectedDevices()
+        private string FormatRawData(byte[] rawDataFromUSB)
         {
-            return USBDevice.GetDevices(DEVICE_GUID);
+            return "(" + rawDataFromUSB.Length + "): " + String.Join(" ", Array.ConvertAll(rawDataFromUSB, b => "0x" + b.ToString("X2")));
         }
+
+        private byte UsbPipeReaderMethod(USBPipe pipe)
+        {
+            byte[] rawByte = new byte[1];
+            pipe.Read(rawByte);
+            return rawByte[0];            
+        }
+
+        private byte[] ReadAllFromPipe(USBPipe pipe)
+        {
+            List<byte> result = new List<byte>();
+
+            while (true)
+            {
+                var task = Task.Run(() => UsbPipeReaderMethod(pipe)); //you can pass parameters to the method as well
+                if (task.Wait(TimeSpan.FromSeconds(0.1)))
+                    result.Add(task.Result); //the method returns elegantly
+                else
+                    return result.ToArray(); //the method timed-out
+            }
+        }
+
 
         private bool PollUSBData(object stateInfo)
         {

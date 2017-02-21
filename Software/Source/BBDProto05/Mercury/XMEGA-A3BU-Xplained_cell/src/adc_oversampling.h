@@ -80,6 +80,12 @@ typedef struct CellSettings_struct
 	// ADC clock speed in Hz
 	uint32_t clk_adc;
 
+	// is ADC-A enabled
+	bool adca_enabled;
+
+	// is ADC-B enabled
+	bool adcb_enabled;
+
 	// ADC reference
 	enum adc_reference adc_ref;
 
@@ -109,14 +115,13 @@ extern volatile bool adc_oversampled_flag;
 
 /* FUNCTION PROTOTYPES */
 
-/*! \brief Function to get the offset of ADC */
-static int8_t adc_offset_get_signed(ADC_t *adc);
-
 /*! \brief Function to convert decimal value to ASCII */
-void convert_to_ascii(uint8_t *buf_index, uint64_t dec_val);
+void convert_to_ascii(char *buf_index, uint64_t dec_val);
 
 /*! \brief Function to display raw ADC count on LCD */
-void display_adccount( uint64_t adc_rawcount, uint8_t x_cordinate, uint8_t sign_flag);
+void display_adccount(uint64_t adc_rawcount, uint8_t x_cordinate, uint8_t sign_flag);
+
+void init_adc_channel(ADC_t *adc, uint8_t ch_mask, enum adcch_positive_input pos, uint8_t gain);
 
 /*! \brief Function to initialize the ADC */
 extern void init_adc(ADC_t *adc, CellSettings_t *settings);

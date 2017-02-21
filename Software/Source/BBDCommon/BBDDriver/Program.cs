@@ -108,13 +108,13 @@ namespace BBDDriver
                 Console.WriteLine("OK");
             }
 
-            int fftSize = 4096;
+            int fftSize = 1024 * 16;
             frequencyStep = (float)waveSource.SamplesPerSecond / fftSize;
 
-            //MultiChannelInput<IDataChannel> normalizedSource = FilterManager.ApplyFilters(waveSource, new NormalizeFilter() { Settings = new NormalizeFilterSettings() { Enabled = true, SampleCount = waveSource.SamplesPerSecond * 3, Gain = 1.0f } });
+            MultiChannelInput<IDataChannel> normalizedSource = FilterManager.ApplyFilters(waveSource, new NormalizeFilter() { Settings = new NormalizeFilterSettings() { Enabled = true, SampleCount = waveSource.SamplesPerSecond * 3, Gain = 1.0f } });
             //MultiChannelInput<IDataChannel> filteredSource = FilterManager.ApplyFilters(waveSource, new ByPassFilter() { Settings = new ByPassFilterSettings() { Enabled = true } });
             //MultiChannelInput<IDataChannel> filteredSource = FilterManager.ApplyFilters(waveSource, new FillFilter() { Settings = new FillFilterSettings() { Enabled = true, ValueToFillWith = 0.75f } });
-            //MultiChannelInput<IDataChannel> filteredSource = FilterManager.ApplyFilters(normalizedSource, new FFTWFilter() { Settings = new FFTWFilterSettings() { Enabled = true, FFTSampleCount = fftSize, IsBackward = false, PlanningRigor = FFTPlanningRigor.Estimate, IsRealTime = true, Timeout = 300, OutputFormat = FFTOutputFormat.Magnitude } });
+            MultiChannelInput<IDataChannel> filteredSource = FilterManager.ApplyFilters(normalizedSource, new FFTWFilter() { Settings = new FFTWFilterSettings() { Enabled = true, FFTSampleCount = fftSize, IsBackward = false, PlanningRigor = FFTPlanningRigor.Estimate, IsRealTime = true, Timeout = 300, OutputFormat = FFTOutputFormat.Magnitude } });
             //MultiChannelInput<IDataChannel> filteredSource = FilterManager.ApplyFilters(waveSource, new FFTWFilter() { Settings = new FFTWFilterSettings() { Enabled = true, FFTSampleCount = fftSize, IsBackward = false, PlanningRigor = FFTPlanningRigor.Estimate, IsRealTime = true, Timeout = 300, OutputFormat = FFTOutputFormat.FrequencyMagnitudePair } });
             //MultiChannelInput<IDataChannel> thresholdedSource = FilterManager.ApplyFilters(filteredSource, new ThresholdFilter() { Settings = new ThresholdFilterSettings() { Enabled = true, MinValue = 0.001f, MaxValue = Single.MaxValue } });
             //MultiChannelInput<IDataChannel> averagedSource = FilterManager.ApplyFilters(thresholdedSource, new MovingAverageFilter() { Settings = new MovingAverageFilterSettings() { Enabled = true, InputDataDimensions = 2, MovingAverageLength = 10 } });
@@ -128,17 +128,16 @@ namespace BBDDriver
             //vtsfo = new SimpleVTSFileOutput(filteredSource, $"{workingDirectory}{SessionId}.vts", true);
             //vtsfo.DataWritten += Vtsfo_DataWritten;
 
-            VisualOutput vo = new VisualOutput(waveSource, 25, VisualOutputMode.None);
-            //VisualOutput vo = new VisualOutput(filteredSource, 25, VisualOutputMode.Waveform);
-            //VisualOutput vo = new VisualOutput(averagedSource, 25, VisualOutputMode.Spectrum);
+            //VisualOutput vo = new VisualOutput(waveSource, 25, VisualOutputMode.None);
+            VisualOutput vo = new VisualOutput(normalizedSource, 25, VisualOutputMode.Waveform);
+            //VisualOutput vo = new VisualOutput(filteredSource, 25, VisualOutputMode.Spectrum);
             //VisualOutput vo = new VisualOutput(averagedSource, 25, VisualOutputMode.DominanceMatrix);
-            //VisualOutput vo = new VisualOutput(waveSource, 25, VisualOutputMode.Waveform);
             vo.RefreshVisualOutput += Vo_RefreshVisualOutput;
 
             firstActivity = DateTime.UtcNow;
 
             Console.OutputEncoding = System.Text.Encoding.Unicode;
-            Console.SetWindowSize(200, 60);
+            Console.SetWindowSize(200, 64);
             Console.SetBufferSize(200, 500);
             consoleRefreshAtY = Console.CursorTop;
         }
@@ -157,12 +156,13 @@ namespace BBDDriver
 
         private static void Vo_RefreshVisualOutput(object sender, RefreshVisualOutputEventArgs e)
         {
-            //if (!e.ChangedSinceLastRefresh) return;
+            if (!e.ChangedSinceLastRefresh) return;
 
             lock (SessionId)
             {
                 try
                 {
+                    int minimumAverageSamples = (e.Dimensions == null ? 1 : (e.Dimensions[1] / Console.WindowWidth) + 1);
 
                     string consoleOutput = "";
                     if (e.Mode == VisualOutputMode.Matrix)
@@ -171,11 +171,11 @@ namespace BBDDriver
                     }
                     else if (e.Mode == VisualOutputMode.Waveform)
                     {
-                        consoleOutput = GenerateWaveformOutput(e, 40, 9);
+                        consoleOutput = GenerateWaveformOutput(e, minimumAverageSamples, 4, 13);
                     }
                     else if (e.Mode == VisualOutputMode.Spectrum)
                     {
-                        consoleOutput = GenerateSpectrumOutput(e, 16, 10);
+                        consoleOutput = GenerateSpectrumOutput(e, minimumAverageSamples, 4, 13);
                     }
                     else if (e.Mode == VisualOutputMode.DominanceMatrix)
                     {
@@ -197,13 +197,13 @@ namespace BBDDriver
             }
         }
 
-        private static string GenerateSpectrumOutput(RefreshVisualOutputEventArgs e, int avgSampleCount, int height)
+        private static string GenerateSpectrumOutput(RefreshVisualOutputEventArgs e, int avgSampleCount, int maxChannelCount, int height)
         {
             consoleSB.Clear();
 
             float chColumnMax = 0.0f;
             float[] chExcess = new float[e.Dimensions[0]];
-            for (int chIndex = 0; chIndex < Math.Min(4, e.Dimensions[0]); chIndex++)
+            for (int chIndex = 0; chIndex < Math.Min(maxChannelCount, e.Dimensions[0]); chIndex++)
             {
                 int columnCount = e.Dimensions[1] / avgSampleCount;
                 float[] columnAvgs = new float[columnCount];
@@ -231,7 +231,7 @@ namespace BBDDriver
                     if (columnAvgs[x] > chColumnMax) chColumnMax = columnAvgs[x];
                 }
 
-                consoleSB.AppendLine($"=== channel {chIndex} ------ value range on y-axis: [{columnMin.ToString("0.0000")}->{columnMax.ToString("0.0000")}], dominant value: {dominantValue.ToString("0.0000")} at {(frequencyStep * dominantIndex).ToString("#,##0.0")}Hz-{(frequencyStep * (dominantIndex + 1)).ToString("#,##0.0")}Hz, the not meassured excess is {chExcess[chIndex].ToString("0.0000")}");
+                consoleSB.AppendLine($"=== channel {chIndex} ------ value range on y-axis: [{columnMin.ToString("0.0000")}->{columnMax.ToString("0.0000")}], dominant value: {dominantValue.ToString("0.0000")} " + (dominantValue < 0.01f ? "                  " : $"at {(frequencyStep * (dominantIndex - 0.5f)).ToString("#,##0.0")}Hz-{(frequencyStep * (dominantIndex + 0.5f)).ToString("#,##0.0")}Hz") + $", the not meassured excess is {chExcess[chIndex].ToString("0.0000")}");
                 for (int y = height - 1; y >= 0; y--)
                 {
                     float maxValue = columnMin + (((columnMax - columnMin) / height) * (y + 1));
@@ -255,10 +255,10 @@ namespace BBDDriver
 
         }
 
-        private static string GenerateWaveformOutput(RefreshVisualOutputEventArgs e, int avgSampleCount, int height)
+        private static string GenerateWaveformOutput(RefreshVisualOutputEventArgs e, int avgSampleCount, int maxChannelCount, int height)
         {
             consoleSB.Clear();
-            for (int chIndex = 0; chIndex < Math.Min(4, e.Dimensions[0]); chIndex++)
+            for (int chIndex = 0; chIndex < Math.Min(maxChannelCount, e.Dimensions[0]); chIndex++)
             {
                 int columnCount = e.Dimensions[1] / avgSampleCount;
                 float[] columnMins = Enumerable.Repeat<float>(Single.MaxValue, columnCount).ToArray();
@@ -345,6 +345,8 @@ namespace BBDDriver
             {
                 consoleTitle += $" - vts file: {(vtsFileBytesWritten / 1024).ToString("#,0")} kbytes (overflow warnings: {vtsDataOverflowWarningCount})";
             }
+
+            consoleTitle += "     ";
 
             return consoleTitle;
         }

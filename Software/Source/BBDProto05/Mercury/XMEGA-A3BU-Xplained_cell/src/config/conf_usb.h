@@ -49,8 +49,6 @@
 
 #include "compiler.h"
 
-#warning You must refill the following definitions with a correct values
-
 /**
  * USB Device Configuration
  * @{
@@ -80,9 +78,9 @@
  */
 /* ! To authorize the High speed */
 #if (UC3A3 || UC3A4)
-/* #define  USB_DEVICE_HS_SUPPORT */
+#define  USB_DEVICE_HS_SUPPORT
 #elif (SAM3XA || SAM3U)
-/* #define  USB_DEVICE_HS_SUPPORT */
+#define  USB_DEVICE_HS_SUPPORT
 #endif
 /* @} */
 
@@ -92,7 +90,7 @@
  */
 #define  UDC_VBUS_EVENT(b_vbus_high)	// user_callback_vbus_action(b_vbus_high)
 /* extern void user_callback_vbus_action(bool b_vbus_high); */
-#define  UDC_SOF_EVENT()                  main_suspend_action()
+#define  UDC_SOF_EVENT()                  main_sof_action()
 /* extern void user_callback_sof_action(void); */
 #define  UDC_SUSPEND_EVENT()              main_suspend_action()
 /* extern void user_callback_suspend_action(void); */
