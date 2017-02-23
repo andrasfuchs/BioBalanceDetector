@@ -403,6 +403,8 @@
     <Folder Include="src\ASF\common\services\usb\class\" />
     <Folder Include="src\ASF\common\services\usb\class\phdc\" />
     <Folder Include="src\ASF\common\services\usb\class\phdc\device\" />
+    <Folder Include="src\ASF\common\services\usb\class\phdc\device\example\" />
+    <Folder Include="src\ASF\common\services\usb\class\phdc\device\example\atxmega256a3bu_xmega_a3bu_xplained\" />
     <Folder Include="src\ASF\common\services\usb\udc\" />
     <Folder Include="src\ASF\common\utils\" />
     <Folder Include="src\ASF\common\utils\interrupt\" />
@@ -428,6 +430,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src\adc_oversampling.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\ui.h">
       <SubType>compile</SubType>
     </Compile>
     <None Include="src\asf.h">
@@ -658,6 +663,9 @@
     <None Include="src\ASF\common\services\usb\class\phdc\usb_protocol_phdc.h">
       <SubType>compile</SubType>
     </None>
+    <Compile Include="src\ASF\common\services\usb\class\phdc\device\example\atxmega256a3bu_xmega_a3bu_xplained\ui.c">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="src\ASF\common\services\usb\class\phdc\device\udi_phdc.c">
       <SubType>compile</SubType>
     </Compile>

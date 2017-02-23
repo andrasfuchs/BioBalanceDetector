@@ -102,6 +102,7 @@
 #include <adc_oversampling.h>
 #include <main.h>
 #include <asf.h>
+#include "ui.h"
 #include "ieee11073_skeleton.h"
 
 // USB
@@ -118,12 +119,12 @@ static CellSettings_t settings;
 
 void main_suspend_action(void)
 {
-	//ui_powerdown();
+	ui_powerdown();
 }
 
 void main_resume_action(void)
 {
-	//ui_wakeup();
+	ui_wakeup();
 }
 
 void main_sof_action(void)
@@ -132,7 +133,7 @@ void main_sof_action(void)
 		return;
 	}
 
-	//ui_process(udd_get_frame_number());
+	ui_process(udd_get_frame_number());
 }
 
 bool main_phdc_enable(void)
@@ -151,14 +152,14 @@ static void data_sent_ack(udd_ep_status_t status, iram_size_t nb_send, udd_ep_id
 {
 	loopcounter += 100000;
 	convert_to_ascii(&loopcounter_ascii_buf[ASCII_BUFFER_SIZE - 1], loopcounter);
-	gfx_mono_draw_string(loopcounter_ascii_buf, 0, 10, &sysfont);
+	gfx_mono_draw_string(loopcounter_ascii_buf, 0, 20, &sysfont);
 }
 
 static void data_received_ack(udd_ep_status_t status, iram_size_t nb_received, udd_ep_id_t ep)
 {
 	loopcounter += 10000;
 	convert_to_ascii(&loopcounter_ascii_buf[ASCII_BUFFER_SIZE - 1], loopcounter);
-	gfx_mono_draw_string(loopcounter_ascii_buf, 0, 10, &sysfont);
+	gfx_mono_draw_string(loopcounter_ascii_buf, 0, 20, &sysfont);
 
 	//udd_ep_run(UDI_PHDC_EP_BULK_IN, false, &settings, sizeof(settings), data_sent_ack);
 }
@@ -200,10 +201,10 @@ int main( void )
 	gfx_mono_init();
 
 	/* Display headings on LCD for oversampled result */
-	//gfx_mono_draw_string("Oversampled", 0, 0, &sysfont);
+	gfx_mono_draw_string("Bio Balance Detector", 0, 0, &sysfont);
 
 	/* Display headings on LCD for normal result */
-	//gfx_mono_draw_string("Normal", 80, 0, &sysfont);
+	gfx_mono_draw_string("Mercury-16", 0, 10, &sysfont);
 
 	//settings.device_id = Get_debug_register(AVR32_DID);
 	settings.clk_sys = sysclk_get_per_hz();
@@ -234,24 +235,25 @@ int main( void )
 	/* Set LCD contrast */
 	st7565r_set_contrast(ST7565R_DISPLAY_CONTRAST_MIN);
 
-	//main_phdc_enable();
+	ioport_set_pin_high(LED0_GPIO);
+	ioport_set_pin_high(LED1_GPIO);
+	ioport_set_pin_high(LED2_GPIO);
 
 	/* Continuous Execution Loop */
 	while (true) {
 		sleepmgr_enter_sleep();
 		
-		//loopcounter++;
-		//convert_to_ascii(&loopcounter_ascii_buf[ASCII_BUFFER_SIZE - 1], loopcounter);
-		//gfx_mono_draw_string(loopcounter_ascii_buf, 0, 10, &sysfont);
+		loopcounter++;
+		convert_to_ascii(&loopcounter_ascii_buf[ASCII_BUFFER_SIZE - 2], loopcounter);
+		loopcounter_ascii_buf[ASCII_BUFFER_SIZE - 1] = 0;
+		gfx_mono_draw_string(loopcounter_ascii_buf, 0, 20, &sysfont);
 
 		delay_ms(300);
 		ioport_set_pin_high(LED1_GPIO);
 		delay_ms(1100);
 		ioport_set_pin_low(LED1_GPIO);
 
-		//uint8_t* buffer = read_data;
-//
-		//success = udd_ep_run(UDI_PHDC_EP_BULK_OUT, true, buffer, sizeof(read_data), data_received_ack);
+		//success = udd_ep_run(UDI_PHDC_EP_BULK_OUT, true, read_data, sizeof(read_data), data_received_ack);
 		//if (success == true) {
 			//delay_ms(300);
 			//ioport_set_pin_low(LED2_GPIO);
@@ -261,12 +263,11 @@ int main( void )
 
 		if (main_b_phdc_enable) {
 			if (ieee11073_skeleton_process()) {
-				//ui_association(true); /* Association Ok */
+				ui_association(true); /* Association Ok */
 			} else {
-				//ui_association(false); /* No association */
+				ui_association(false); /* No association */
 			}
-		}
-				
+		}				
 	}
 }
 

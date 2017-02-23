@@ -14,7 +14,7 @@ namespace BBDDriver.Models.Source
     internal class BBDMercury16Input : MultiChannelInput<IDataChannel>, IDisposable
     {
         // warning: interface guid changes when the driver is regenerated (by zadig)
-        private const string DEVICE_INTERFACE_GUID = "{45e6adab-0529-4678-bd5f-4b9fed0a9c40}";
+        private const string DEVICE_INTERFACE_GUID = "{a59515a9-4bb2-4032-b9b9-1b1b6a0aa023}";
         private const int DEVICE_VID = 0x03EB;
         private const int DEVICE_PID = 0x2405;
         private const string DEVICE_DESC = "Mercury-16";
@@ -56,11 +56,11 @@ namespace BBDDriver.Models.Source
 
 
             // DotNetLibUsb
-            var deviceList = LibUsbDotNet.LibUsb.LibUsbDevice.AllDevices.ToArray();
-            foreach (var deviceInfoLUDN in deviceList)
-            {
-                Console.WriteLine("libusb: " + deviceInfoLUDN.DeviceInterfaceGuids[0].ToString().ToLower() + " - " + deviceInfoLUDN.Device.Info.ProductString);
-            }
+            //var deviceList = LibUsbDotNet.LibUsb.LibUsbDevice.AllDevices.ToArray();
+            //foreach (var deviceInfoLUDN in deviceList)
+            //{
+            //    Console.WriteLine("libusb: " + deviceInfoLUDN.DeviceInterfaceGuids[0].ToString().ToLower() + " - " + deviceInfoLUDN.Device.Info.ProductString);
+            //}
 
             //if (this.deviceInfo == null)
             //{
@@ -141,14 +141,16 @@ namespace BBDDriver.Models.Source
         {
             List<byte> result = new List<byte>();
 
-            while (true)
+            while (result.Count < 2 * 1024)
             {
                 var task = Task.Run(() => UsbPipeReaderMethod(pipe)); //you can pass parameters to the method as well
                 if (task.Wait(TimeSpan.FromSeconds(0.1)))
                     result.Add(task.Result); //the method returns elegantly
                 else
-                    return result.ToArray(); //the method timed-out
+                    break; //the method timed-out
             }
+
+            return result.ToArray();
         }
 
 

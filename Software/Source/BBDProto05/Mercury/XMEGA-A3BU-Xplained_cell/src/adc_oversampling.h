@@ -55,7 +55,7 @@
 #define NUMBER_OF_DIGITS_IN_ADCCOUNT  5
 
 /* ! \brief Size of buffer used to store ASCII value of result */
-#define ASCII_BUFFER_SIZE    9
+#define ASCII_BUFFER_SIZE    10
 
 #include <adc.h>
 
