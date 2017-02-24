@@ -58,10 +58,25 @@
 #define ASCII_BUFFER_SIZE    10
 
 #include <adc.h>
+#include "asf.h"
 
+typedef struct HeartBeat_struct
+{
+	uint16_t choice;
+
+	uint16_t length;
+
+	uint32_t ticks;
+
+} HeartBeat_t;
 
 typedef struct CellSettings_struct
 {
+	// 0xF004
+	uint16_t choice;
+
+	uint16_t length;
+
 	// reset | enabled
 	uint8_t device_status;
 
@@ -96,7 +111,7 @@ typedef struct CellSettings_struct
 	uint32_t sample_rate;
 
 	// compensation of the timer (slightly changes the speed)
-	int16_t per_value_compensation;
+	int16_t sample_rate_compensation;
 
 	// number of channels
 	uint32_t channel_count;
@@ -104,7 +119,17 @@ typedef struct CellSettings_struct
 	uint8_t usb_address;
 
 	bool usb_high_speed;
+
+	bool send_adc_values_to_usb;
+
+	bool send_adc_values_to_usart;
 } CellSettings_t;
+
+union CellSettings_union
+{
+	uint8_t uint8_array[32];
+	CellSettings_t cell_settings;
+} CellSettings_union;
 
 
 /**
@@ -113,10 +138,13 @@ typedef struct CellSettings_struct
  */
 extern volatile bool adc_oversampled_flag;
 
+bool send_adc_data_to_usb;
+
 /* FUNCTION PROTOTYPES */
 
 /*! \brief Function to convert decimal value to ASCII */
 void convert_to_ascii(char *buf_index, uint64_t dec_val);
+void convert_to_ascii_4digit(char *buf_index, uint64_t dec_val);
 
 /*! \brief Function to display raw ADC count on LCD */
 void display_adccount(uint64_t adc_rawcount, uint8_t x_cordinate, uint8_t sign_flag);
@@ -130,5 +158,7 @@ void init_tc(CellSettings_t *settings);
 
 /*! \brief Function to process sampled ADC values */
 extern void adc_oversampled(void);
+
+udd_callback_trans_t adc_data_sent_callback;
 
 #endif /* ADC_OVERSAMPLING_H */

@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using libusbK;
 using LibUsbDotNet;
 using MadWizard.WinUSBNet;
+using System.Runtime.InteropServices;
+using BBDDriver.Models.IEEE11073;
 
 namespace BBDDriver.Models.Source
 {
@@ -36,6 +38,74 @@ namespace BBDDriver.Models.Source
         public int ADCGain { get; set; } = 1;
         public int SampleRatekHz { get; set; } = 8;
         public int BufferSize { get; set; } = 32 * 1024;
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct CellSettings
+        {            
+            // reset | enabled
+            [MarshalAs(UnmanagedType.U1)]
+            public byte DeviceStatus;
+
+            // unknown | cell | organizer
+            [MarshalAs(UnmanagedType.U1)]
+            public byte DeviceType;
+
+            // MPCM index
+            [MarshalAs(UnmanagedType.U1)]
+            public byte DeviceIndex;
+
+            // unique ID
+            [MarshalAs(UnmanagedType.U4)]
+            public UInt32 DeviceID;
+
+            // system clock speed in Hz
+            [MarshalAs(UnmanagedType.U4)]
+            public UInt32 SystemClock;
+
+            // ADC clock speed in Hz
+            [MarshalAs(UnmanagedType.U4)]
+            public UInt32 ADCClock;
+
+            // is ADC-A enabled
+            [MarshalAs(UnmanagedType.Bool)]
+            public bool ADCAEnabled;
+
+            // is ADC-B enabled
+            [MarshalAs(UnmanagedType.Bool)]
+            public bool ADCBEnabled;
+
+            // ADC reference
+            [MarshalAs(UnmanagedType.U1)]
+            public byte ADCReference;
+
+            // ADC gain
+            [MarshalAs(UnmanagedType.U1)]
+            public byte ADCGain;
+
+            // sampling timer rate in Hz
+            [MarshalAs(UnmanagedType.U4)]
+            public UInt32 SampleRate;
+
+            // compensation of the timer (slightly changes the speed)
+            [MarshalAs(UnmanagedType.I2)]
+            public short SampleRateCompensation;
+
+            // number of channels
+            [MarshalAs(UnmanagedType.U4)]
+            public UInt32 ChannelCount;
+
+            [MarshalAs(UnmanagedType.U1)]
+            public byte USBAddress;
+
+            [MarshalAs(UnmanagedType.Bool)]
+            public bool USBHighSpeed;
+
+            [MarshalAs(UnmanagedType.Bool)]
+            public bool SendADCValuesToUSB;
+
+            [MarshalAs(UnmanagedType.Bool)]
+            public bool SendADCValuesToUSART;
+        }
 
         public BBDMercury16Input(USBDeviceInfo selectedDevice = null) : base(8000, 8)
         {
@@ -87,32 +157,24 @@ namespace BBDDriver.Models.Source
             // Find your device in the array
             usbDevice = new USBDevice(selectedDevice);
             usbInterface = usbDevice.Interfaces.Find(USBBaseClass.PersonalHealthcare);
+
+            CellSettings cellSettings;
+
+            var phdPacket = ReadIEEE11073Pakcet(usbInterface.InPipe);
+
+            // stop streaming data
+            usbInterface.OutPipe.Write(new byte[] { 0xF0, 0x01, 0x00, 0x00 });
             
+            // get the cell settings
+            usbInterface.OutPipe.Write(new byte[] { 0xF0, 0x03, 0x00, 0x00 });
+            cellSettings = ReadPacket<CellSettings>(usbInterface.InPipe);
 
+            // start streaming data
+            usbInterface.OutPipe.Write(new byte[] { 0xF0, 0x02, 0x00, 0x00 });
 
-            byte[] rawDataFromUSB = null; 
-            Console.WriteLine();
-            while (true)
-            {
-                usbInterface.OutPipe.Write(new byte[] 
-                {
-                    0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA,
-                    0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA,
-                    0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA,
-                    0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA
-                });
-                
-                rawDataFromUSB = ReadAllFromPipe(usbInterface.InPipe);
-                if (rawDataFromUSB.Length > 0) Console.WriteLine(FormatRawData(rawDataFromUSB));
-
-                Thread.Sleep(5000);
-            }
-
-            
-            
-            // TODO: get the number of channels on the device and their sample rate
-            int channelCount = 8;
-            for (int i = 0; i < channelCount; i++)
+            cellSettings.ChannelCount = 8;
+            //this.SamplesPerSecond = cellSettings.SampleRate;
+            for (int i = 0; i < cellSettings.ChannelCount; i++)
             {
                 this.SetChannel(i, new SinglePrecisionDataChannel(this.SamplesPerSecond, this.SamplesPerSecond * 5));
             }
@@ -123,6 +185,52 @@ namespace BBDDriver.Models.Source
             {
                 while (PollUSBData(this)) {}
             });
+        }
+
+        private T ReadPacket<T>(USBPipe pipe)
+        {
+            byte[] rawHeaderLE = new byte[8];
+            usbInterface.InPipe.Read(rawHeaderLE);
+            GCHandle handle = GCHandle.Alloc(rawHeaderLE, GCHandleType.Pinned);
+            APDU apdu = (APDU)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(APDU));
+            handle.Free();
+
+            if (apdu.Length > 0)
+            {
+                byte[] rawBodyLE = new byte[apdu.Length];
+                usbInterface.InPipe.Read(rawBodyLE);
+                handle = GCHandle.Alloc(rawBodyLE, GCHandleType.Pinned);
+                T result = (T)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(T));
+                handle.Free();
+                return result;
+            } else
+            {
+                return default(T);
+            }
+        }
+
+        private APDU ReadIEEE11073Pakcet(USBPipe pipe)
+        {
+            byte[] rawHeaderBE = new byte[8];
+            usbInterface.InPipe.Read(rawHeaderBE);
+
+            APDU apdu = Tools.GetBigEndian<APDU>(rawHeaderBE);
+            
+            if (apdu.Length > 0)
+            {
+                byte[] rawBodyBE = new byte[apdu.Length];
+                usbInterface.InPipe.Read(rawBodyBE);
+
+                if (apdu.Choice == 0xE700)
+                {
+                    apdu.Data = Tools.GetBigEndian<DataAPDU>(rawBodyBE);
+                } else
+                {
+                    apdu.Data = new DataAPDU();
+                }
+            }
+
+            return apdu;
         }
 
         private string FormatRawData(byte[] rawDataFromUSB)
@@ -137,6 +245,7 @@ namespace BBDDriver.Models.Source
             return rawByte[0];            
         }
 
+        [Obsolete]
         private byte[] ReadAllFromPipe(USBPipe pipe)
         {
             List<byte> result = new List<byte>();

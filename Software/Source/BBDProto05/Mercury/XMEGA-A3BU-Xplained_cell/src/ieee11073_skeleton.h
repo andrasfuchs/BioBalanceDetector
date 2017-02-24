@@ -53,4 +53,8 @@ bool ieee11073_skeleton_process(void);
 void ieee11073_skeleton_send_measure_1(void);
 void ieee11073_skeleton_send_measure_2(void);
 
+typedef void (*ieee11073_metadata_callback_t) (udd_ep_status_t status, iram_size_t nb_transfered, udd_ep_id_t ep, uint8_t *metadata);
+
+ieee11073_metadata_callback_t unknown_metadata_received_callback;
+
 #endif /* _COMMUNICATION_MODEL_H_ */

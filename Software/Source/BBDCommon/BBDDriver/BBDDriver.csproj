@@ -139,6 +139,7 @@
     <Compile Include="Models\Filter\ChannelFilterSettings.cs" />
     <Compile Include="Models\Filter\IChannelFilter.cs" />
     <Compile Include="Models\Filter\SettingsChangedEventArgs.cs" />
+    <Compile Include="Models\IEEE11073\AssociationRequest.cs" />
     <Compile Include="Models\Output\FileOutput.cs" />
     <Compile Include="Models\Output\BinaryFileOutput.cs" />
     <Compile Include="Models\Output\SimpleVTSFileOutput.cs" />

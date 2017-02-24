@@ -108,14 +108,15 @@
 // USB
 
 static volatile bool main_b_phdc_enable = false;
-static int64_t loopcounter = 0;
+static int64_t tx_counter = 0;
+static int64_t rx_counter = 0;
 static char loopcounter_ascii_buf[ASCII_BUFFER_SIZE] = {"+1.123456"};
+static char rxtxcounter_ascii_buf[5] = {"0000"};
 
-static uint8_t read_data[32] = { 0 };
-static bool success = false;
+static bool dataLEDState = false;
 
 static CellSettings_t settings;
-
+static HeartBeat_t heartbeat;
 
 void main_suspend_action(void)
 {
@@ -148,20 +149,48 @@ void main_phdc_disable(void)
 	ieee11073_skeleton_disable();
 }
 
-static void data_sent_ack(udd_ep_status_t status, iram_size_t nb_send, udd_ep_id_t ep)
+static void sent_ack(udd_ep_status_t status, iram_size_t nb_send, udd_ep_id_t ep)
 {
-	loopcounter += 100000;
-	convert_to_ascii(&loopcounter_ascii_buf[ASCII_BUFFER_SIZE - 1], loopcounter);
-	gfx_mono_draw_string(loopcounter_ascii_buf, 0, 20, &sysfont);
+	tx_counter += 1;
 }
 
-static void data_received_ack(udd_ep_status_t status, iram_size_t nb_received, udd_ep_id_t ep)
+static void adc_data_sent_ack(udd_ep_status_t status, iram_size_t nb_send, udd_ep_id_t ep)
 {
-	loopcounter += 10000;
-	convert_to_ascii(&loopcounter_ascii_buf[ASCII_BUFFER_SIZE - 1], loopcounter);
-	gfx_mono_draw_string(loopcounter_ascii_buf, 0, 20, &sysfont);
+	tx_counter += 1;
 
-	//udd_ep_run(UDI_PHDC_EP_BULK_IN, false, &settings, sizeof(settings), data_sent_ack);
+	dataLEDState = !dataLEDState;
+	if (dataLEDState)
+	{
+		ioport_set_pin_low(LED0_GPIO);
+	} else
+	{
+		ioport_set_pin_high(LED0_GPIO);
+	}
+}
+
+static void unknown_metadata_received(udd_ep_status_t status, iram_size_t nb_received, udd_ep_id_t ep, uint8_t *metadata)
+{
+	rx_counter += 1;
+
+	delay_ms(300);
+	ioport_set_pin_low(LED2_GPIO);
+	delay_ms(300);
+	ioport_set_pin_high(LED2_GPIO);
+
+	if ((metadata[0] == 0xF0) && (metadata[1] == 0x01))
+	{
+		send_adc_data_to_usb = false;
+	}
+
+	if ((metadata[0] == 0xF0) && (metadata[1] == 0x02))
+	{
+		send_adc_data_to_usb = settings.send_adc_values_to_usb;
+	}
+
+	if ((metadata[0] == 0xF0) && (metadata[1] == 0x03))
+	{
+		//udd_ep_run(UDI_PHDC_EP_BULK_IN, false, (uint8_t*)&settings, sizeof(settings), sent_ack);
+	}
 }
 
 /**
@@ -192,10 +221,12 @@ int main( void )
 	sleepmgr_init();
 
 	/* Start USB stack to authorize VBus monitoring */
+	adc_data_sent_callback = adc_data_sent_ack;
+	unknown_metadata_received_callback = unknown_metadata_received;
 	udc_start();
 	
 	/* We need some time here to USB initialization */
-	delay_ms(500);
+	delay_ms(1500);
 
 	///* Initialize ST7565R controller and LCD display */
 	gfx_mono_init();
@@ -206,7 +237,17 @@ int main( void )
 	/* Display headings on LCD for normal result */
 	gfx_mono_draw_string("Mercury-16", 0, 10, &sysfont);
 
-	//settings.device_id = Get_debug_register(AVR32_DID);
+	gfx_mono_draw_string("Data Tx:0000 Rx:0000", 0, 20, &sysfont);
+
+	heartbeat.choice = 0xF005;
+	heartbeat.length = sizeof(heartbeat) - 4;
+
+	settings.choice = 0xF004;
+	settings.length = sizeof(settings) - 4;
+	settings.device_status = 1;
+	settings.device_type = 2;
+	settings.device_index = 3;
+	settings.device_id = 123456789;
 	settings.clk_sys = sysclk_get_per_hz();
 	settings.clk_adc = 2000000UL;
 	settings.adca_enabled = adc_is_enabled(&ADCA);
@@ -214,10 +255,12 @@ int main( void )
 	settings.adc_ref = ADC_REFSEL_INT1V_gc;
 	settings.adc_gain = 1;
 	settings.sample_rate = 8000;
-	settings.per_value_compensation = 7;
+	settings.sample_rate_compensation = 0;
 	settings.channel_count = 8;
 	settings.usb_address = udd_getaddress();
 	settings.usb_high_speed = udd_is_high_speed();
+	settings.send_adc_values_to_usb = true;
+	settings.send_adc_values_to_usart = false;
 
 	/* Initialize ADC ,to read ADC offset and configure ADC for oversampling
 	**/
@@ -243,23 +286,15 @@ int main( void )
 	while (true) {
 		sleepmgr_enter_sleep();
 		
-		loopcounter++;
-		convert_to_ascii(&loopcounter_ascii_buf[ASCII_BUFFER_SIZE - 2], loopcounter);
-		loopcounter_ascii_buf[ASCII_BUFFER_SIZE - 1] = 0;
-		gfx_mono_draw_string(loopcounter_ascii_buf, 0, 20, &sysfont);
+		convert_to_ascii_4digit(&rxtxcounter_ascii_buf[4], rx_counter);
+		gfx_mono_draw_string(rxtxcounter_ascii_buf, 48, 20, &sysfont);
+		convert_to_ascii_4digit(&rxtxcounter_ascii_buf[4], tx_counter);
+		gfx_mono_draw_string(rxtxcounter_ascii_buf, 96, 20, &sysfont);
 
 		delay_ms(300);
 		ioport_set_pin_high(LED1_GPIO);
 		delay_ms(1100);
 		ioport_set_pin_low(LED1_GPIO);
-
-		//success = udd_ep_run(UDI_PHDC_EP_BULK_OUT, true, read_data, sizeof(read_data), data_received_ack);
-		//if (success == true) {
-			//delay_ms(300);
-			//ioport_set_pin_low(LED2_GPIO);
-			//delay_ms(300);
-			//ioport_set_pin_high(LED2_GPIO);
-		//}
 
 		if (main_b_phdc_enable) {
 			if (ieee11073_skeleton_process()) {
@@ -267,7 +302,10 @@ int main( void )
 			} else {
 				ui_association(false); /* No association */
 			}
-		}				
+		}	
+		
+		heartbeat.ticks++;
+		udd_ep_run(UDI_PHDC_EP_BULK_IN, false, (uint8_t*)&heartbeat, sizeof(heartbeat), sent_ack);
 	}
 }
 

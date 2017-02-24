@@ -186,7 +186,13 @@ void ieee11073_received(bool status, uint16_t nb_received)
 	}
 
 	ieee11073_g_phdc_metadata_out.metadata_size = nb_received;
-	ieee11073_decode_metadata();
+
+	// HACK: let's override the metadata processor
+	if (!ieee11073_decode_metadata())
+	{
+		unknown_metadata_received_callback(status, nb_received, UDI_PHDC_EP_BULK_OUT, ieee11073_g_phdc_metadata_out.metadata);
+	}
+
 	ieee11073_enable_reception();
 }
 

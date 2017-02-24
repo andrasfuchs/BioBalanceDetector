@@ -111,8 +111,6 @@ static char v_input_ascii_buf[ASCII_BUFFER_SIZE] = {"+1.123456"};
 #define ADC_RESULT_BUFFER_SIZE 896
 static uint16_t adc_values[8 * ADC_RESULT_BUFFER_SIZE] = { 0 };
 
-static bool dataLEDState = false;
-
 /**
  * \brief This Function converts a decimal value to ASCII
  *  - It will extract each digit from decimal value and add to
@@ -125,6 +123,10 @@ void convert_to_ascii(char *buf_index, uint64_t dec_val)
 {
 	uint8_t digit_count = 0;
 
+	// set the ending to 0
+	*buf_index = 0;
+	buf_index--;
+
 	/* Loop through all digits to convert to ASCII */
 	for (digit_count = 0; digit_count <= NUMBER_OF_DIGITS_IN_RESULT;
 			digit_count++) {
@@ -136,6 +138,35 @@ void convert_to_ascii(char *buf_index, uint64_t dec_val)
 			buf_index--;
 		}
 
+		/*
+		 * Extract each Digit by doing %10 and convert to ASCII,
+		 *  - Then store to buffer index
+		 *	- Initially we will get the right most digit and so on
+		 */
+		*buf_index = (dec_val % 10) + 48;
+
+		/* Remove extracted digit by doing divide with 10 */
+		dec_val = (dec_val / 10);
+
+		/*
+		 * Decrement the buffer Index to store next digit ,start from
+		 * right most digit and move backwards for extracting each digit
+		 */
+		buf_index--;
+	}
+}
+
+void convert_to_ascii_4digit(char *buf_index, uint64_t dec_val)
+{
+	uint8_t digit_count = 0;
+
+	// set the ending to 0
+	*buf_index = 0;
+	buf_index--;
+
+	/* Loop through all digits to convert to ASCII */
+	for (digit_count = 0; digit_count < 4; digit_count++) 
+	{
 		/*
 		 * Extract each Digit by doing %10 and convert to ASCII,
 		 *  - Then store to buffer index
@@ -223,18 +254,6 @@ void init_adc(ADC_t *adc, CellSettings_t *settings)
 	adc_enable(adc);
 }
 
-static void data_sent_ack(udd_ep_status_t status, iram_size_t nb_send, udd_ep_id_t ep)
-{
-	dataLEDState = !dataLEDState;
-	if (dataLEDState)
-	{
-		//ioport_set_pin_low(LED1_GPIO);
-	} else 
-	{
-		//ioport_set_pin_high(LED1_GPIO);
-	}
-}
-
 static void pick_a_sample_callback(void)
 {
 	int offset = adc_samplecount * 8;
@@ -251,7 +270,10 @@ static void pick_a_sample_callback(void)
 	if (adc_samplecount >= ADC_RESULT_BUFFER_SIZE)
 	{
 		// send data to USB
-		//udd_ep_run(UDI_PHDC_EP_BULK_IN, false, &adc_values, sizeof(adc_values), data_sent_ack);		
+		if (send_adc_data_to_usb)
+		{
+			//udd_ep_run(UDI_PHDC_EP_BULK_IN, false, &adc_values, sizeof(adc_values), adc_data_sent_callback);		
+		}		
 
 		adc_samplecount = 0;
 	}
@@ -306,7 +328,7 @@ static void pick_a_sample_callback(void)
 //!  78 + TC0_DIV8    produces 30'700Hz output (if the CPU runs at 32MHz [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE  80, CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ, udd_ep_run|shortpacket=true  - 480 kbytes/s, .NET Task
 //!  78 + TC0_DIV8    produces  5'040Hz output (if the CPU runs at 32MHz [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE  80, CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ, udd_ep_run|shortpacket=true  -  79 kbytes/s, .NET Timer
 //
-// below this, the followings are fixed: TC0_DIV8, CPU@32Mhz, [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE 896, CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ, udd_ep_run|shortpacket=false
+// below this, the followings are fixed: TC0_DIV8, CPU@32Mhz, [2MHz * 16 / 1 / 1 / 1]) ADC_RESULT_BUFFER_SIZE 896, CONFIG_OSC_AUTOCAL_RC2MHZ_REF_OSC   OSC_ID_RC32KHZ, udd_ep_run|shortpacket=false, endpoint packet size: 32 bytes, USB Full Speed
 // variables: effective_per_value, .NET implementation
 //   268 kbytes/s - epv: 256, .NET Task (no processing), 512k buffer
 //   268 kbytes/s - epv: 256, .NET Task (no processing), 512k buffer
@@ -322,7 +344,7 @@ static void pick_a_sample_callback(void)
 
 void init_tc(CellSettings_t *settings)
 {
-	uint16_t effective_per_value = (settings->clk_sys / 8 / settings->sample_rate) + settings->per_value_compensation;
+	uint16_t effective_per_value = (settings->clk_sys / 8 / settings->sample_rate) + settings->sample_rate_compensation;
 	settings->sample_rate = settings->clk_sys / 8 / effective_per_value;
 
 	tc_enable(&TCC0);
