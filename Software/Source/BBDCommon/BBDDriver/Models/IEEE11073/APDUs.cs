@@ -7,14 +7,21 @@ using System.Threading.Tasks;
 
 namespace BBDDriver.Models.IEEE11073
 {
+    public class DataPacket
+    {
+        public APDU APDU;
+
+        public byte[] RawData;
+
+        public DataAPDU Data;
+    }
+
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct APDU
     {
         public UInt16 Choice;
 
         public UInt16 Length;
-
-        public DataAPDU Data;
 
         public override string ToString()
         {

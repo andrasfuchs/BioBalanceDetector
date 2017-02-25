@@ -189,7 +189,7 @@ static void unknown_metadata_received(udd_ep_status_t status, iram_size_t nb_rec
 
 	if ((metadata[0] == 0xF0) && (metadata[1] == 0x03))
 	{
-		//udd_ep_run(UDI_PHDC_EP_BULK_IN, false, (uint8_t*)&settings, sizeof(settings), sent_ack);
+		udd_ep_run(UDI_PHDC_EP_BULK_IN, false, (uint8_t*)&settings, sizeof(settings), sent_ack);
 	}
 }
 
@@ -252,7 +252,7 @@ int main( void )
 	settings.clk_adc = 2000000UL;
 	settings.adca_enabled = adc_is_enabled(&ADCA);
 	settings.adcb_enabled = adc_is_enabled(&ADCB);
-	settings.adc_ref = ADC_REFSEL_INT1V_gc;
+	settings.adc_ref = (uint8_t)ADC_REFSEL_INT1V_gc;
 	settings.adc_gain = 1;
 	settings.sample_rate = 8000;
 	settings.sample_rate_compensation = 0;

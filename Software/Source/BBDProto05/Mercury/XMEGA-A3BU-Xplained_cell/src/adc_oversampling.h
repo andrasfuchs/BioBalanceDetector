@@ -54,6 +54,10 @@
 /* ! \brief (Number of digits -1) in which ADC raw count is displayed on LCD */
 #define NUMBER_OF_DIGITS_IN_ADCCOUNT  5
 
+
+#define ADC_RESULT_BUFFER_SIZE 896
+
+
 /* ! \brief Size of buffer used to store ASCII value of result */
 #define ASCII_BUFFER_SIZE    10
 
@@ -62,6 +66,7 @@
 
 typedef struct HeartBeat_struct
 {
+	// 0xF005
 	uint16_t choice;
 
 	uint16_t length;
@@ -102,7 +107,7 @@ typedef struct CellSettings_struct
 	bool adcb_enabled;
 
 	// ADC reference
-	enum adc_reference adc_ref;
+	uint8_t adc_ref;
 
 	// ADC gain
 	uint8_t adc_gain;
@@ -125,11 +130,15 @@ typedef struct CellSettings_struct
 	bool send_adc_values_to_usart;
 } CellSettings_t;
 
-union CellSettings_union
+typedef struct ADCResults_struct
 {
-	uint8_t uint8_array[32];
-	CellSettings_t cell_settings;
-} CellSettings_union;
+	// 0xF006
+	uint16_t choice;
+
+	uint16_t length;
+
+	uint16_t adc_values[8 * ADC_RESULT_BUFFER_SIZE];
+} ADCResults_t;
 
 
 /**

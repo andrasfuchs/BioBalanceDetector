@@ -96,20 +96,13 @@ static int64_t v_input_one_sample = 0;
  */
 volatile bool adc_oversampled_flag = false;
 
-/* ! \brief Static variable to keep ADC configuration parameters */
-//static struct adc_config adc_conf;
-
-/* ! \brief Static variable to keep ADC channel configuration parameters */
-//static struct adc_channel_config adc_ch_conf;
+static ADCResults_t adc_results;
 
 /**
  * \brief Static buffer variable to store ASCII value of calculated input
  *        voltage for display
  */
 static char v_input_ascii_buf[ASCII_BUFFER_SIZE] = {"+1.123456"};
-
-#define ADC_RESULT_BUFFER_SIZE 896
-static uint16_t adc_values[8 * ADC_RESULT_BUFFER_SIZE] = { 0 };
 
 /**
  * \brief This Function converts a decimal value to ASCII
@@ -200,6 +193,9 @@ void init_adc_channel(ADC_t *adc, uint8_t ch_mask, enum adcch_positive_input pos
 void init_adc(ADC_t *adc, CellSettings_t *settings)
 {
 	struct adc_config adc_conf;
+
+	adc_results.choice = 0xF006;
+	adc_results.length = 2 * 8 * ADC_RESULT_BUFFER_SIZE;
 	
 	/* Initialize configuration structures */
 	adc_read_configuration(adc, &adc_conf);
@@ -257,14 +253,14 @@ void init_adc(ADC_t *adc, CellSettings_t *settings)
 static void pick_a_sample_callback(void)
 {
 	int offset = adc_samplecount * 8;
-	adc_values[offset + 0] = ADCA.CH0RES;
-	adc_values[offset + 1] = ADCA.CH1RES;
-	adc_values[offset + 2] = ADCA.CH2RES;
-	adc_values[offset + 3] = ADCA.CH3RES;
-	adc_values[offset + 4] = ADCB.CH0RES;
-	adc_values[offset + 5] = ADCB.CH1RES;
-	adc_values[offset + 6] = ADCB.CH2RES;
-	adc_values[offset + 7] = ADCB.CH3RES;
+	adc_results.adc_values[offset + 0] = ADCA.CH0RES;
+	adc_results.adc_values[offset + 1] = ADCA.CH1RES;
+	adc_results.adc_values[offset + 2] = ADCA.CH2RES;
+	adc_results.adc_values[offset + 3] = ADCA.CH3RES;
+	adc_results.adc_values[offset + 4] = ADCB.CH0RES;
+	adc_results.adc_values[offset + 5] = ADCB.CH1RES;
+	adc_results.adc_values[offset + 6] = ADCB.CH2RES;
+	adc_results.adc_values[offset + 7] = ADCB.CH3RES;
 	
 	adc_samplecount++;
 	if (adc_samplecount >= ADC_RESULT_BUFFER_SIZE)
@@ -272,7 +268,7 @@ static void pick_a_sample_callback(void)
 		// send data to USB
 		if (send_adc_data_to_usb)
 		{
-			//udd_ep_run(UDI_PHDC_EP_BULK_IN, false, &adc_values, sizeof(adc_values), adc_data_sent_callback);		
+			udd_ep_run(UDI_PHDC_EP_BULK_IN, false, (uint8_t*)&adc_results, sizeof(adc_results), adc_data_sent_callback);
 		}		
 
 		adc_samplecount = 0;
