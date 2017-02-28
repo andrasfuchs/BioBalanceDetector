@@ -53,6 +53,7 @@
 #include <conf_oversampling.h>
 #include <adc_oversampling.h>
 #include <asf.h>
+#include <math.h>
 
 /**
  * \brief Static variable to store total ADC Offset value for total number
@@ -75,9 +76,6 @@ static int64_t adc_result_accum_processed = 0;
 /* ! \brief Static variable to process the single ADC result */
 static int64_t adc_result_one_sample_processed = 0;
 
-/* ! \brief Static variable to keep number of samples for oversampling */
-static volatile uint16_t adc_samplecount = 0;
-
 /**
  * \brief Static variable to find analog value at ADC input after
  *        oversampling process
@@ -90,13 +88,14 @@ static int64_t v_input = 0;
  */
 static int64_t v_input_one_sample = 0;
 
-/**
- * \brief Global variable/flag to indicate that one set of
- *         oversampling is done for start processing
- */
-volatile bool adc_oversampled_flag = false;
 
-static ADCResults_t adc_results;
+volatile bool adc_samplepicking_flag = false;
+
+static volatile uint16_t adc_samplecount = 0;
+
+static volatile uint8_t adc_buffer_index;	// used for double buffering
+
+static ADCResults_t adc_results[2];
 
 /**
  * \brief Static buffer variable to store ASCII value of calculated input
@@ -194,8 +193,12 @@ void init_adc(ADC_t *adc, CellSettings_t *settings)
 {
 	struct adc_config adc_conf;
 
-	adc_results.choice = 0xF006;
-	adc_results.length = 2 * 8 * ADC_RESULT_BUFFER_SIZE;
+	adc_results[0].choice = 0xF006;
+	adc_results[0].length = 2 * 8 * ADC_RESULT_BUFFER_SIZE;
+	adc_results[0].device_id = settings->device_id;
+	adc_results[1].choice = 0xF006;
+	adc_results[1].length = 2 * 8 * ADC_RESULT_BUFFER_SIZE;
+	adc_results[1].device_id = settings->device_id;
 	
 	/* Initialize configuration structures */
 	adc_read_configuration(adc, &adc_conf);
@@ -252,32 +255,68 @@ void init_adc(ADC_t *adc, CellSettings_t *settings)
 
 static void pick_a_sample_callback(void)
 {
-	int offset = adc_samplecount * 8;
-	adc_results.adc_values[offset + 0] = ADCA.CH0RES;
-	adc_results.adc_values[offset + 1] = ADCA.CH1RES;
-	adc_results.adc_values[offset + 2] = ADCA.CH2RES;
-	adc_results.adc_values[offset + 3] = ADCA.CH3RES;
-	adc_results.adc_values[offset + 4] = ADCB.CH0RES;
-	adc_results.adc_values[offset + 5] = ADCB.CH1RES;
-	adc_results.adc_values[offset + 6] = ADCB.CH2RES;
-	adc_results.adc_values[offset + 7] = ADCB.CH3RES;
+	while (adc_samplepicking_flag);
+	adc_samplepicking_flag = true;
+
+	if (adc_test_mode == 0) 
+	{
+		int offset = adc_samplecount * 8;
+		adc_results[adc_buffer_index].adc_values[offset + 0] = ADCA.CH0RES;
+		adc_results[adc_buffer_index].adc_values[offset + 1] = ADCA.CH1RES;
+		adc_results[adc_buffer_index].adc_values[offset + 2] = ADCA.CH2RES;
+		adc_results[adc_buffer_index].adc_values[offset + 3] = ADCA.CH3RES;
+		adc_results[adc_buffer_index].adc_values[offset + 4] = ADCB.CH0RES;
+		adc_results[adc_buffer_index].adc_values[offset + 5] = ADCB.CH1RES;
+		adc_results[adc_buffer_index].adc_values[offset + 6] = ADCB.CH2RES;
+		adc_results[adc_buffer_index].adc_values[offset + 7] = ADCB.CH3RES;
+	} else
+	{
+		adc_test_counter++;
+		
+		short test_value = 0;
+		if (adc_test_mode == 1)
+		{
+			test_value = adc_test_counter;
+		} else if (adc_test_mode == 2)
+		{
+			test_value = (adc_test_counter * adc_test_step);
+		} else if (adc_test_mode == 3)
+		{
+			test_value = (sin(adc_test_counter * adc_test_step) * 32768) + 32768;
+		}
+
+		int offset = adc_samplecount * 8;
+		adc_results[adc_buffer_index].adc_values[offset + 0] = test_value;
+		adc_results[adc_buffer_index].adc_values[offset + 1] = test_value;
+		adc_results[adc_buffer_index].adc_values[offset + 2] = test_value;
+		adc_results[adc_buffer_index].adc_values[offset + 3] = test_value;
+		adc_results[adc_buffer_index].adc_values[offset + 4] = test_value;
+		adc_results[adc_buffer_index].adc_values[offset + 5] = test_value;
+		adc_results[adc_buffer_index].adc_values[offset + 6] = test_value;
+		adc_results[adc_buffer_index].adc_values[offset + 7] = test_value;
+	}
 	
 	adc_samplecount++;
-	if (adc_samplecount >= ADC_RESULT_BUFFER_SIZE)
+	if (adc_samplecount == ADC_RESULT_BUFFER_SIZE)
 	{
 		// send data to USB
 		if (send_adc_data_to_usb)
 		{
-			udd_ep_run(UDI_PHDC_EP_BULK_IN, false, (uint8_t*)&adc_results, sizeof(adc_results), adc_data_sent_callback);
+			udd_ep_run(UDI_PHDC_EP_BULK_IN, false, (uint8_t*)&adc_results[adc_buffer_index], sizeof(adc_results[adc_buffer_index]), adc_data_sent_callback);
+			usart_serial_write_packet(USART_SERIAL, (uint8_t*)&adc_results[adc_buffer_index], sizeof(adc_results[adc_buffer_index]));
 		}		
 
+		adc_buffer_index = (adc_buffer_index + 1) % 2;
 		adc_samplecount = 0;
 	}
+
+	adc_samplepicking_flag = false;
 
 	//Important to clear Interrupt Flag
 	tc_clear_overflow(&TCC0);
 }
 
+/*
 // '!' indicates that the speed is less than expected
 //  100 + TC0_DIV1024 produces    129Hz output (if the CPU runs at 12MHz [32MHz->48Mhz / 2 / 1 / 2])
 //  100 + TC0_DIV1024 produces    132Hz output (if the CPU runs at 12MHz [2MHz * 24 / 2 / 1 / 2])
@@ -337,7 +376,7 @@ static void pick_a_sample_callback(void)
 //   782 kbytes/s - epv:  78, .NET Task (all processing on a separate thread), 64k buffer
 //
 // conclusion: at least 32k buffer is needed and the 795 kbytes/s seems to be a barrier on XMEGA
-
+*/
 void init_tc(CellSettings_t *settings)
 {
 	uint16_t effective_per_value = (settings->clk_sys / 8 / settings->sample_rate) + settings->sample_rate_compensation;

@@ -41,7 +41,13 @@ namespace BBDDriver.Models.Source
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         private struct CellSettings
-        {            
+        {
+            [MarshalAs(UnmanagedType.U4)]
+            public UInt32 FirmwareVersion;
+
+            [MarshalAs(UnmanagedType.U1)]
+            public byte TestMode;
+
             // reset | enabled
             [MarshalAs(UnmanagedType.U1)]
             public byte DeviceStatus;
@@ -82,6 +88,9 @@ namespace BBDDriver.Models.Source
             [MarshalAs(UnmanagedType.U1)]
             public byte ADCGain;
 
+            [MarshalAs(UnmanagedType.U1)]
+            public byte ADCBits;
+
             // sampling timer rate in Hz
             [MarshalAs(UnmanagedType.U4)]
             public UInt32 SampleRate;
@@ -94,17 +103,34 @@ namespace BBDDriver.Models.Source
             [MarshalAs(UnmanagedType.U4)]
             public UInt32 ChannelCount;
 
+            // is USB enabled
+            [MarshalAs(UnmanagedType.U1)]
+            public bool USBEnabled;
+
             [MarshalAs(UnmanagedType.U1)]
             public byte USBAddress;
 
+            [MarshalAs(UnmanagedType.U4)]
+            public UInt32 USBSpeed;
+
+            // is USART enabled
             [MarshalAs(UnmanagedType.U1)]
-            public bool USBHighSpeed;
+            public bool USARTEnabled;
+
+            [MarshalAs(UnmanagedType.U4)]
+            public UInt32 USARTSpeed;
 
             [MarshalAs(UnmanagedType.U1)]
-            public bool SendADCValuesToUSB;
+            public byte ADCValueBits;
+
+            [MarshalAs(UnmanagedType.U4)]
+            public UInt32 ADCValuePerPacket;
 
             [MarshalAs(UnmanagedType.U1)]
-            public bool SendADCValuesToUSART;
+            public bool ADCValuePacketToUSB;
+
+            [MarshalAs(UnmanagedType.U1)]
+            public bool ADCValuePacketToUSART;
         }
 
         public BBDMercury16Input(USBDeviceInfo selectedDevice = null) : base(8000, 8)
@@ -308,6 +334,7 @@ namespace BBDDriver.Models.Source
             try
             {
                 dp = ReadPacketRaw(usbInterface.InPipe, 0xF006, 10);
+                if (dp.APDU.Choice != 0xF006) return false;
             }
             catch
             {
@@ -352,7 +379,7 @@ namespace BBDDriver.Models.Source
                     ushort shortValue = shorts[j * channels.Length + i];
                     if (j == 0) prevShortValue = shortValue;
 
-                    floats[j] = (shortValue / 65536.0f) * ADCReferenceV;
+                    floats[j] = ((shortValue / 65536.0f) - 0.5f) * (ADCReferenceV * 2);
 
                     ushort valueChange = (ushort)Math.Abs(shortValue - prevShortValue);
                     if (valueChange > drbe.MaxJumpBetweenSampleValues) drbe.MaxJumpBetweenSampleValues = valueChange;

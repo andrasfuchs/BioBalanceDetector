@@ -59,6 +59,9 @@
 #include <ccp.h>
 #include <xmega_reset_cause.h>
 
+// From module: DMA - Direct Memory Access
+#include <dma.h>
+
 // From module: Delay routines
 #include <delay.h>
 
@@ -73,6 +76,9 @@
 
 // From module: Generic board support
 #include <board.h>
+
+// From module: Huge Memory Interface
+#include <hugemem.h>
 
 // From module: IOPORT - General purpose I/O service
 #include <ioport.h>
@@ -108,6 +114,9 @@
 
 // From module: TC - Timer Counter
 #include <tc.h>
+
+// From module: USART - Serial interface - XMEGA implementation
+#include <serial.h>
 
 // From module: USART - Universal Synchronous/Asynchronous Receiver/Transmitter
 #include <usart.h>

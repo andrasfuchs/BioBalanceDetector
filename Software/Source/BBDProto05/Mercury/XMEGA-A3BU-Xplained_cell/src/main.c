@@ -117,6 +117,9 @@ static bool dataLEDState = false;
 
 static CellSettings_t settings;
 static HeartBeat_t heartbeat;
+static HeartBeat_t heartbeat_received;
+
+
 
 void main_suspend_action(void)
 {
@@ -149,12 +152,14 @@ void main_phdc_disable(void)
 	ieee11073_skeleton_disable();
 }
 
-static void sent_ack(udd_ep_status_t status, iram_size_t nb_send, udd_ep_id_t ep)
+
+
+static void usb_heartbeat_sent(udd_ep_status_t status, iram_size_t nb_send, udd_ep_id_t ep)
 {
 	tx_counter += 1;
 }
 
-static void adc_data_sent_ack(udd_ep_status_t status, iram_size_t nb_send, udd_ep_id_t ep)
+static void usb_adc_data_sent(udd_ep_status_t status, iram_size_t nb_send, udd_ep_id_t ep)
 {
 	tx_counter += 1;
 
@@ -168,7 +173,7 @@ static void adc_data_sent_ack(udd_ep_status_t status, iram_size_t nb_send, udd_e
 	}
 }
 
-static void unknown_metadata_received(udd_ep_status_t status, iram_size_t nb_received, udd_ep_id_t ep, uint8_t *metadata)
+static void usb_unknown_metadata_received(udd_ep_status_t status, iram_size_t nb_received, udd_ep_id_t ep, uint8_t *metadata)
 {
 	rx_counter += 1;
 
@@ -184,14 +189,99 @@ static void unknown_metadata_received(udd_ep_status_t status, iram_size_t nb_rec
 
 	if ((metadata[0] == 0xF0) && (metadata[1] == 0x02))
 	{
-		send_adc_data_to_usb = settings.send_adc_values_to_usb;
+		send_adc_data_to_usb = settings.adc_value_packet_to_usb;
 	}
 
 	if ((metadata[0] == 0xF0) && (metadata[1] == 0x03))
 	{
-		udd_ep_run(UDI_PHDC_EP_BULK_IN, false, (uint8_t*)&settings, sizeof(settings), sent_ack);
+		udd_ep_run(UDI_PHDC_EP_BULK_IN, false, (uint8_t*)&settings, sizeof(settings), usb_heartbeat_sent);
 	}
 }
+
+
+#define DMA_CHANNEL_USART_OUT   0
+#define DMA_CHANNEL_USART_IN	1
+#define DMA_BUFFER_SIZE 1024
+
+static uint8_t dma_source[DMA_BUFFER_SIZE] = "Flora\r\n";
+static uint8_t dma_destination[DMA_BUFFER_SIZE];
+
+static void usart_heartbeat_sent(enum dma_channel_status status)
+{
+	if (status == DMA_CH_TRANSFER_COMPLETED)
+	{
+		tx_counter += 1000;
+	}
+}
+
+static void usart_heartbeat_received(enum dma_channel_status status)
+{
+	//if ((status == DMA_CH_TRANSFER_COMPLETED) && (heartbeat_received.choice == 0xF005))
+	if ((status == DMA_CH_TRANSFER_COMPLETED) && (dma_destination[0] == 0xF0))
+	{
+		rx_counter += 1000;
+	}
+}
+
+static void dma_usart_out_init(void)
+{
+	struct dma_channel_config dmach_conf;
+	memset(&dmach_conf, 0, sizeof(dmach_conf));
+	
+	dma_channel_set_burst_length(&dmach_conf, DMA_CH_BURSTLEN_1BYTE_gc);
+	//dma_channel_set_transfer_count(&dmach_conf, sizeof(heartbeat));
+	dma_channel_set_transfer_count(&dmach_conf, DMA_BUFFER_SIZE);
+	dma_channel_set_trigger_source(&dmach_conf, DMA_CH_TRIGSRC_USARTE0_DRE_gc );
+	
+	dma_channel_set_src_reload_mode(&dmach_conf,DMA_CH_SRCRELOAD_TRANSACTION_gc);
+	dma_channel_set_dest_reload_mode(&dmach_conf,DMA_CH_DESTRELOAD_NONE_gc);
+	
+	dma_channel_set_src_dir_mode(&dmach_conf, DMA_CH_SRCDIR_INC_gc);
+	//dma_channel_set_source_address(&dmach_conf,(uint16_t)(uintptr_t)&heartbeat);
+	dma_channel_set_source_address(&dmach_conf,(uint16_t)(uintptr_t)&dma_source);	
+	
+	dma_channel_set_dest_dir_mode(&dmach_conf, DMA_CH_DESTDIR_FIXED_gc);
+	dma_channel_set_destination_address(&dmach_conf,(uint16_t)(uintptr_t)USART_SERIAL.DATA);
+	
+	dma_channel_set_single_shot(&dmach_conf);
+
+	dma_set_callback(DMA_CHANNEL_USART_OUT, usart_heartbeat_sent);
+	
+	dma_channel_set_interrupt_level(&dmach_conf, DMA_INT_LVL_LO);
+	
+	dma_channel_write_config(DMA_CHANNEL_USART_OUT, &dmach_conf);	
+}
+
+static void dma_usart_in_init(void)
+{
+	struct dma_channel_config dmach_conf;
+	memset(&dmach_conf, 0, sizeof(dmach_conf));
+	
+	dma_channel_set_burst_length(&dmach_conf, DMA_CH_BURSTLEN_1BYTE_gc);
+	//dma_channel_set_transfer_count(&dmach_conf, sizeof(heartbeat_received));
+	dma_channel_set_transfer_count(&dmach_conf, DMA_BUFFER_SIZE);
+	dma_channel_set_trigger_source(&dmach_conf, DMA_CH_TRIGSRC_USARTE0_RXC_gc );
+	
+	dma_channel_set_src_reload_mode(&dmach_conf,DMA_CH_SRCRELOAD_NONE_gc);
+	dma_channel_set_dest_reload_mode(&dmach_conf,DMA_CH_DESTRELOAD_TRANSACTION_gc);
+	
+	dma_channel_set_src_dir_mode(&dmach_conf, DMA_CH_SRCDIR_FIXED_gc);
+	dma_channel_set_source_address(&dmach_conf,(uint16_t)(uintptr_t)USART_SERIAL.DATA);
+	
+	dma_channel_set_dest_dir_mode(&dmach_conf, DMA_CH_DESTDIR_INC_gc);
+	//dma_channel_set_destination_address(&dmach_conf,(uint16_t)(uintptr_t)&heartbeat_received);
+	dma_channel_set_destination_address(&dmach_conf,(uint16_t)(uintptr_t)&dma_destination);
+	
+	dma_channel_set_single_shot(&dmach_conf);
+
+	dma_set_callback(DMA_CHANNEL_USART_IN, usart_heartbeat_received);
+	
+	dma_channel_set_interrupt_level(&dmach_conf, DMA_INT_LVL_LO);
+	
+	dma_channel_write_config(DMA_CHANNEL_USART_IN, &dmach_conf);
+}
+
+
 
 /**
  * \brief Main application routine
@@ -220,13 +310,6 @@ int main( void )
 	pmic_init();
 	sleepmgr_init();
 
-	/* Start USB stack to authorize VBus monitoring */
-	adc_data_sent_callback = adc_data_sent_ack;
-	unknown_metadata_received_callback = unknown_metadata_received;
-	udc_start();
-	
-	/* We need some time here to USB initialization */
-	delay_ms(1500);
 
 	///* Initialize ST7565R controller and LCD display */
 	gfx_mono_init();
@@ -237,13 +320,59 @@ int main( void )
 	/* Display headings on LCD for normal result */
 	gfx_mono_draw_string("Mercury-16", 0, 10, &sysfont);
 
-	gfx_mono_draw_string("Data Tx:0000 Rx:0000", 0, 20, &sysfont);
+	/* Switch ON LCD back light */
+	ioport_set_pin_high(NHD_C12832A1Z_BACKLIGHT);
+
+	/* Set LCD contrast */
+	st7565r_set_contrast(ST7565R_DISPLAY_CONTRAST_MIN);
+
+
+	gfx_mono_draw_string("Initializing USART...\0", 0, 20, &sysfont);
+
+	///* Initialize USART */
+	 static usart_serial_options_t usart_options = {
+		 .baudrate = USART_SERIAL_BAUDRATE,
+		 .charlength = USART_SERIAL_CHAR_LENGTH,
+		 .paritytype = USART_SERIAL_PARITY,
+		 .stopbits = USART_SERIAL_STOP_BIT
+	 };
+	 sysclk_enable_module(SYSCLK_PORT_E, PR_USART0_bm);	 
+	 usart_serial_init(USART_SERIAL, &usart_options);
+	 usart_set_mode(USART_SERIAL, USART_CMODE_SYNCHRONOUS_gc);
+	 usart_set_rx_interrupt_level(USART_SERIAL, USART_RXCINTLVL_OFF_gc);
+	 usart_set_tx_interrupt_level(USART_SERIAL, USART_TXCINTLVL_OFF_gc);
+	 delay_ms(1000);
+
+
+	 gfx_mono_draw_string("Initializing DMA...\0", 0, 20, &sysfont);
+
+	 // DMA setup for USART to RAM transfer
+	 dma_enable();
+	 dma_usart_out_init();
+	 dma_usart_in_init();
+	 delay_ms(1000);
+	 
+	 
+	 gfx_mono_draw_string("Initializing USB...\0", 0, 20, &sysfont);
+
+	/* Start USB stack to authorize VBus monitoring */
+	adc_data_sent_callback = usb_adc_data_sent;
+	unknown_metadata_received_callback = usb_unknown_metadata_received;
+	udc_start();
+	
+	/* We need some time here to USB initialization */
+	delay_ms(3000);
+
+
+	gfx_mono_draw_string("Data  Tx:0000 Rx:0000", 0, 20, &sysfont);
 
 	heartbeat.choice = 0xF005;
 	heartbeat.length = sizeof(heartbeat) - 4;
 
 	settings.choice = 0xF004;
 	settings.length = sizeof(settings) - 4;
+	settings.firmware_version = 0x0002;
+	settings.test_mode = 0;
 	settings.device_status = 1;
 	settings.device_type = 2;
 	settings.device_index = 3;
@@ -252,15 +381,28 @@ int main( void )
 	settings.clk_adc = 2000000UL;
 	settings.adca_enabled = adc_is_enabled(&ADCA);
 	settings.adcb_enabled = adc_is_enabled(&ADCB);
+	settings.adc_bits = 12;
 	settings.adc_ref = (uint8_t)ADC_REFSEL_INT1V_gc;
 	settings.adc_gain = 1;
 	settings.sample_rate = 8000;
 	settings.sample_rate_compensation = 0;
 	settings.channel_count = 8;
 	settings.usb_address = udd_getaddress();
-	settings.usb_high_speed = udd_is_high_speed();
-	settings.send_adc_values_to_usb = true;
-	settings.send_adc_values_to_usart = false;
+	settings.usb_speed = (udd_is_high_speed() ? 480000000UL : 12000000UL);
+	settings.usart_speed = 9600;
+	settings.adc_value_bits = 16;
+	settings.adc_value_count_per_packet = ADC_RESULT_BUFFER_SIZE;
+	settings.adc_value_packet_to_usb = true;
+	settings.adc_value_packet_to_usart = false;
+
+	adc_test_mode = settings.test_mode;
+	if (adc_test_mode == 2)
+	{
+		adc_test_step = 65536 / settings.sample_rate;
+	} else if (adc_test_mode == 3) 
+	{
+		adc_test_step = 2.0 / settings.sample_rate;
+	}	
 
 	/* Initialize ADC ,to read ADC offset and configure ADC for oversampling
 	**/
@@ -272,12 +414,6 @@ int main( void )
 	/* Enable global interrupt */
 	//cpu_irq_enable();
 
-	/* Switch ON LCD back light */
-	ioport_set_pin_high(NHD_C12832A1Z_BACKLIGHT);
-
-	/* Set LCD contrast */
-	st7565r_set_contrast(ST7565R_DISPLAY_CONTRAST_MIN);
-
 	ioport_set_pin_high(LED0_GPIO);
 	ioport_set_pin_high(LED1_GPIO);
 	ioport_set_pin_high(LED2_GPIO);
@@ -286,9 +422,9 @@ int main( void )
 	while (true) {
 		sleepmgr_enter_sleep();
 		
-		convert_to_ascii_4digit(&rxtxcounter_ascii_buf[4], rx_counter);
-		gfx_mono_draw_string(rxtxcounter_ascii_buf, 48, 20, &sysfont);
 		convert_to_ascii_4digit(&rxtxcounter_ascii_buf[4], tx_counter);
+		gfx_mono_draw_string(rxtxcounter_ascii_buf, 48, 20, &sysfont);
+		convert_to_ascii_4digit(&rxtxcounter_ascii_buf[4], rx_counter);
 		gfx_mono_draw_string(rxtxcounter_ascii_buf, 96, 20, &sysfont);
 
 		delay_ms(300);
@@ -296,16 +432,22 @@ int main( void )
 		delay_ms(1100);
 		ioport_set_pin_low(LED1_GPIO);
 
-		if (main_b_phdc_enable) {
-			if (ieee11073_skeleton_process()) {
-				ui_association(true); /* Association Ok */
-			} else {
-				ui_association(false); /* No association */
-			}
-		}	
+		//if (main_b_phdc_enable) {
+			//if (ieee11073_skeleton_process()) {
+				//ui_association(true); /* Association Ok */
+			//} else {
+				//ui_association(false); /* No association */
+			//}
+		//}	
 		
 		heartbeat.ticks++;
-		udd_ep_run(UDI_PHDC_EP_BULK_IN, false, (uint8_t*)&heartbeat, sizeof(heartbeat), sent_ack);
+		//udd_ep_run(UDI_PHDC_EP_BULK_IN, false, (uint8_t*)&heartbeat, sizeof(heartbeat), usb_heartbeat_sent);
+				
+		// wait for the previous DMA to finish		
+		dma_channel_enable(DMA_CHANNEL_USART_OUT);		
+		while (dma_channel_is_busy(DMA_CHANNEL_USART_OUT));
+		dma_channel_disable(DMA_CHANNEL_USART_OUT);
+		dma_channel_enable(DMA_CHANNEL_USART_IN);		
 	}
 }
 

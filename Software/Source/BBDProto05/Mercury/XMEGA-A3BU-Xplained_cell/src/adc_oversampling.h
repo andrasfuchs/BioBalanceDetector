@@ -54,8 +54,8 @@
 /* ! \brief (Number of digits -1) in which ADC raw count is displayed on LCD */
 #define NUMBER_OF_DIGITS_IN_ADCCOUNT  5
 
-
-#define ADC_RESULT_BUFFER_SIZE 896
+/* Number of samples stored in memory before sending it to the organizer (note: must be dividable by the number of channels (8)) */
+#define ADC_RESULT_BUFFER_SIZE 384
 
 
 /* ! \brief Size of buffer used to store ASCII value of result */
@@ -81,6 +81,10 @@ typedef struct CellSettings_struct
 	uint16_t choice;
 
 	uint16_t length;
+
+	uint32_t firmware_version;
+
+	uint8_t test_mode;
 
 	// reset | enabled
 	uint8_t device_status;
@@ -112,6 +116,8 @@ typedef struct CellSettings_struct
 	// ADC gain
 	uint8_t adc_gain;
 
+	uint8_t adc_bits;
+
 	// sampling timer rate in Hz
 	uint32_t sample_rate;
 
@@ -121,13 +127,25 @@ typedef struct CellSettings_struct
 	// number of channels
 	uint32_t channel_count;
 
+	// is USB enabled
+	bool usb_enabled;
+
 	uint8_t usb_address;
 
-	bool usb_high_speed;
+	uint32_t usb_speed;
 
-	bool send_adc_values_to_usb;
+	// is USART enabled
+	bool usart_enabled;
 
-	bool send_adc_values_to_usart;
+	uint32_t usart_speed;
+
+	uint8_t adc_value_bits;
+
+	uint32_t adc_value_count_per_packet;
+
+	bool adc_value_packet_to_usb;
+	
+	bool adc_value_packet_to_usart;
 } CellSettings_t;
 
 typedef struct ADCResults_struct
@@ -136,6 +154,8 @@ typedef struct ADCResults_struct
 	uint16_t choice;
 
 	uint16_t length;
+
+	uint32_t device_id;
 
 	uint16_t adc_values[8 * ADC_RESULT_BUFFER_SIZE];
 } ADCResults_t;
@@ -148,6 +168,13 @@ typedef struct ADCResults_struct
 extern volatile bool adc_oversampled_flag;
 
 bool send_adc_data_to_usb;
+
+int8_t adc_test_mode;
+
+int32_t adc_test_counter;
+
+double adc_test_step;
+
 
 /* FUNCTION PROTOTYPES */
 
