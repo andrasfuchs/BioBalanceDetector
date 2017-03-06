@@ -132,15 +132,22 @@ typedef struct CellSettings_struct
 
 	uint8_t usb_address;
 
+	// USB speed in bits per second
 	uint32_t usb_speed;
 
 	// is USART enabled
 	bool usart_enabled;
 
+	// asynchronous (1) or synchronous master (2) or synchronous slave (3)
+	uint8_t usart_mode;
+
+	// USART speed in bits per second
 	uint32_t usart_speed;
 
+	// 8 or 12 bit resolution
 	uint8_t adc_value_bits;
 
+	// how big the bulk packets are
 	uint32_t adc_value_count_per_packet;
 
 	bool adc_value_packet_to_usb;
@@ -180,7 +187,8 @@ double adc_test_step;
 
 /*! \brief Function to convert decimal value to ASCII */
 void convert_to_ascii(char *buf_index, uint64_t dec_val);
-void convert_to_ascii_4digit(char *buf_index, uint64_t dec_val);
+void convert_to_ascii_5digit(char *buf_index, uint64_t dec_val);
+void convert_to_hex(char *buf_index, uint8_t dec_val);
 
 /*! \brief Function to display raw ADC count on LCD */
 void display_adccount(uint64_t adc_rawcount, uint8_t x_cordinate, uint8_t sign_flag);

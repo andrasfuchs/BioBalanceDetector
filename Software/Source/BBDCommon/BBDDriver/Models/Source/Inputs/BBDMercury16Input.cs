@@ -117,6 +117,10 @@ namespace BBDDriver.Models.Source
             [MarshalAs(UnmanagedType.U1)]
             public bool USARTEnabled;
 
+            // USART mode (1 - async, 2 - sync master, 3 - sync slave)
+            [MarshalAs(UnmanagedType.U1)]
+            public byte USARTMode;
+
             [MarshalAs(UnmanagedType.U4)]
             public UInt32 USARTSpeed;
 

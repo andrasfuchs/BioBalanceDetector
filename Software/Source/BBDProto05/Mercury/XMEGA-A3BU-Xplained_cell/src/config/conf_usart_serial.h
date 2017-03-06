@@ -47,9 +47,8 @@
 #ifndef CONF_USART_SERIAL_H_INCLUDED
 #define CONF_USART_SERIAL_H_INCLUDED
 
-#define USART_SERIAL                     &USARTE0
-#define USART_SERIAL_BAUDRATE            9600
-#define USART_SERIAL_CHAR_LENGTH         USART_CHSIZE_8BIT_gc
+#define USART_SERIAL                     &USARTC0
+#define USART_SERIAL_CHAR_LENGTH         USART_CHSIZE_9BIT_gc
 #define USART_SERIAL_PARITY              USART_PMODE_ODD_gc
 #define USART_SERIAL_STOP_BIT            false
 

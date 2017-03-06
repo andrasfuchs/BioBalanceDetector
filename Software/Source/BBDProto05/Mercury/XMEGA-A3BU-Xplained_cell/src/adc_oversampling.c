@@ -148,7 +148,35 @@ void convert_to_ascii(char *buf_index, uint64_t dec_val)
 	}
 }
 
-void convert_to_ascii_4digit(char *buf_index, uint64_t dec_val)
+void convert_to_hex(char *buf_index, uint8_t dec_val)
+{
+	// set the ending to 0
+	*buf_index = 0;
+	buf_index--;
+
+	for (int i=0; i<2; i++)
+	{
+		if (dec_val	% 16 >= 10)
+		{
+			*buf_index = (dec_val % 16) + 55;
+		} else
+		{
+			*buf_index = (dec_val % 16) + 48;
+		}
+		
+		/* Remove extracted digit by doing divide with 10 */
+		dec_val = (dec_val / 16);
+
+		/*
+		* Decrement the buffer Index to store next digit ,start from
+		* right most digit and move backwards for extracting each digit
+		*/
+		buf_index--;
+	}
+}
+
+
+void convert_to_ascii_5digit(char *buf_index, uint64_t dec_val)
 {
 	uint8_t digit_count = 0;
 
@@ -157,7 +185,7 @@ void convert_to_ascii_4digit(char *buf_index, uint64_t dec_val)
 	buf_index--;
 
 	/* Loop through all digits to convert to ASCII */
-	for (digit_count = 0; digit_count < 4; digit_count++) 
+	for (digit_count = 0; digit_count < 5; digit_count++) 
 	{
 		/*
 		 * Extract each Digit by doing %10 and convert to ASCII,
