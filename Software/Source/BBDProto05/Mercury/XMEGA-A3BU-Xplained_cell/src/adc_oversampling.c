@@ -340,9 +340,13 @@ static void pick_a_sample_callback(void)
 		// send data to USB
 		if (send_adc_data_to_usb)
 		{
-			udd_ep_run(UDI_PHDC_EP_BULK_IN, false, (uint8_t*)&adc_results[adc_buffer_index], sizeof(adc_results[adc_buffer_index]), adc_data_sent_callback);
+			udd_ep_run(UDI_PHDC_EP_BULK_IN, false, (uint8_t*)&adc_results[adc_buffer_index], sizeof(adc_results[adc_buffer_index]), adc_data_sent_callback);			
+		}
+
+		if (settings.adc_value_packet_to_usart)
+		{
 			usart_serial_write_packet(USART_SERIAL, (uint8_t*)&adc_results[adc_buffer_index], sizeof(adc_results[adc_buffer_index]));
-		}		
+		}
 
 		adc_buffer_index = (adc_buffer_index + 1) % 2;
 		adc_samplecount = 0;

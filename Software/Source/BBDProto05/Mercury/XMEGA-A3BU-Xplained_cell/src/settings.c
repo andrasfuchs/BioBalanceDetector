@@ -27,8 +27,8 @@
 	 settings.adca_enabled = adc_is_enabled(&ADCA);
 	 settings.adcb_enabled = adc_is_enabled(&ADCB);
 	 settings.adc_bits = 12;
-	 settings.adc_ref = (uint8_t)ADC_REFSEL_INT1V_gc;
-	 //settings.adc_ref = (uint8_t)ADC_REFSEL_INTVCC_gc;
+	 //settings.adc_ref = (uint8_t)ADC_REFSEL_INT1V_gc;
+	 settings.adc_ref = (uint8_t)ADC_REFSEL_INTVCC_gc;
 	 settings.adc_gain = 1;
 	 settings.sample_rate = 8000;
 	 settings.sample_rate_compensation = 0;

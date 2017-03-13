@@ -190,6 +190,8 @@ namespace BBDDriver.Models.Source
                 if (connectedDevices.Length == 0) throw new System.IO.IOException("There is no BBD Mercury-16 connected on any of the USB ports.");
 
                 selectedDevice = connectedDevices[0];
+
+                //USBNotifier notifier = new USBNotifier(null, DEVICE_INTERFACE_GUID);
             }
 
             // Find your device in the array
