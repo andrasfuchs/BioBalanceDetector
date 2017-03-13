@@ -129,9 +129,9 @@ namespace BBDDriver
             //vtsfo.DataWritten += Vtsfo_DataWritten;
 
             //VisualOutput vo = new VisualOutput(waveSource, 25, VisualOutputMode.None);
-            //VisualOutput vo = new VisualOutput(normalizedSource, 25, VisualOutputMode.Waveform);
+            VisualOutput vo = new VisualOutput(normalizedSource, 25, VisualOutputMode.Waveform);
             //VisualOutput vo = new VisualOutput(waveSource, 25, VisualOutputMode.Waveform);
-            VisualOutput vo = new VisualOutput(filteredSource, 25, VisualOutputMode.Spectrum);
+            //VisualOutput vo = new VisualOutput(filteredSource, 25, VisualOutputMode.Spectrum);
             //VisualOutput vo = new VisualOutput(averagedSource, 25, VisualOutputMode.DominanceMatrix);
             vo.RefreshVisualOutput += Vo_RefreshVisualOutput;
 
