@@ -9,5 +9,7 @@ namespace BBDDriver.Models.Filter
     public class ChannelFilterSettings
     {
         public bool Enabled { set; get; }
+
+        public int BufferSize { set; get; }
     }
 }

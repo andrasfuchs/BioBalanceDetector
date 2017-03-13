@@ -37,7 +37,7 @@ namespace BBDDriver.Models.Filter
         private float[] timeDomainData;
         private float[] frequencyDomainData;
 
-        private bool isProcessing = false;
+        private volatile bool isProcessing = false;
 
         public int TimeoutCount { get; private set; }
         public int OutputBlockSize { get; private set; }
@@ -143,10 +143,6 @@ namespace BBDDriver.Models.Filter
                     magnitude[i] = (float)Math.Sqrt(real * real + im * im) / (settings.FFTSampleCount / 2);
                     if (magnitude[i] > 1.0f) magnitude[i] = 1.0f;
                 }
-
-                // the excess (not-measured) magnitude is stored at the position 0
-                magnitude[0] = 1.0f - magnitude.Sum();
-                if (magnitude[0] < 0) magnitude[0] = 0;
 
                 if (settings.OutputFormat == FFTOutputFormat.Magnitude)
                 {

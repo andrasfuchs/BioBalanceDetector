@@ -114,13 +114,13 @@ namespace BBDDriver
             MultiChannelInput<IDataChannel> normalizedSource = FilterManager.ApplyFilters(waveSource, new NormalizeFilter() { Settings = new NormalizeFilterSettings() { Enabled = true, SampleCount = waveSource.SamplesPerSecond * 3, Gain = 1.0f } });
             //MultiChannelInput<IDataChannel> filteredSource = FilterManager.ApplyFilters(waveSource, new ByPassFilter() { Settings = new ByPassFilterSettings() { Enabled = true } });
             //MultiChannelInput<IDataChannel> filteredSource = FilterManager.ApplyFilters(waveSource, new FillFilter() { Settings = new FillFilterSettings() { Enabled = true, ValueToFillWith = 0.75f } });
-            //MultiChannelInput<IDataChannel> filteredSource = FilterManager.ApplyFilters(normalizedSource, new FFTWFilter() { Settings = new FFTWFilterSettings() { Enabled = true, FFTSampleCount = fftSize, IsBackward = false, PlanningRigor = FFTPlanningRigor.Estimate, IsRealTime = true, Timeout = 300, OutputFormat = FFTOutputFormat.Magnitude } });
+            MultiChannelInput<IDataChannel> filteredSource = FilterManager.ApplyFilters(normalizedSource, new FFTWFilter() { Settings = new FFTWFilterSettings() { Enabled = true, FFTSampleCount = fftSize, IsBackward = false, PlanningRigor = FFTPlanningRigor.Estimate, IsRealTime = true, Timeout = 300, OutputFormat = FFTOutputFormat.Magnitude, BufferSize = fftSize * 16 } });
             //MultiChannelInput<IDataChannel> filteredSource = FilterManager.ApplyFilters(normalizedSource, new FFTWFilter() { Settings = new FFTWFilterSettings() { Enabled = true, FFTSampleCount = fftSize, IsBackward = false, PlanningRigor = FFTPlanningRigor.Estimate, IsRealTime = true, Timeout = 300, OutputFormat = FFTOutputFormat.FrequencyMagnitudePair } });
             //MultiChannelInput<IDataChannel> thresholdedSource = FilterManager.ApplyFilters(filteredSource, new ThresholdFilter() { Settings = new ThresholdFilterSettings() { Enabled = true, MinValue = 0.001f, MaxValue = Single.MaxValue } });
             //MultiChannelInput<IDataChannel> averagedSource = FilterManager.ApplyFilters(thresholdedSource, new MovingAverageFilter() { Settings = new MovingAverageFilterSettings() { Enabled = true, InputDataDimensions = 2, MovingAverageLength = 10 } });
 
-            wfo = new WaveFileOutput(normalizedSource, $"{workingDirectory}{SessionId}.wav");
-            wfo.DataWritten += Wfo_DataWritten;
+            //wfo = new WaveFileOutput(normalizedSource, $"{workingDirectory}{SessionId}.wav");
+            //wfo.DataWritten += Wfo_DataWritten;
 
             //vtkfo = new VTKFileOutput(filteredSource, $"{workingDirectory}{SessionId}.vts");
             //vtkfo.DataWritten += Wfo_DataWritten;
@@ -129,9 +129,9 @@ namespace BBDDriver
             //vtsfo.DataWritten += Vtsfo_DataWritten;
 
             //VisualOutput vo = new VisualOutput(waveSource, 25, VisualOutputMode.None);
-            VisualOutput vo = new VisualOutput(normalizedSource, 25, VisualOutputMode.Waveform);
+            //VisualOutput vo = new VisualOutput(normalizedSource, 25, VisualOutputMode.Waveform);
             //VisualOutput vo = new VisualOutput(waveSource, 25, VisualOutputMode.Waveform);
-            //VisualOutput vo = new VisualOutput(filteredSource, 25, VisualOutputMode.Spectrum);
+            VisualOutput vo = new VisualOutput(filteredSource, 25, VisualOutputMode.Spectrum);
             //VisualOutput vo = new VisualOutput(averagedSource, 25, VisualOutputMode.DominanceMatrix);
             vo.RefreshVisualOutput += Vo_RefreshVisualOutput;
 
@@ -203,7 +203,6 @@ namespace BBDDriver
             consoleSB.Clear();
 
             float chColumnMax = 0.0f;
-            float[] chExcess = new float[e.Dimensions[0]];
             for (int chIndex = 0; chIndex < Math.Min(maxChannelCount, e.Dimensions[0]); chIndex++)
             {
                 int columnCount = e.Dimensions[1] / avgSampleCount;
@@ -212,8 +211,6 @@ namespace BBDDriver
                 float dominantValue = 0.0f;
                 float dominantIndex = 0.0f;
 
-                chExcess[chIndex] = e.Values[chIndex, 0, 0];
-                e.Values[chIndex, 0, 0] = 0;
                 for (int x = 0; x < columnCount; x++)
                 {
                     for (int sampleIndex = 0; sampleIndex < avgSampleCount; sampleIndex++)
@@ -232,7 +229,7 @@ namespace BBDDriver
                     if (columnAvgs[x] > chColumnMax) chColumnMax = columnAvgs[x];
                 }
 
-                consoleSB.AppendLine($"=== channel {chIndex} ------ value range on y-axis: [{columnMin.ToString("0.0000")}->{columnMax.ToString("0.0000")}], dominant value: {dominantValue.ToString("0.0000")} " + (dominantValue < 0.01f ? "                  " : $"at {(frequencyStep * (dominantIndex - 0.5f)).ToString("#,##0.0")}Hz-{(frequencyStep * (dominantIndex + 0.5f)).ToString("#,##0.0")}Hz") + $", the not meassured excess is {chExcess[chIndex].ToString("0.0000")}");
+                consoleSB.AppendLine($"=== channel {chIndex} ------ value range on y-axis: [{columnMin.ToString("0.0000")}->{columnMax.ToString("0.0000")}], dominant value: {dominantValue.ToString("0.0000")} " + (dominantValue < 0.01f ? "                  " : $"at {(frequencyStep * (dominantIndex - 0.5f)).ToString("#,##0.0")}Hz-{(frequencyStep * (dominantIndex + 0.5f)).ToString("#,##0.0")}Hz"));
                 for (int y = height - 1; y >= 0; y--)
                 {
                     float maxValue = columnMin + (((columnMax - columnMin) / height) * (y + 1));
@@ -242,6 +239,9 @@ namespace BBDDriver
                     for (int x = 0; x < columnCount; x++)
                     {
                         line[x] = (columnAvgs[x] <= minValue ? ' ' : '|');
+
+                        if ((chIndex == 0) && (y == height - 1) && (line[x] == '|')) line[x] = '|';
+
                         if ((columnAvgs[x] > 0) && (columnAvgs[x] >= minValue) && (columnAvgs[x] <= maxValue)) line[x] = '^';
                     }
                     consoleSB.Append(line);

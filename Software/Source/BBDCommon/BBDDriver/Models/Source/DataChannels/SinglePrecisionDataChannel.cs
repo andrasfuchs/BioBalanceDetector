@@ -72,14 +72,16 @@ namespace BBDDriver.Models.Source
             lock (this.Data)
             {
                 int dataCount = data.Length;
+                int sourcePosition = 0;
 
                 while (dataCount > 0)
                 {
                     int copyCount = (BufferSize - BufferPosition < dataCount ? BufferSize - BufferPosition : dataCount);
 
-                    Array.Copy(data, 0, this.Data, BufferPosition, copyCount);
+                    Array.Copy(data, sourcePosition, this.Data, BufferPosition, copyCount);
                     BufferPosition = (BufferPosition + copyCount) % BufferSize;
 
+                    sourcePosition += copyCount;
                     dataCount -= copyCount;
                 }
             }
