@@ -40,7 +40,11 @@ namespace BBDDriver.Models.Filter
             for (int i = 0; i < newData.Length; i++)
             {
                 result[i] = (newData[i] + settings.Offset) * settings.Gain;
+
+                if (result[i] > +1.0) result[i] = +1.0f;
+                if (result[i] < -1.0) result[i] = -1.0f;
             }
+
 
             this.Output.AppendData(result);
         }

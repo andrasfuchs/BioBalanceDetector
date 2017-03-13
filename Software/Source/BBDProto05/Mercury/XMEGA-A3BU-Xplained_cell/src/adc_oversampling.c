@@ -175,7 +175,6 @@ void convert_to_hex(char *buf_index, uint8_t dec_val)
 	}
 }
 
-
 void convert_to_ascii_5digit(char *buf_index, uint64_t dec_val)
 {
 	uint8_t digit_count = 0;
@@ -205,7 +204,7 @@ void convert_to_ascii_5digit(char *buf_index, uint64_t dec_val)
 	}
 }
 
-void init_adc_channel(ADC_t *adc, uint8_t ch_mask, enum adcch_positive_input pos, uint8_t gain)
+void init_adc_channel(ADC_t *adc, uint8_t ch_mask, enum adcch_positive_input pos_input, uint8_t gain)
 {
 	struct adc_channel_config adc_ch_conf;
 
@@ -213,7 +212,7 @@ void init_adc_channel(ADC_t *adc, uint8_t ch_mask, enum adcch_positive_input pos
 	adcch_set_interrupt_mode(&adc_ch_conf, ADCCH_MODE_COMPLETE);
 	//adcch_enable_interrupt(&adc_ch_conf);
 	adcch_disable_interrupt(&adc_ch_conf);
-	adcch_set_input(&adc_ch_conf, pos, ADCCH_NEG_NONE, gain);
+	adcch_set_input(&adc_ch_conf, pos_input, ADCCH_NEG_NONE, gain);
 	adcch_write_configuration(adc, ch_mask, &adc_ch_conf);
 }
 
@@ -222,10 +221,10 @@ void init_adc(ADC_t *adc, CellSettings_t *settings)
 	struct adc_config adc_conf;
 
 	adc_results[0].choice = 0xF006;
-	adc_results[0].length = 2 * 8 * ADC_RESULT_BUFFER_SIZE;
+	adc_results[0].length = 2 * 8 * ADC_RESULT_BUFFER_SIZE + 4;  // + 4 bytes device ID
 	adc_results[0].device_id = settings->device_id;
 	adc_results[1].choice = 0xF006;
-	adc_results[1].length = 2 * 8 * ADC_RESULT_BUFFER_SIZE;
+	adc_results[1].length = 2 * 8 * ADC_RESULT_BUFFER_SIZE + 4;  // + 4 bytes device ID
 	adc_results[1].device_id = settings->device_id;
 	
 	/* Initialize configuration structures */
@@ -273,10 +272,21 @@ void init_adc(ADC_t *adc, CellSettings_t *settings)
 	adc_write_configuration(adc, &adc_conf);
 	//adc_set_callback(adc, adca_handler);
 
-	init_adc_channel(adc, ADC_CH0, ADCCH_POS_PIN8 , settings->adc_gain);
-	init_adc_channel(adc, ADC_CH1, ADCCH_POS_PIN9 , settings->adc_gain);
-	init_adc_channel(adc, ADC_CH2, ADCCH_POS_PIN10, settings->adc_gain);
-	init_adc_channel(adc, ADC_CH3, ADCCH_POS_PIN11, settings->adc_gain);
+	if (adc == &ADCA)
+	{
+		init_adc_channel(adc, ADC_CH0, ADCCH_POS_PIN4, settings->adc_gain); // J2-PIN4: ADCA4 (ADC4)
+		init_adc_channel(adc, ADC_CH1, ADCCH_POS_PIN5, settings->adc_gain);
+		init_adc_channel(adc, ADC_CH2, ADCCH_POS_PIN6, settings->adc_gain);
+		init_adc_channel(adc, ADC_CH3, ADCCH_POS_PIN7, settings->adc_gain);
+	}
+
+	if (adc == &ADCB)
+	{
+		init_adc_channel(adc, ADC_CH0, ADCCH_POS_PIN0, settings->adc_gain); // J2-PIN0: ADCB0 (ADC0)
+		init_adc_channel(adc, ADC_CH1, ADCCH_POS_PIN1, settings->adc_gain);
+		init_adc_channel(adc, ADC_CH2, ADCCH_POS_PIN2, settings->adc_gain);
+		init_adc_channel(adc, ADC_CH3, ADCCH_POS_PIN3, settings->adc_gain);
+	}
 
 	adc_enable(adc);
 }
@@ -289,14 +299,14 @@ static void pick_a_sample_callback(void)
 	if (adc_test_mode == 0) 
 	{
 		int offset = adc_samplecount * 8;
-		adc_results[adc_buffer_index].adc_values[offset + 0] = ADCA.CH0RES;
-		adc_results[adc_buffer_index].adc_values[offset + 1] = ADCA.CH1RES;
-		adc_results[adc_buffer_index].adc_values[offset + 2] = ADCA.CH2RES;
-		adc_results[adc_buffer_index].adc_values[offset + 3] = ADCA.CH3RES;
-		adc_results[adc_buffer_index].adc_values[offset + 4] = ADCB.CH0RES;
-		adc_results[adc_buffer_index].adc_values[offset + 5] = ADCB.CH1RES;
-		adc_results[adc_buffer_index].adc_values[offset + 6] = ADCB.CH2RES;
-		adc_results[adc_buffer_index].adc_values[offset + 7] = ADCB.CH3RES;
+		adc_results[adc_buffer_index].adc_values[offset + 0] = ADCB.CH0RES;
+		adc_results[adc_buffer_index].adc_values[offset + 1] = ADCB.CH1RES;
+		adc_results[adc_buffer_index].adc_values[offset + 2] = ADCB.CH2RES;
+		adc_results[adc_buffer_index].adc_values[offset + 3] = ADCB.CH3RES;
+		adc_results[adc_buffer_index].adc_values[offset + 4] = ADCA.CH0RES;
+		adc_results[adc_buffer_index].adc_values[offset + 5] = ADCA.CH1RES;
+		adc_results[adc_buffer_index].adc_values[offset + 6] = ADCA.CH2RES;
+		adc_results[adc_buffer_index].adc_values[offset + 7] = ADCA.CH3RES;
 	} else
 	{
 		adc_test_counter++;

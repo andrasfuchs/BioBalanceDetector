@@ -59,6 +59,9 @@
 #include <ccp.h>
 #include <xmega_reset_cause.h>
 
+// From module: DAC - Digital to Analog Converter
+#include <dac.h>
+
 // From module: DMA - Direct Memory Access
 #include <dma.h>
 

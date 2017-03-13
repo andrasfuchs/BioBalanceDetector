@@ -120,13 +120,14 @@ static bool usart_error = false;
 
 static bool dataLEDState = false;
 
-static CellSettings_t settings;
 static HeartBeat_t heartbeat;
 static HeartBeat_t heartbeat_received;
 
 #define DMA_CHANNEL_USART_OUT   0
 #define DMA_CHANNEL_USART_IN	1
 #define DMA_BUFFER_SIZE 2
+
+struct dac_config dac_conf;
 
 static uint8_t usart_source[DMA_BUFFER_SIZE];
 static uint8_t usart_destination[DMA_BUFFER_SIZE];
@@ -151,7 +152,6 @@ static void usart_send_mpcm_data(usart_if usart, uint8_t data, bool is_address)
 	/* Second, let's load the 8-bit data into the DATA register of the USART */
 	(usart)->DATA = data;
 }
-
 
 static bool usart_receive_mpcm_data(usart_if usart, uint8_t* data, uint8_t my_address)
 {
@@ -201,6 +201,7 @@ ISR(USARTC0_RXC_vect)
 		rx_counter += 1;	
 	}
 }
+
 
 void main_suspend_action(void)
 {
@@ -295,6 +296,12 @@ static void usart_heartbeat_received(enum dma_channel_status status)
 	{
 		rx_counter += 1000;
 	}
+
+	if (status != DMA_CH_TRANSFER_COMPLETED)
+	{
+		rx_counter += 10000;
+	}
+
 }
 
 static void dma_usart_out_init(void)
@@ -337,7 +344,7 @@ static void dma_usart_in_init(void)
 	dma_channel_set_trigger_source(&dmach_conf, DMA_CH_TRIGSRC_USARTC0_RXC_gc );
 	
 	dma_channel_set_src_reload_mode(&dmach_conf,DMA_CH_SRCRELOAD_NONE_gc);
-	dma_channel_set_dest_reload_mode(&dmach_conf,DMA_CH_DESTRELOAD_TRANSACTION_gc);
+	dma_channel_set_dest_reload_mode(&dmach_conf,DMA_CH_DESTRELOAD_BLOCK_gc);
 	
 	dma_channel_set_src_dir_mode(&dmach_conf, DMA_CH_SRCDIR_FIXED_gc);
 	dma_channel_set_source_address(&dmach_conf,(uint16_t)(uintptr_t)USART_SERIAL.DATA);
@@ -416,10 +423,9 @@ static void usart_send_receive_data_dma(void)
 
 	if ((settings.usart_mode == 1) || (settings.usart_mode == 3))
 	{
-		dma_channel_enable(DMA_CHANNEL_USART_IN);
 		// wait for the previous DMA to finish
 		while (dma_channel_is_busy(DMA_CHANNEL_USART_IN));
-		dma_channel_disable(DMA_CHANNEL_USART_IN);
+		dma_channel_enable(DMA_CHANNEL_USART_IN);
 
 		rx_counter++;
 	}
@@ -432,7 +438,6 @@ static void usart_send_receive_data_serial(void)
 		if ((settings.usart_mode == 1) || (settings.usart_mode == 2))
 		{
 			usart_send_mpcm_data(USART_SERIAL, usart_source[i], false);
-			//usart_serial_putchar(USART_SERIAL, usart_source[i]);
 
 			tx_counter++;
 
@@ -454,69 +459,52 @@ static void usart_send_receive_data_serial(void)
 				rx_counter = 0x55;
 			}
 		}
-
-		if ((settings.usart_mode == 1) || (settings.usart_mode == 3))
-		{
-			//usart_serial_getchar(USART_SERIAL, &usart_destination[i]);
-//
-			//rx_counter++;
-		}
 	}
 }
 
-
-static void load_default_settings(void)
+void gfx_update_tx_rx(void)
 {
-	heartbeat.choice = 0xF005;
-	heartbeat.length = sizeof(heartbeat) - 4;
+	/* Update the Tx Rx counters */
+	convert_to_ascii_5digit(&rxtxcounter_ascii_buf[5], tx_counter);
+	gfx_mono_draw_string(rxtxcounter_ascii_buf, 48, 20, &sysfont);
+	convert_to_ascii_5digit(&rxtxcounter_ascii_buf[5], rx_counter);
+	gfx_mono_draw_string(rxtxcounter_ascii_buf, 96, 20, &sysfont);
 
-	settings.choice = 0xF004;
-	settings.length = sizeof(settings) - 4;
-	settings.firmware_version = 0x0002;
-	settings.test_mode = 0;
-	settings.device_status = 1;
-	settings.device_type = 2;
-	settings.device_index = 0x55;
-	settings.device_id = 123456789;
-	settings.clk_sys = sysclk_get_per_hz();
-	settings.clk_adc = 2000000UL;
-	settings.adca_enabled = adc_is_enabled(&ADCA);
-	settings.adcb_enabled = adc_is_enabled(&ADCB);
-	settings.adc_bits = 12;
-	settings.adc_ref = (uint8_t)ADC_REFSEL_INT1V_gc;
-	settings.adc_gain = 1;
-	settings.sample_rate = 8000;
-	settings.sample_rate_compensation = 0;
-	settings.channel_count = 8;
-	settings.usb_address = udd_getaddress();
-	settings.usb_speed = (udd_is_high_speed() ? 480000000UL : 12000000UL);
-	settings.usart_mode = 3;
-	settings.usart_speed = 1200;
-	settings.adc_value_bits = 16;
-	settings.adc_value_count_per_packet = ADC_RESULT_BUFFER_SIZE;
-	settings.adc_value_packet_to_usb = true;
-	settings.adc_value_packet_to_usart = false;
+	if (settings.usart_mode == 2)
+	{
+		convert_to_hex(&char_ascii_buf[4], usart_source[0]);
+	}
+	if ((settings.usart_mode == 1) || (settings.usart_mode == 3))
+	{
+		convert_to_hex(&char_ascii_buf[4], usart_destination[0]);
+	}
+
+	usart_error = (usart_destination[1] != usart_destination[0] + 1);
+	if (usart_error) char_ascii_buf[0] = '!'; else char_ascii_buf[0] = '0';
+	gfx_mono_draw_string(char_ascii_buf, 102, 10, &sysfont);
 }
 
-/**
-* \brief Main application routine
-*  - Initializes the board and LCD display
-*  - Initialize ADC ,to read ADC offset and configure for oversampling
-*  - If number of sample Reached to  total number of oversample required,
-*    call function to start process on oversampled ADC readings
-*/
+
+
+void check_reset_button()
+{
+	// reset button event handler
+	if (gpio_pin_is_low(GPIO_PUSH_BUTTON_0)) {
+		do                          
+		{              
+			wdt_set_timeout_period(WDT_TIMEOUT_PERIOD_16CLK);
+			wdt_enable();  
+			for(;;)                 
+			{                       
+			}                       
+		} while(0);
+	}
+}
+
 int main( void )
 {
-	/*
-	* Initialize basic features for the AVR XMEGA family.
-	*  - PMIC is needed to enable all interrupt levels.
-	*  - Board init for setting up GPIO and board specific features.
-	*  - Sysclk init for configuring clock speed and turning off unused
-	*    peripherals.
-	*  - Sleepmgr init for setting up the basics for the sleep manager,
-	*/
-
 	irq_initialize_vectors();
+
 	/* Enable global interrupt */
 	cpu_irq_enable();
 
@@ -525,7 +513,11 @@ int main( void )
 	pmic_init();
 	sleepmgr_init();
 
-	load_default_settings();
+
+	heartbeat.choice = 0xF005;
+	heartbeat.length = sizeof(heartbeat) - 4;
+
+	settings_load_default();
 
 	///* Initialize ST7565R controller and LCD display */
 	gfx_mono_init();
@@ -545,54 +537,85 @@ int main( void )
 	st7565r_set_contrast(ST7565R_DISPLAY_CONTRAST_MIN);
 
 
+	if (settings.usb_enabled)
+	{
+		gfx_mono_draw_string("Initializing USB...  \0", 0, 20, &sysfont);
 
-	gfx_mono_draw_string("Initializing USB...  \0", 0, 20, &sysfont);
-
-	/* Start USB stack to authorize VBus monitoring */
-	adc_data_sent_callback = usb_adc_data_sent;
-	unknown_metadata_received_callback = usb_unknown_metadata_received;
-	udc_start();
+		/* Start USB stack to authorize VBus monitoring */
+		adc_data_sent_callback = usb_adc_data_sent;
+		unknown_metadata_received_callback = usb_unknown_metadata_received;
+		udc_start();
 		
-	/* We need some time here to USB initialization */
-	delay_ms(3000);
+		/* We need some time here to USB initialization */
+		delay_ms(3000);
+	}
 
 
+	if (settings.usart_enabled)
+	{
+		gfx_mono_draw_string("Initializing USART...\0", 0, 20, &sysfont);
 
-	gfx_mono_draw_string("Initializing USART...\0", 0, 20, &sysfont);
-
-	usart_init(settings);
-	delay_ms(200);
+		usart_init(settings);
+		delay_ms(200);
 
 
-	gfx_mono_draw_string("Initializing DMA...  \0", 0, 20, &sysfont);
+		gfx_mono_draw_string("Initializing DMA...  \0", 0, 20, &sysfont);
 
-	// DMA setup for USART to RAM transfer
-	//dma_enable();
-	//dma_usart_out_init();
-	//dma_usart_in_init();
-	//delay_ms(200);
+		// DMA setup for USART to RAM transfer
+		dma_enable();
+		dma_usart_out_init();
+		dma_usart_in_init();
+		delay_ms(200);
+	}
+
+	if (settings.dac_enabled)
+	{
+		gfx_mono_draw_string("Initializing DAC...  \0", 0, 20, &sysfont);
+		// Initialize the dac configuration.
+		dac_read_configuration(&SPEAKER_DAC, &dac_conf);
+
+		/* Create configuration:
+		 * - 1V from bandgap as reference, left adjusted channel value
+		 * - one active DAC channel, no internal output
+		 * - conversions triggered by event channel 0
+		 * - 1 us conversion intervals
+		 */
+		dac_set_conversion_parameters(&dac_conf, DAC_REF_BANDGAP, DAC_ADJ_LEFT);
+		dac_set_active_channel(&dac_conf, EMITTER_DAC_CHANNEL, 0);
+		//dac_set_conversion_trigger(&dac_conf, EMITTER_DAC_CHANNEL, 0);
+		dac_write_configuration(&EMITTER_DAC, &dac_conf);
+		dac_enable(&EMITTER_DAC);
+
+		dac_wait_for_channel_ready(&EMITTER_DAC, EMITTER_DAC_CHANNEL);
+		dac_set_channel_value(&EMITTER_DAC, EMITTER_DAC_CHANNEL, 65535);
+
+		delay_ms(200);
+	}
 	
 
 	gfx_mono_draw_string("Data  Tx:0000 Rx:0000", 0, 20, &sysfont);
 
-	/* Initialize ADC ,to read ADC offset and configure ADC for oversampling 
-	**/
-	//init_adc(&ADCA, &settings);
-	//init_adc(&ADCB, &settings);
+	if (settings.adc_enabled)
+	{
+		/* Initialize ADC ,to read ADC offset and configure ADC for oversampling 
+		**/
+		init_adc(&ADCA, &settings);
+		init_adc(&ADCB, &settings);
 
-	// Initialize ADC test data settings
-	adc_test_mode = settings.test_mode;
-	if (adc_test_mode == 2)
-	{
-		adc_test_step = 65536 / settings.sample_rate;
-	} else if (adc_test_mode == 3)
-	{
-		adc_test_step = 2.0 / settings.sample_rate;
+		// Initialize ADC test data settings
+		adc_test_mode = settings.test_mode;
+		if (adc_test_mode == 2)
+		{
+			adc_test_step = 65536 / settings.sample_rate;
+		} else if (adc_test_mode == 3)
+		{
+			adc_test_step = 2.0 / settings.sample_rate;
+		}
+
+
+		/* Enable timer counter for ADC sampling */
+		init_tc(&settings);
 	}
-
-
-	/* Enable timer counter for sampling */
-	//init_tc(&settings);
 
 	/* Enable global interrupt */
 	//cpu_irq_enable();
@@ -607,40 +630,13 @@ int main( void )
 	/* Continuous Execution Loop */
 	while (true) {
 	
-		// reset button event handler
-		if (gpio_pin_is_low(GPIO_PUSH_BUTTON_0)) {
-			do                          
-			{              
-				wdt_set_timeout_period(WDT_TIMEOUT_PERIOD_16CLK);
-				wdt_enable();  
-				for(;;)                 
-				{                       
-				}                       
-			} while(0);
-		}
+		check_reset_button();
+		
 
 		sleepmgr_enter_sleep();
 		
-		/* Update the Tx Rx counters */
-		convert_to_ascii_5digit(&rxtxcounter_ascii_buf[5], tx_counter);
-		gfx_mono_draw_string(rxtxcounter_ascii_buf, 48, 20, &sysfont);
-		convert_to_ascii_5digit(&rxtxcounter_ascii_buf[5], rx_counter);
-		gfx_mono_draw_string(rxtxcounter_ascii_buf, 96, 20, &sysfont);
+		gfx_update_tx_rx();
 
-		if (settings.usart_mode == 2) 
-		{
-			convert_to_hex(&char_ascii_buf[4], usart_source[0]);
-		}
-		if ((settings.usart_mode == 1) || (settings.usart_mode == 3))
-		{
-			convert_to_hex(&char_ascii_buf[4], usart_destination[0]);
-		}
-
-		usart_error = (usart_destination[1] != usart_destination[0] + 1);
-		if (usart_error) char_ascii_buf[0] = '!'; else char_ascii_buf[0] = '0';
-		gfx_mono_draw_string(char_ascii_buf, 102, 10, &sysfont);
-
-		main_b_phdc_enable = false;
 		if (main_b_phdc_enable) {
 			if (ieee11073_skeleton_process()) {
 				ui_association(true); /* Association Ok */
@@ -649,15 +645,15 @@ int main( void )
 			}
 		} else {
 			/* Blink the heartbeat LED */
+			delay_ms(1100);
+			ioport_set_pin_low(LED1_GPIO);
 			delay_ms(300);
 			ioport_set_pin_high(LED1_GPIO);
-			//delay_ms(1100);
-			ioport_set_pin_low(LED1_GPIO);
 		}
 		
 		/* Send heartbeat packet to USB */
 		heartbeat.ticks++;
-		//udd_ep_run(UDI_PHDC_EP_BULK_IN, false, (uint8_t*)&heartbeat, sizeof(heartbeat), usb_heartbeat_sent);
+		udd_ep_run(UDI_PHDC_EP_BULK_IN, false, (uint8_t*)&heartbeat, sizeof(heartbeat), usb_heartbeat_sent);
 		
 
 
@@ -667,54 +663,6 @@ int main( void )
 		}
 
 		usart_send_receive_data_serial();
-		//usart_send_receive_data_dma();		
-
+		//usart_send_receive_data_dma();
 	}
 }
-
-
-//int __main(void)
-//{
-	//irq_initialize_vectors();
-	//cpu_irq_enable();
-//
-	///* Initialize the sleep manager */
-	//sleepmgr_init();
-	//#if !SAM0
-	//sysclk_init();
-	//board_init();
-	//#else
-	//system_init();
-	//#endif
-	////ui_init();
-	////ui_powerdown();
-//
-	///* Start USB stack to authorize VBus monitoring */
-	//udc_start();
-//
-	//short dataToSend[1024 * 4];
-	//for (int i=0; i < 1024 * 4; i++) dataToSend[i] = i;
-//
-	///* The main loop manages only the power mode
-	//* because the USB management is done by interrupt
-	//*/
-	//while (true) {
-		//sleepmgr_enter_sleep();
-		//if (main_b_phdc_enable) {
-			//if (ieee11073_skeleton_process()) {
-				////ui_association(true); /* Association Ok */
-				//} else {
-				////ui_association(false); /* No association */
-			//}
-//
-			////ieee11073_send_association();
-			////ieee11073_send_mesure(155);
-			////ieee11073_skeleton_send_measure_1();
-			////ieee11073_skeleton_send_measure_2();
-			//if (!udd_ep_run(UDI_PHDC_EP_BULK_IN, true, &dataToSend, sizeof(dataToSend), data_sent_ack))
-			//{
-				////return false;
-			//}
-		//}
-	//}
-//}

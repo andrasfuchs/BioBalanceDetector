@@ -47,6 +47,9 @@
 #ifndef OVERSAMPLING_H
 #define OVERSAMPLING_H
 
+#include <conf_dac.h>
+#include "settings.h"
+
 /* This file is intentionally left blank */
 
 void main_suspend_action(void);

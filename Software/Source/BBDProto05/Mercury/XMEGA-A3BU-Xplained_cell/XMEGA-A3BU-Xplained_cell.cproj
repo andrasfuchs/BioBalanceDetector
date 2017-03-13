@@ -43,6 +43,7 @@
     <option id="xmega.drivers.tc" value="Add" config="" content-id="Atmel.ASF" />
     <option id="xmega.drivers.usart" value="Add" config="" content-id="Atmel.ASF" />
     <option id="xmega.drivers.wdt" value="Add" config="" content-id="Atmel.ASF" />
+    <option id="xmega.drivers.dac" value="Add" config="" content-id="Atmel.ASF" />
     <option id="xmega.applications.xmega_adc_oversampling_demo" value="Add" config="" content-id="Atmel.ASF" />
   </options>
   <configurations>
@@ -162,6 +163,8 @@
     <file path="src/ASF/xmega/drivers/dma/dma.h" framework="" version="3.33.0" source="xmega\drivers\dma\dma.h" changed="False" content-id="Atmel.ASF" />
     <file path="src/ASF/xmega/drivers/wdt/wdt.c" framework="" version="3.33.0" source="xmega\drivers\wdt\wdt.c" changed="False" content-id="Atmel.ASF" />
     <file path="src/ASF/xmega/drivers/wdt/wdt.h" framework="" version="3.33.0" source="xmega\drivers\wdt\wdt.h" changed="False" content-id="Atmel.ASF" />
+    <file path="src/ASF/xmega/drivers/dac/dac.c" framework="" version="3.33.0" source="xmega\drivers\dac\dac.c" changed="False" content-id="Atmel.ASF" />
+    <file path="src/ASF/xmega/drivers/dac/dac.h" framework="" version="3.33.0" source="xmega\drivers\dac\dac.h" changed="False" content-id="Atmel.ASF" />
   </files>
   <documentation help="http://asf.atmel.com/docs/3.33.0/xmega.applications.xmega_adc_oversampling_demo.xmega_a3bu_xplained/html/index.html" />
   <offline-documentation help="" />
@@ -243,6 +246,7 @@
       <Value>../src/ASF/common/services/hugemem</Value>
       <Value>../src/ASF/xmega/drivers/dma</Value>
       <Value>../src/ASF/xmega/drivers/wdt</Value>
+      <Value>../src/ASF/xmega/drivers/dac</Value>
     </ListValues>
   </avrgcc.compiler.directories.IncludePaths>
   <avrgcc.compiler.optimization.level>Optimize for size (-Os)</avrgcc.compiler.optimization.level>
@@ -294,6 +298,7 @@
       <Value>../src/ASF/common/services/hugemem</Value>
       <Value>../src/ASF/xmega/drivers/dma</Value>
       <Value>../src/ASF/xmega/drivers/wdt</Value>
+      <Value>../src/ASF/xmega/drivers/dac</Value>
     </ListValues>
   </avrgcc.assembler.general.IncludePaths>
 </AvrGcc>
@@ -353,6 +358,7 @@
       <Value>../src/ASF/common/services/hugemem</Value>
       <Value>../src/ASF/xmega/drivers/dma</Value>
       <Value>../src/ASF/xmega/drivers/wdt</Value>
+      <Value>../src/ASF/xmega/drivers/dac</Value>
     </ListValues>
   </avrgcc.compiler.directories.IncludePaths>
   <avrgcc.compiler.optimization.OtherFlags>-fdata-sections</avrgcc.compiler.optimization.OtherFlags>
@@ -404,6 +410,7 @@
       <Value>../src/ASF/common/services/hugemem</Value>
       <Value>../src/ASF/xmega/drivers/dma</Value>
       <Value>../src/ASF/xmega/drivers/wdt</Value>
+      <Value>../src/ASF/xmega/drivers/dac</Value>
     </ListValues>
   </avrgcc.assembler.general.IncludePaths>
   <avrgcc.assembler.debugging.DebugLevel>Default (-Wa,-g)</avrgcc.assembler.debugging.DebugLevel>
@@ -456,6 +463,7 @@
     <Folder Include="src\ASF\xmega\drivers\adc\" />
     <Folder Include="src\ASF\xmega\drivers\adc\xmega_aau\" />
     <Folder Include="src\ASF\xmega\drivers\cpu\" />
+    <Folder Include="src\ASF\xmega\drivers\dac\" />
     <Folder Include="src\ASF\xmega\drivers\dma\" />
     <Folder Include="src\ASF\xmega\drivers\nvm\" />
     <Folder Include="src\ASF\xmega\drivers\pmic\" />
@@ -507,6 +515,12 @@
     <Compile Include="src\ASF\common\services\spi\xmega_usart_spi\usart_spi.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="src\ASF\xmega\drivers\dac\dac.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <None Include="src\ASF\xmega\drivers\dac\dac.h">
+      <SubType>compile</SubType>
+    </None>
     <Compile Include="src\ASF\xmega\drivers\dma\dma.c">
       <SubType>compile</SubType>
     </Compile>
@@ -519,7 +533,19 @@
     <None Include="src\ASF\xmega\drivers\wdt\wdt.h">
       <SubType>compile</SubType>
     </None>
+    <Compile Include="src\communication.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\config\conf_dac.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="src\config\conf_usart_spi.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\settings.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\settings.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\ui.h">

@@ -72,6 +72,10 @@ namespace BBDDriver.Models.Source
             [MarshalAs(UnmanagedType.U4)]
             public UInt32 ADCClock;
 
+            // is any of the ADCs enabled
+            [MarshalAs(UnmanagedType.U1)]
+            public bool ADCEnabled;
+
             // is ADC-A enabled
             [MarshalAs(UnmanagedType.U1)]
             public bool ADCAEnabled;
@@ -102,6 +106,10 @@ namespace BBDDriver.Models.Source
             // number of channels
             [MarshalAs(UnmanagedType.U4)]
             public UInt32 ChannelCount;
+
+            // is DAC enabled
+            [MarshalAs(UnmanagedType.U1)]
+            public bool DACEnabled;
 
             // is USB enabled
             [MarshalAs(UnmanagedType.U1)]
@@ -347,9 +355,13 @@ namespace BBDDriver.Models.Source
 
             DataRateBenchmarkEntry drbe = new DataRateBenchmarkEntry() { TimeStamp = DateTime.UtcNow, IsRead = true, BytesTransferred = dp.RawData.Length, SamplesTransferred = dp.RawData.Length / 2 / channels.Length };
 
+            // cut the 32-bit device id
+            byte[] channelData = new byte[dp.RawData.Length - 4];
+            Array.Copy(dp.RawData, 4, channelData, 0, channelData.Length);
+
             Task processUsbDataTask = Task.Run(() =>
             {
-                ProcessUSBData(dp.RawData, dp.RawData.Length, drbe);
+                ProcessUSBData(channelData, channelData.Length, drbe);
             });
 
             lock (BenchmarkEntries)
@@ -383,7 +395,10 @@ namespace BBDDriver.Models.Source
                     ushort shortValue = shorts[j * channels.Length + i];
                     if (j == 0) prevShortValue = shortValue;
 
+
                     floats[j] = ((shortValue / 65536.0f) - 0.5f) * (ADCReferenceV * 2);
+
+
 
                     ushort valueChange = (ushort)Math.Abs(shortValue - prevShortValue);
                     if (valueChange > drbe.MaxJumpBetweenSampleValues) drbe.MaxJumpBetweenSampleValues = valueChange;
