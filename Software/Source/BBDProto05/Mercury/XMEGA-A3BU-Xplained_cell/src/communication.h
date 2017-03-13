@@ -46,8 +46,11 @@ typedef struct CellSettings_struct
 	// MPCM index
 	uint8_t device_index;
 
-	// unique ID
+	// same ID for the same type of chip (e.g. Atmel XMEGA256A4)
 	uint32_t device_id;
+
+	// unique serial for every chip
+	uint32_t device_serial;
 
 	// system clock speed in Hz
 	uint32_t clk_sys;

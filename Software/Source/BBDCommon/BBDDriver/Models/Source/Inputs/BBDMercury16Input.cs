@@ -60,9 +60,13 @@ namespace BBDDriver.Models.Source
             [MarshalAs(UnmanagedType.U1)]
             public byte DeviceIndex;
 
-            // unique ID
+            // same ID for the same type of chip (e.g. Atmel XMEGA256A4)
             [MarshalAs(UnmanagedType.U4)]
             public UInt32 DeviceID;
+
+            // unique serial for every chip
+            [MarshalAs(UnmanagedType.U4)]
+            public UInt32 DeviceSerial;
 
             // system clock speed in Hz
             [MarshalAs(UnmanagedType.U4)]

@@ -519,6 +519,17 @@ int main( void )
 
 	settings_load_default();
 
+	nvm_wait_until_ready();
+	
+	// this is the same for all XMEGA256A4s I guess
+	struct nvm_device_id device_id;
+	nvm_read_device_id(&device_id);
+	settings.device_id = (device_id.devid0 * 65536) + (device_id.devid1 * 256) + device_id.devid2;
+
+	struct nvm_device_serial device_serial;
+	nvm_read_device_serial(&device_serial);
+	settings.device_serial = (device_serial.lotnum0 * 16777216) + (device_serial.wafnum * 65536) + (device_serial.coordx0 * 256) + device_serial.coordy0;
+
 	///* Initialize ST7565R controller and LCD display */
 	gfx_mono_init();
 
