@@ -123,7 +123,7 @@ typedef struct ADCResults_struct
 
 	uint16_t length;
 
-	uint32_t device_id;
+	uint32_t device_serial;
 
 	uint16_t adc_values[8 * ADC_RESULT_BUFFER_SIZE];
 } ADCResults_t;

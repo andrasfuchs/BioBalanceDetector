@@ -219,6 +219,12 @@ namespace BBDDriver.Models.Source
             // start streaming data
             usbInterface.OutPipe.Write(new byte[] { 0xF0, 0x02, 0x00, 0x00 });
 
+            if ((cellSettings.ChannelCount != 8) && (cellSettings.ChannelCount != 16) && (cellSettings.ChannelCount != 24))
+            {
+                throw new Exception($"The number of channels reported by Mercury-16 ({cellSettings.ChannelCount}) is invalid!");
+            }
+
+
             //this.SamplesPerSecond = cellSettings.SampleRate;
             for (int i = 0; i < cellSettings.ChannelCount; i++)
             {

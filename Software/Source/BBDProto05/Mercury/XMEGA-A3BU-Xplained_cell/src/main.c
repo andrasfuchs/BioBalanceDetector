@@ -125,12 +125,12 @@ static HeartBeat_t heartbeat_received;
 
 #define DMA_CHANNEL_USART_OUT   0
 #define DMA_CHANNEL_USART_IN	1
-#define DMA_BUFFER_SIZE 2
+#define USART_BUFFER_SIZE 2
 
 struct dac_config dac_conf;
 
-static uint8_t usart_source[DMA_BUFFER_SIZE];
-static uint8_t usart_destination[DMA_BUFFER_SIZE];
+static uint8_t usart_source[USART_BUFFER_SIZE];
+static uint8_t usart_destination[USART_BUFFER_SIZE];
 
 static int usart_interrupt_counter = 0;
 
@@ -197,7 +197,7 @@ ISR(USARTC0_RXC_vect)
 {
 	if (usart_receive_mpcm_data(&USARTC0, &usart_destination[usart_interrupt_counter], settings.device_index))
 	{
-		usart_interrupt_counter = (usart_interrupt_counter+1) % DMA_BUFFER_SIZE;
+		usart_interrupt_counter = (usart_interrupt_counter+1) % USART_BUFFER_SIZE;
 		rx_counter += 1;	
 	}
 }
@@ -311,7 +311,7 @@ static void dma_usart_out_init(void)
 	
 	dma_channel_set_burst_length(&dmach_conf, DMA_CH_BURSTLEN_1BYTE_gc);
 	//dma_channel_set_transfer_count(&dmach_conf, sizeof(heartbeat));
-	dma_channel_set_transfer_count(&dmach_conf, DMA_BUFFER_SIZE);
+	dma_channel_set_transfer_count(&dmach_conf, USART_BUFFER_SIZE);
 	dma_channel_set_trigger_source(&dmach_conf, DMA_CH_TRIGSRC_USARTC0_DRE_gc );
 	
 	dma_channel_set_src_reload_mode(&dmach_conf,DMA_CH_SRCRELOAD_TRANSACTION_gc);
@@ -340,7 +340,7 @@ static void dma_usart_in_init(void)
 	
 	dma_channel_set_burst_length(&dmach_conf, DMA_CH_BURSTLEN_1BYTE_gc);
 	//dma_channel_set_transfer_count(&dmach_conf, sizeof(heartbeat_received));
-	dma_channel_set_transfer_count(&dmach_conf, DMA_BUFFER_SIZE);
+	dma_channel_set_transfer_count(&dmach_conf, USART_BUFFER_SIZE);
 	dma_channel_set_trigger_source(&dmach_conf, DMA_CH_TRIGSRC_USARTC0_RXC_gc );
 	
 	dma_channel_set_src_reload_mode(&dmach_conf,DMA_CH_SRCRELOAD_NONE_gc);
@@ -433,31 +433,34 @@ static void usart_send_receive_data_dma(void)
 
 static void usart_send_receive_data_serial(void)
 {
-	for (int i=0; i<DMA_BUFFER_SIZE; i++)
+	for (int i=0; i<USART_BUFFER_SIZE; i++)
 	{
 		if ((settings.usart_mode == 1) || (settings.usart_mode == 2))
 		{
-			usart_send_mpcm_data(USART_SERIAL, usart_source[i], false);
-
-			tx_counter++;
-
 			if (tx_counter % 48 == 0)
 			{
 				usart_send_mpcm_data(USART_SERIAL, 0x00, true);
 				rx_counter = 0x00;
 			}
 
-			if (tx_counter % 48 == 16)
+			if (settings.test_mode == 2)
 			{
-				usart_send_mpcm_data(USART_SERIAL, 0x0A, true);
-				rx_counter = 0x0A;
+				if (tx_counter % 48 == 16)
+				{
+					usart_send_mpcm_data(USART_SERIAL, 0x0A, true);
+					rx_counter = 0x0A;
+				}
+
+				if (tx_counter % 48 == 32)
+				{
+					usart_send_mpcm_data(USART_SERIAL, 0x55, true);
+					rx_counter = 0x55;
+				}
 			}
 
-			if (tx_counter % 48 == 32)
-			{
-				usart_send_mpcm_data(USART_SERIAL, 0x55, true);
-				rx_counter = 0x55;
-			}
+			usart_send_mpcm_data(USART_SERIAL, usart_source[i], false);
+
+			tx_counter++;
 		}
 	}
 }
@@ -518,17 +521,6 @@ int main( void )
 	heartbeat.length = sizeof(heartbeat) - 4;
 
 	settings_load_default();
-
-	nvm_wait_until_ready();
-	
-	// this is the same for all XMEGA256A4s I guess
-	struct nvm_device_id device_id;
-	nvm_read_device_id(&device_id);
-	settings.device_id = (device_id.devid0 * 65536) + (device_id.devid1 * 256) + device_id.devid2;
-
-	struct nvm_device_serial device_serial;
-	nvm_read_device_serial(&device_serial);
-	settings.device_serial = (device_serial.lotnum0 * 16777216) + (device_serial.wafnum * 65536) + (device_serial.coordx0 * 256) + device_serial.coordy0;
 
 	///* Initialize ST7565R controller and LCD display */
 	gfx_mono_init();
@@ -626,10 +618,17 @@ int main( void )
 
 		/* Enable timer counter for ADC sampling */
 		init_tc(&settings);
+	} else if (settings.usb_enabled)
+	{
+		// I don't know why but this is needed in order to make the USART work, if ADCs are disabled
+		tc_enable(&TCC0);
+		tc_set_overflow_interrupt_level(&TCC0, TC_INT_LVL_HI);
+		tc_write_clock_source(&TCC0, TC_TC0_CLKSEL_DIV8_gc);
 	}
 
 	/* Enable global interrupt */
 	//cpu_irq_enable();
+
 
 	
 	/* Reset LEDs */
@@ -656,21 +655,26 @@ int main( void )
 			}
 		} else {
 			/* Blink the heartbeat LED */
-			delay_ms(1100);
-			ioport_set_pin_low(LED1_GPIO);
-			delay_ms(300);
-			ioport_set_pin_high(LED1_GPIO);
+			//delay_ms(1100);
+			//ioport_set_pin_low(LED1_GPIO);
+			//delay_ms(300);
+			//ioport_set_pin_high(LED1_GPIO);
 		}
 		
-		/* Send heartbeat packet to USB */
 		heartbeat.ticks++;
-		udd_ep_run(UDI_PHDC_EP_BULK_IN, false, (uint8_t*)&heartbeat, sizeof(heartbeat), usb_heartbeat_sent);
-		
 
-
-		for (int i=0; i<DMA_BUFFER_SIZE; i++)
+		if (settings.usb_enabled)
 		{
-			usart_source[i] = i + heartbeat.ticks;
+			/* Send heartbeat packet to USB */
+			udd_ep_run(UDI_PHDC_EP_BULK_IN, false, (uint8_t*)&heartbeat, sizeof(heartbeat), usb_heartbeat_sent);
+		}		
+
+		if (settings.test_mode == 1)
+		{
+			for (int i=0; i<USART_BUFFER_SIZE; i++)
+			{
+				usart_source[i] = i + heartbeat.ticks;
+			}
 		}
 
 		usart_send_receive_data_serial();

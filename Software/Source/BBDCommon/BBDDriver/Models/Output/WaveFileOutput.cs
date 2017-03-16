@@ -81,8 +81,6 @@ namespace BBDDriver.Models.Output
 
         protected override byte[] ConvertData(float data)
         {
-            if ((data < -1.0f) || (data > +1.0f)) data = 0;
-
             return BitConverter.GetBytes((short)(data * 32767));
         }
     }

@@ -119,8 +119,8 @@ namespace BBDDriver
             MultiChannelInput<IDataChannel> thresholdedSource = FilterManager.ApplyFilters(filteredSource, new ThresholdFilter() { Settings = new ThresholdFilterSettings() { Enabled = true, MinValue = 0.002f, MaxValue = Single.MaxValue } });
             //MultiChannelInput<IDataChannel> averagedSource = FilterManager.ApplyFilters(thresholdedSource, new MovingAverageFilter() { Settings = new MovingAverageFilterSettings() { Enabled = true, InputDataDimensions = 2, MovingAverageLength = 10 } });
 
-            //wfo = new WaveFileOutput(normalizedSource, $"{workingDirectory}{SessionId}.wav");
-            //wfo.DataWritten += Wfo_DataWritten;
+            wfo = new WaveFileOutput(normalizedSource, $"{workingDirectory}{SessionId}.wav");
+            wfo.DataWritten += Wfo_DataWritten;
 
             //vtkfo = new VTKFileOutput(filteredSource, $"{workingDirectory}{SessionId}.vts");
             //vtkfo.DataWritten += Wfo_DataWritten;

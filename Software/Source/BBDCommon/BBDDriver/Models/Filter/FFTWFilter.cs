@@ -49,6 +49,11 @@ namespace BBDDriver.Models.Filter
         {
             if (plan == null) return;
 
+            if (this.OutputBlockSize > this.Input.BufferSize)
+            {
+                throw new Exception($"FFTWFilter's block size ({this.OutputBlockSize}) is bugger than the buffer size of the input ({this.Input.BufferSize}). Decrease the block size or increase the buffer size!");
+            }
+
             this.FrequencyStep = (float)Input.SamplesPerSecond / settings.FFTSampleCount;
             this.ValidFrequencyMin = this.FrequencyStep;
             this.ValidFrequencyMax = (float)Input.SamplesPerSecond / 2.0f;

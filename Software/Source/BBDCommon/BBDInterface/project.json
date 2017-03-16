@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "BundlerMinifier.Core": "2.2.306",
+    "Microsoft.AspNet.SignalR.Core": "2.2.1",
     "Microsoft.AspNetCore.Diagnostics": "1.1.0",
     "Microsoft.AspNetCore.Mvc": "1.1.0",
     "Microsoft.AspNetCore.Razor.Tools": {

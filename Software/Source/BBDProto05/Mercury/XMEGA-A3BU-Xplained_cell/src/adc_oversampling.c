@@ -222,10 +222,10 @@ void init_adc(ADC_t *adc, CellSettings_t *settings)
 
 	adc_results[0].choice = 0xF006;
 	adc_results[0].length = 2 * 8 * ADC_RESULT_BUFFER_SIZE + 4;  // + 4 bytes device ID
-	adc_results[0].device_id = settings->device_id;
+	adc_results[0].device_serial = settings->device_serial;
 	adc_results[1].choice = 0xF006;
 	adc_results[1].length = 2 * 8 * ADC_RESULT_BUFFER_SIZE + 4;  // + 4 bytes device ID
-	adc_results[1].device_id = settings->device_id;
+	adc_results[1].device_serial = settings->device_serial;
 	
 	/* Initialize configuration structures */
 	adc_read_configuration(adc, &adc_conf);
@@ -338,7 +338,7 @@ static void pick_a_sample_callback(void)
 	if (adc_samplecount == ADC_RESULT_BUFFER_SIZE)
 	{
 		// send data to USB
-		if (send_adc_data_to_usb)
+		if ((settings.adc_value_packet_to_usb) && (send_adc_data_to_usb))
 		{
 			udd_ep_run(UDI_PHDC_EP_BULK_IN, false, (uint8_t*)&adc_results[adc_buffer_index], sizeof(adc_results[adc_buffer_index]), adc_data_sent_callback);			
 		}
