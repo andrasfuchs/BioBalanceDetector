@@ -41,17 +41,8 @@
       <HintPath>..\packages\CoreCompat.LibUsbDotNet.2.2.8-r101\lib\net45\CoreCompat.LibUsbDotNet.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="fftwlib, Version=3.3.5.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\FFTW.3.3.5\fftwlib.dll</HintPath>
-    </Reference>
-    <Reference Include="Kitware.mummy.Runtime, Version=1.0.2.599, Culture=neutral, PublicKeyToken=995c7fb9db2c1b44, processorArchitecture=AMD64">
-      <HintPath>..\packages\Activiz.NET.x64.5.8.0\lib\net20\Kitware.mummy.Runtime.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Kitware.VTK, Version=5.8.0.607, Culture=neutral, PublicKeyToken=995c7fb9db2c1b44, processorArchitecture=AMD64">
-      <HintPath>..\packages\Activiz.NET.x64.5.8.0\lib\net20\Kitware.VTK.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="fftwlib">
+      <HintPath>..\FFTW-binaries\reference\fftwlib.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
@@ -147,7 +138,6 @@
     <Compile Include="Models\Output\FileOutput.cs" />
     <Compile Include="Models\Output\BinaryFileOutput.cs" />
     <Compile Include="Models\Output\SimpleVTSFileOutput.cs" />
-    <Compile Include="Models\Output\VTKFileOutput.cs" />
     <Compile Include="Models\Output\WebSocketOutput.cs" />
     <Compile Include="Models\RefreshVisualOutputEventArgs.cs" />
     <Compile Include="Models\DataChangedEventArgs.cs" />

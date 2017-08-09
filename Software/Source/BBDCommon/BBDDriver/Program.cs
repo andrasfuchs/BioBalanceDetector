@@ -43,7 +43,6 @@ namespace BBDDriver
         private static MultiChannelInput<IDataChannel> waveSource = null;
 
         private static WaveFileOutput wfo;
-        private static VTKFileOutput vtkfo;
         private static SimpleVTSFileOutput vtsfo;
 
         private static StringBuilder consoleSB;

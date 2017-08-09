@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BBDDriver", "BBDDriver\BBDD
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "clFFT.NET", "clFFT.NET\clFFT.NET.csproj", "{73C13E55-53AD-47A1-B10C-B76344A5002F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFTWSharp", "FFTWSharp\FFTWSharp.csproj", "{BEA875B8-E28A-49C5-8E7E-6512DA65F7E1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{73C13E55-53AD-47A1-B10C-B76344A5002F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{73C13E55-53AD-47A1-B10C-B76344A5002F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{73C13E55-53AD-47A1-B10C-B76344A5002F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BEA875B8-E28A-49C5-8E7E-6512DA65F7E1}.Debug|Any CPU.ActiveCfg = Release|Any CPU
+		{BEA875B8-E28A-49C5-8E7E-6512DA65F7E1}.Debug|Any CPU.Build.0 = Release|Any CPU
+		{BEA875B8-E28A-49C5-8E7E-6512DA65F7E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BEA875B8-E28A-49C5-8E7E-6512DA65F7E1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
