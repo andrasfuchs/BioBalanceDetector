@@ -137,8 +137,8 @@ namespace BBDDriver
             firstActivity = DateTime.UtcNow;
 
             Console.OutputEncoding = System.Text.Encoding.Unicode;
-            Console.SetWindowSize(200, 64);
             Console.SetBufferSize(200, 500);
+            Console.SetWindowSize(200, 63);            
             consoleRefreshAtY = Console.CursorTop;
         }
 

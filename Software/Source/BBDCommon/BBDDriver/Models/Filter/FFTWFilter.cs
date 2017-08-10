@@ -186,8 +186,21 @@ namespace BBDDriver.Models.Filter
             complexInput = new float[n * 2];
             complexOutput = new float[n * 2];
 
-            mfin = new fftwf_complexarray(complexInput);
-            mfout = new fftwf_complexarray(complexOutput);
+            try
+            {
+                mfin = new fftwf_complexarray(complexInput);
+                mfout = new fftwf_complexarray(complexOutput);
+            }
+            catch (DllNotFoundException)
+            {
+                Console.WriteLine("DllNotFoundException: You must copy the native FFTW DLLs (libfftw3-3.dll, libfftw3f-3.dll, libfftw3l-3.dll) into the working directory.");
+                throw;
+            }
+            catch (BadImageFormatException)
+            {
+                Console.WriteLine("BadImageFormatException: This normally means, that you're loading a 32bit DLL into a 64bit process or vice versa.");
+                throw;
+            }
 
             plan = fftwf_plan.dft_1d(n, mfin, mfout, 
                 settings.IsBackward ? fftw_direction.Backward : fftw_direction.Forward, 
