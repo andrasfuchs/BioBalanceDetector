@@ -27,8 +27,8 @@
 	 settings.firmware_version = 0x0002;
 	 settings.test_mode = 0;
 	 settings.device_status = 1;
-	 settings.device_type = 2;
-	 settings.device_index = 0x0C;
+	 settings.device_type = 2;	// 0 - unknown, 1 - cell , 2 - organizer
+	 settings.device_index = 0x36; // master: 0x36, slaves: 0x55 0xA0
 	 settings.device_id = (device_id.devid0 * 65536) + (device_id.devid1 * 256) + device_id.devid2;
 	 settings.device_serial = (device_serial.lotnum0 * 16777216) + (device_serial.wafnum * 65536) + (device_serial.coordx0 * 256) + device_serial.coordy0;
 	 settings.clk_sys = sysclk_get_per_hz();
@@ -37,8 +37,8 @@
 	 settings.adca_enabled = adc_is_enabled(&ADCA);
 	 settings.adcb_enabled = adc_is_enabled(&ADCB);
 	 settings.adc_bits = 12;
-	 //settings.adc_ref = (uint8_t)ADC_REFSEL_INT1V_gc;
-	 settings.adc_ref = (uint8_t)ADC_REFSEL_INTVCC_gc;
+	 settings.adc_ref = (uint8_t)ADC_REFSEL_INT1V_gc;
+	 //settings.adc_ref = (uint8_t)ADC_REFSEL_INTVCC_gc;
 	 settings.adc_gain = 1;
 	 settings.sample_rate = 8000;
 	 settings.sample_rate_compensation = 0;
@@ -48,7 +48,7 @@
 	 settings.usb_address = udd_getaddress();
 	 settings.usb_speed = (udd_is_high_speed() ? 480000000UL : 12000000UL);
 	 settings.usart_enabled = false;
-	 settings.usart_mode = 2;
+	 settings.usart_mode = 2; // 1 - async, 2 - sync master, 3 - sync slave
 	 settings.usart_speed = 1200;
 	 settings.adc_value_bits = 16;
 	 settings.adc_value_count_per_packet = ADC_RESULT_BUFFER_SIZE;

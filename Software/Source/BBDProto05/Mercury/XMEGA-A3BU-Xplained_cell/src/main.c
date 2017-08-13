@@ -1,98 +1,8 @@
 /**
 * \file
 *
-* \brief XMEGA ADC Oversampling Demo application Main File
+* \brief Bio Balance Detector Mercury-16 firmware
 *
-* Copyright (C) 2014-2015 Atmel Corporation. All rights reserved.
-*
-* \asf_license_start
-*
-* \page License
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met:
-*
-* 1. Redistributions of source code must retain the above copyright notice,
-*    this list of conditions and the following disclaimer.
-*
-* 2. Redistributions in binary form must reproduce the above copyright notice,
-*    this list of conditions and the following disclaimer in the documentation
-*    and/or other materials provided with the distribution.
-*
-* 3. The name of Atmel may not be used to endorse or promote products derived
-*    from this software without specific prior written permission.
-*
-* 4. This software may only be redistributed and used in connection with an
-*    Atmel microcontroller product.
-*
-* THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR IMPLIED
-* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
-* MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
-* EXPRESSLY AND SPECIFICALLY DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR
-* ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-* DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
-* OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
-* STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-* ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-* POSSIBILITY OF SUCH DAMAGE.
-*
-* \asf_license_stop
-*
-*/
-
-/**
-* \mainpage
-*
-* \section intro Introduction
-*  This Projects demonstrates:\n
-*  - How to implement oversampling application with XMEGA ADC : \n
-*    The oversampling is used to increase the resolution of ADC hardware by
-*    implementing signal processing in firmware.
-*    In this example,configuration has been selected to increase
-*    resolution from 12 bit signed to 16 bit signed
-*  - More information can be obtained from application note
-*	  "Atmel AVR1629: XMEGA ADC Oversampling"
-*
-* \section files Main Files
-* - oversampling.c                : Oversampling demo application main file
-* - adc_oversampling.c            : ADC applications and signal processing
-*                                   functions related to oversampling
-* - conf_oversampling.h           : Configuration Macros for oversampling
-*
-* \section referenceinfo References
-*  - Refer Application Note: AVR121: Enhancing ADC resolution by oversampling
-*  - Refer Application Note: AVR120: ADC Characteristics and Calibration
-*  - Refer Application Note: AVR1300: Using the XMEGA ADC
-*  - Refer Application Note: AVR1505: XMEGA-A1 Xplained training - XMEGA ADC
-*
-* \section device_info Device Info
-* All AVR XMEGA device. This example have been tested with following setup:
-* - XMEGA-A3BU Xplained
-*
-* \section description Description of the example
-*
-* - All configurations related to oversampling level, ADC input pin, reference
-*   voltages, reference source and gain error factor are available from
-*   conf_oversampling.h file.
-* - To calculate a single result, this demo application will use number of
-*   sample as per configuration and perform signal processing to get higher
-*   resolution ADC result.
-* - After oversampling process, the converted analog input voltage and also
-*   ADC counts are displayed on LCD available in XMEGA-A3BU Xplained kit.
-* - Also, for comparison purpose, analog input voltage is calculated with only
-*   one sample(i.e. without oversampling) and this analog input voltage and
-*   corresponding ADC counts are displayed on LCD.
-*
-* \section compinfo Compilation info
-* This software was written for the GNU GCC and IAR for AVR. Other compilers
-* may or may not work.
-*
-* \section contactinfo Contact Information
-* For further information, visit <a href="http://www.atmel.com/">Atmel</a>.\n
-*/
-/*
-* Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
 */
 
 #include <compiler.h>
@@ -447,8 +357,8 @@ static void usart_send_receive_data_serial(void)
 			{
 				if (tx_counter % 48 == 16)
 				{
-					usart_send_mpcm_data(USART_SERIAL, 0x0A, true);
-					rx_counter = 0x0A;
+					usart_send_mpcm_data(USART_SERIAL, 0xA0, true);
+					rx_counter = 0xA0;
 				}
 
 				if (tx_counter % 48 == 32)
@@ -623,7 +533,7 @@ int main( void )
 		// I don't know why but this is needed in order to make the USART work, if ADCs are disabled
 		tc_enable(&TCC0);
 		tc_set_overflow_interrupt_level(&TCC0, TC_INT_LVL_HI);
-		tc_write_clock_source(&TCC0, TC_TC0_CLKSEL_DIV8_gc);
+		tc_write_clock_source(&TCC0, TC_CLKSEL_DIV8_gc);
 	}
 
 	/* Enable global interrupt */
