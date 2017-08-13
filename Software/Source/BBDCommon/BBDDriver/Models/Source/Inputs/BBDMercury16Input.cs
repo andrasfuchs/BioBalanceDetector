@@ -16,7 +16,8 @@ namespace BBDDriver.Models.Source
     internal class BBDMercury16Input : MultiChannelInput<IDataChannel>, IDisposable
     {
         // warning: interface guid changes when the driver is regenerated (by zadig)
-        private const string DEVICE_INTERFACE_GUID = "{a59515a9-4bb2-4032-b9b9-1b1b6a0aa023}";
+        // the new DeviceGUID can be found in the .inf file in the 'C:\Users\{username}\usb_driver' folder.
+        private const string DEVICE_INTERFACE_GUID = "{ABA7BA71-CA9E-428F-813C-0B97D8205E31}";
         private const int DEVICE_VID = 0x03EB;
         private const int DEVICE_PID = 0x2405;
         private const string DEVICE_DESC = "Mercury-16";

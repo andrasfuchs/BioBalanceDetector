@@ -110,12 +110,12 @@ namespace BBDDriver
             int fftSize = 1024 * 16;
             frequencyStep = (float)waveSource.SamplesPerSecond / fftSize;
 
-            MultiChannelInput<IDataChannel> normalizedSource = FilterManager.ApplyFilters(waveSource, new NormalizeFilter() { Settings = new NormalizeFilterSettings() { Enabled = true, SampleCount = waveSource.SamplesPerSecond * 3, Gain = 1.0f } });
+            MultiChannelInput<IDataChannel> normalizedSource = FilterManager.ApplyFilters(waveSource, new NormalizeFilter() { Settings = new NormalizeFilterSettings() { Enabled = true, SampleCount = waveSource.SamplesPerSecond * 3, Gain = 8.0f } });
             //MultiChannelInput<IDataChannel> filteredSource = FilterManager.ApplyFilters(waveSource, new ByPassFilter() { Settings = new ByPassFilterSettings() { Enabled = true } });
             //MultiChannelInput<IDataChannel> filteredSource = FilterManager.ApplyFilters(waveSource, new FillFilter() { Settings = new FillFilterSettings() { Enabled = true, ValueToFillWith = 0.75f } });
-            //MultiChannelInput<IDataChannel> filteredSource = FilterManager.ApplyFilters(normalizedSource, new FFTWFilter() { Settings = new FFTWFilterSettings() { Enabled = true, FFTSampleCount = fftSize, IsBackward = false, PlanningRigor = FFTPlanningRigor.Estimate, IsRealTime = true, Timeout = 300, OutputFormat = FFTOutputFormat.Magnitude, BufferSize = fftSize * 16 } });
-            MultiChannelInput<IDataChannel> filteredSource = FilterManager.ApplyFilters(normalizedSource, new FFTWFilter() { Settings = new FFTWFilterSettings() { Enabled = true, FFTSampleCount = fftSize, IsBackward = false, PlanningRigor = FFTPlanningRigor.Estimate, IsRealTime = true, Timeout = 300, OutputFormat = FFTOutputFormat.FrequencyMagnitudePair } });
-            MultiChannelInput<IDataChannel> thresholdedSource = FilterManager.ApplyFilters(filteredSource, new ThresholdFilter() { Settings = new ThresholdFilterSettings() { Enabled = true, MinValue = 0.002f, MaxValue = Single.MaxValue } });
+            MultiChannelInput<IDataChannel> filteredSource = FilterManager.ApplyFilters(normalizedSource, new FFTWFilter() { Settings = new FFTWFilterSettings() { Enabled = true, FFTSampleCount = fftSize, IsBackward = false, PlanningRigor = FFTPlanningRigor.Estimate, IsRealTime = true, Timeout = 300, OutputFormat = FFTOutputFormat.Magnitude, BufferSize = fftSize * 16 } });
+            //MultiChannelInput<IDataChannel> filteredSource = FilterManager.ApplyFilters(normalizedSource, new FFTWFilter() { Settings = new FFTWFilterSettings() { Enabled = true, FFTSampleCount = fftSize, IsBackward = false, PlanningRigor = FFTPlanningRigor.Estimate, IsRealTime = true, Timeout = 300, OutputFormat = FFTOutputFormat.FrequencyMagnitudePair } });
+            //MultiChannelInput<IDataChannel> thresholdedSource = FilterManager.ApplyFilters(filteredSource, new ThresholdFilter() { Settings = new ThresholdFilterSettings() { Enabled = true, MinValue = 0.002f, MaxValue = Single.MaxValue } });
             //MultiChannelInput<IDataChannel> averagedSource = FilterManager.ApplyFilters(thresholdedSource, new MovingAverageFilter() { Settings = new MovingAverageFilterSettings() { Enabled = true, InputDataDimensions = 2, MovingAverageLength = 10 } });
 
             wfo = new WaveFileOutput(normalizedSource, $"{workingDirectory}{SessionId}.wav");
@@ -130,8 +130,8 @@ namespace BBDDriver
             //VisualOutput vo = new VisualOutput(waveSource, 25, VisualOutputMode.None);
             //VisualOutput vo = new VisualOutput(normalizedSource, 25, VisualOutputMode.Waveform);
             //VisualOutput vo = new VisualOutput(waveSource, 25, VisualOutputMode.Waveform);
-            //VisualOutput vo = new VisualOutput(filteredSource, 25, VisualOutputMode.Spectrum);
-            VisualOutput vo = new VisualOutput(thresholdedSource, 25, VisualOutputMode.DominanceMatrix);
+            VisualOutput vo = new VisualOutput(filteredSource, 25, VisualOutputMode.Spectrum);
+            //VisualOutput vo = new VisualOutput(thresholdedSource, 25, VisualOutputMode.DominanceMatrix);
             vo.RefreshVisualOutput += Vo_RefreshVisualOutput;
 
             firstActivity = DateTime.UtcNow;
