@@ -349,7 +349,7 @@ static void usart_send_receive_data_serial(void)
 		{
 			if (tx_counter % 48 == 0)
 			{
-				usart_send_mpcm_data(USART_SERIAL, 0x00, true);
+				usart_send_mpcm_data(USART_SERIAL, 0x00, true); // change the target address to 0x00, so it's broadcasting
 				rx_counter = 0x00;
 			}
 
@@ -357,14 +357,14 @@ static void usart_send_receive_data_serial(void)
 			{
 				if (tx_counter % 48 == 16)
 				{
-					usart_send_mpcm_data(USART_SERIAL, 0xA0, true);
-					rx_counter = 0xA0;
+					usart_send_mpcm_data(USART_SERIAL, 0x11, true); // change the target address to 0x11, so it's targeting the client with the ID of 0x11 (SlaveID:00017 on the LCD screen)
+					rx_counter = 0x11;
 				}
 
 				if (tx_counter % 48 == 32)
 				{
-					usart_send_mpcm_data(USART_SERIAL, 0x55, true);
-					rx_counter = 0x55;
+					usart_send_mpcm_data(USART_SERIAL, 0x22, true); // change the target address to 0x22, so it's targeting the client with the ID of 0x22 (SlaveID:00034 on the LCD screen)
+					rx_counter = 0x22;
 				}
 			}
 
@@ -505,8 +505,21 @@ int main( void )
 		delay_ms(200);
 	}
 	
-
-	gfx_mono_draw_string("Data  Tx:0000 Rx:0000", 0, 20, &sysfont);
+	if (settings.usart_enabled)
+	{
+		if (settings.usart_mode == 2)
+		{
+			gfx_mono_draw_string("Mster Tx00000 Rx00000", 0, 20, &sysfont);
+		} else if (settings.usart_mode == 3) {
+			gfx_mono_draw_string("SlaveID:00000 Rx00000", 0, 20, &sysfont);
+		} else {
+			gfx_mono_draw_string("Data  Tx00000 Rx00000", 0, 20, &sysfont);
+		}
+		gfx_update_tx_rx();
+	} else 
+	{
+		gfx_mono_draw_string("USART disabled       ", 0, 20, &sysfont);
+	}
 
 	if (settings.adc_enabled)
 	{
