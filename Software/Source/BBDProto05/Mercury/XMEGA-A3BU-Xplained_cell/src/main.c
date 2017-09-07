@@ -44,6 +44,8 @@ static uint8_t usart_destination[USART_BUFFER_SIZE];
 
 static int usart_interrupt_counter = 0;
 
+static int menu_index = 0;
+
 
 static void usart_send_mpcm_data(usart_if usart, uint8_t data, bool is_address)
 {
@@ -168,11 +170,6 @@ static void usb_adc_data_sent(udd_ep_status_t status, iram_size_t nb_send, udd_e
 static void usb_unknown_metadata_received(udd_ep_status_t status, iram_size_t nb_received, udd_ep_id_t ep, uint8_t *metadata)
 {
 	rx_counter += 1;
-
-	delay_ms(300);
-	ioport_set_pin_low(LED2_GPIO);
-	delay_ms(300);
-	ioport_set_pin_high(LED2_GPIO);
 
 	if ((metadata[0] == 0xF0) && (metadata[1] == 0x01))
 	{
@@ -414,6 +411,17 @@ void check_reset_button()
 	}
 }
 
+void check_menu_buttons()
+{
+	if (gpio_pin_is_low(GPIO_PUSH_BUTTON_1) && (menu_index > 0)) {
+		menu_index--;
+	}
+
+	if (gpio_pin_is_low(GPIO_PUSH_BUTTON_2) && (menu_index < 3)) {
+		menu_index++;
+	}
+}
+
 int main( void )
 {
 	irq_initialize_vectors();
@@ -563,12 +571,15 @@ int main( void )
 	/* Continuous Execution Loop */
 	while (true) {
 	
-		check_reset_button();
-		
+		check_reset_button();	// if SW0 is pressed let's reset 		
+		check_menu_buttons();	// if the menu buttons (SW1 or SW2) were pressed, change the menu
 
 		sleepmgr_enter_sleep();
 		
-		gfx_update_tx_rx();
+		if (menu_index == 0)
+		{
+			gfx_update_tx_rx();
+		}
 
 		if (main_b_phdc_enable) {
 			if (ieee11073_skeleton_process()) {
