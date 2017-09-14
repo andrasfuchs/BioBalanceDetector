@@ -3,6 +3,7 @@
 #include <sysclk.h>
 #include <conf_oversampling.h>
 #include <bbd_adc.h>
+#include <settings.h>
 #include <asf.h>
 #include <math.h>
 

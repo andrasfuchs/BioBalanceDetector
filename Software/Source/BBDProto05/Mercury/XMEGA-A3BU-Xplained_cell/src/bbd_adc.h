@@ -12,6 +12,7 @@
 #define ASCII_BUFFER_SIZE    10
 
 #include <adc.h>
+#include <communication.h>
 #include "asf.h"
 
 /**
