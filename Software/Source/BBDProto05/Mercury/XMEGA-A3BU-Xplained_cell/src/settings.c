@@ -53,6 +53,6 @@
 	 settings.usart_speed = 1200; // the minumum speed should be [adc_value_bits] * [sample rate] * [channel_count] * [cell count] * 1.2 (for the overhead)
 	 settings.adc_value_bits = 16;
 	 settings.adc_value_count_per_packet = ADC_RESULT_BUFFER_SIZE;
-	 settings.adc_value_packet_to_usb = true;
-	 settings.adc_value_packet_to_usart = false;
+	 settings.adc_value_packet_to_usb = false;  // (!!)
+	 settings.adc_value_packet_to_usart = false;  // (!!)
  }

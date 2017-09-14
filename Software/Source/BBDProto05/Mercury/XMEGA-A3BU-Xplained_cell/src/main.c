@@ -9,7 +9,7 @@
 #include <sleepmgr.h>
 #include <sysclk.h>
 #include <conf_oversampling.h>
-#include <adc_oversampling.h>
+#include <bbd_adc.h>
 #include <main.h>
 #include <asf.h>
 #include <wdt.h>
@@ -18,33 +18,269 @@
 #include "ieee11073_skeleton.h"
 
 // USB
-
 static volatile bool main_b_phdc_enable = false;
-static int64_t tx_counter = 0;
-static int64_t rx_counter = 0;
+static int64_t usb_tx_counter = 0;
+static int64_t usb_rx_counter = 0;
+
+// USART
+static int64_t usart_tx_counter = 0;
+static int64_t usart_rx_counter = 0;
+
+#define USART_BUFFER_SIZE 2
+static uint8_t usart_source[USART_BUFFER_SIZE];
+static uint8_t usart_destination[USART_BUFFER_SIZE];
+
+static int usart_interrupt_counter = 0;
+static bool usart_error = false;
+
+
 static char loopcounter_ascii_buf[ASCII_BUFFER_SIZE] = {"+1.123456"};
 static char rxtxcounter_ascii_buf[6] = {"00000\0"};
 static char mode_ascii_buf[2] = {"0\0"};
-static char char_ascii_buf[5] = {"0x00\0"};
-static bool usart_error = false;
+static char two_digit_hex_buffer[5] = {"0x00\0"};
+static char four_digit_hex_buffer[7] = {"0x0000\0"};
+static char text_buffer[22] = {"\0"};
 
 static bool dataLEDState = false;
 
+static uint8_t menu_animation;
 static HeartBeat_t heartbeat;
 static HeartBeat_t heartbeat_received;
 
 #define DMA_CHANNEL_USART_OUT   0
 #define DMA_CHANNEL_USART_IN	1
-#define USART_BUFFER_SIZE 2
 
 struct dac_config dac_conf;
 
-static uint8_t usart_source[USART_BUFFER_SIZE];
-static uint8_t usart_destination[USART_BUFFER_SIZE];
+// GFX LCD MENU
+static uint8_t menu_index = 0;
+static uint8_t menu_number = 8;
+static uint32_t menu_update_rate = 10;
 
-static int usart_interrupt_counter = 0;
 
-static int menu_index = 0;
+
+void lcd_show_message(const char *str)
+{
+	gfx_mono_draw_string("Bio Balance Detector\0", 0, 0, &sysfont);
+	gfx_mono_draw_string("Mercury-16          \0", 0, 10, &sysfont);
+	gfx_mono_draw_string(str, 0, 20, &sysfont);
+}
+
+void lcd_change_menu(uint8_t menu_index)
+{
+	gfx_mono_draw_string("Bio Balance Detector\0", 0, 0, &sysfont);
+
+	if (menu_index == 0)
+	{
+		gfx_mono_draw_string("Mercury-16 index:0x??\0", 0, 10, &sysfont);
+		gfx_mono_draw_string("fw:0x???? ? type:????\0", 0, 20, &sysfont);
+		
+		convert_to_hex(&two_digit_hex_buffer[4], settings.device_index, 2);
+		gfx_mono_draw_string(two_digit_hex_buffer, 17*6, 10, &sysfont);
+
+		convert_to_hex(&four_digit_hex_buffer[6], settings.firmware_version, 4);
+		gfx_mono_draw_string(four_digit_hex_buffer, 3*6, 20, &sysfont);
+
+		if (settings.device_type == 1)
+		{
+			gfx_mono_draw_string("cell", 17*6, 20, &sysfont);
+		}		
+
+		if (settings.device_type == 2)
+		{
+			gfx_mono_draw_string("orgn", 17*6, 20, &sysfont);
+		}		
+	}
+
+	if (menu_index == 1)
+	{
+		gfx_mono_draw_string("id:0x00000000 ?? MHz \0", 0, 10, &sysfont);
+		gfx_mono_draw_string("s#:0x00000000 test: ?\0", 0, 20, &sysfont);
+		
+		convert_to_hex(&text_buffer[22], settings.device_id, 8);
+		gfx_mono_draw_string(&text_buffer[22-8], 5*6, 10, &sysfont);
+
+		convert_to_hex(&text_buffer[22], settings.device_serial, 8);
+		gfx_mono_draw_string(&text_buffer[22-8], 5*6, 20, &sysfont);
+
+		convert_to_decimal(&text_buffer[22], settings.clk_sys / 1000 / 1000, 2);
+		gfx_mono_draw_string(&text_buffer[22-2], 14*6, 10, &sysfont);
+
+		convert_to_decimal(&text_buffer[22], settings.test_mode, 1);
+		gfx_mono_draw_string(&text_buffer[22-1], 20*6, 20, &sysfont);
+	}
+
+	if (menu_index == 2)
+	{
+		if (settings.adc_enabled)
+		{
+			gfx_mono_draw_string("ADC  enabled ????kSPS\0", 0, 10, &sysfont);
+			gfx_mono_draw_string("?ch ???k ??bit ??? x?\0", 0, 20, &sysfont);
+		} else 
+		{
+			gfx_mono_draw_string("ADC disabled         \0", 0, 10, &sysfont);
+			gfx_mono_draw_string("                     \0", 0, 20, &sysfont);
+		}
+	}
+
+	if (menu_index == 3)
+	{
+		if (settings.dac_enabled)
+		{
+			gfx_mono_draw_string("DAC  enabled ???.?kHz\0", 0, 10, &sysfont);
+			gfx_mono_draw_string("?.?? Hz ?????        \0", 0, 20, &sysfont);
+		} 
+		else 
+		{
+			gfx_mono_draw_string("DAC disabled         \0", 0, 10, &sysfont);
+			gfx_mono_draw_string("                     \0", 0, 20, &sysfont);
+		}
+	}
+
+	if (menu_index == 4)
+	{
+		if (settings.usb_enabled)
+		{
+			gfx_mono_draw_string("USB  enabled   ?? Mhz\0", 0, 10, &sysfont);
+			gfx_mono_draw_string("Address: 0x??        \0", 0, 20, &sysfont);
+
+			convert_to_decimal(&text_buffer[22], settings.usb_speed / 1000 / 1000, 2);
+			gfx_mono_draw_string(&text_buffer[22-2], 15*6, 10, &sysfont);
+
+			convert_to_hex(&text_buffer[22], settings.usb_address, 2);
+			gfx_mono_draw_string(&text_buffer[22-2], 11*6, 20, &sysfont);
+		}
+		else
+		{
+			gfx_mono_draw_string("USB disabled         \0", 0, 10, &sysfont);
+			gfx_mono_draw_string("                     \0", 0, 20, &sysfont);
+		}
+	}
+
+	if (menu_index == 5)
+	{
+		if (settings.adc_value_packet_to_usb)
+		{
+			gfx_mono_draw_string("ADC->USB    enabled  ", 0, 10, &sysfont);
+		}
+		else
+		{
+			gfx_mono_draw_string("ADC->USB   disabled  ", 0, 10, &sysfont);
+		}
+
+		if (settings.adc_value_packet_to_usart)
+		{
+			gfx_mono_draw_string("ADC->USART  enabled  ", 0, 20, &sysfont);
+		}	
+		else
+		{
+			gfx_mono_draw_string("ADC->USART disabled  ", 0, 20, &sysfont);
+		}	
+	}
+
+	if (menu_index == 6)
+	{
+		if (settings.usart_enabled)
+		{
+			if (settings.usart_mode == 1)
+			{
+				gfx_mono_draw_string("USART is async       ", 0, 10, &sysfont);
+			}
+			else if (settings.usart_mode == 2)
+			{
+				gfx_mono_draw_string("USART is sync master ", 0, 10, &sysfont);
+			}
+			else if (settings.usart_mode == 3)
+			{
+				gfx_mono_draw_string("USART is sync slave  ", 0, 10, &sysfont);
+			} 
+			else
+			{
+				gfx_mono_draw_string("USART is  enabled    ", 0, 10, &sysfont);
+			}
+
+			gfx_mono_draw_string("@????????? BAUD      ", 0, 20, &sysfont);
+
+			convert_to_decimal(&text_buffer[22], settings.usart_speed, 9);
+			gfx_mono_draw_string(&text_buffer[22-9], 1*6, 20, &sysfont);
+		}
+		else
+		{
+			gfx_mono_draw_string("USART is disabled (1)", 0, 10, &sysfont);
+			gfx_mono_draw_string("                     ", 0, 20, &sysfont);
+		}
+	}
+
+	if (menu_index == 7)
+	{
+		if (settings.usart_enabled)
+		{
+			gfx_mono_draw_string("USART Tx00000 Rx00000", 0, 10, &sysfont);
+			gfx_mono_draw_string("Speed 00000.0 00000.0", 0, 20, &sysfont);
+		}
+		else
+		{
+			gfx_mono_draw_string("USART is disabled (2)", 0, 10, &sysfont);
+			gfx_mono_draw_string("                     ", 0, 20, &sysfont);
+		}
+	}
+}
+
+void lcd_update_menu(uint8_t menu_index)
+{
+	if (menu_index == 0)
+	{
+		text_buffer[22] = 0;
+		if (menu_animation == 0)
+		{
+			text_buffer[22-1] = '|';
+		}
+		if (menu_animation == 1)
+		{
+			text_buffer[22-1] = '/';
+		}
+		if (menu_animation == 2)
+		{
+			text_buffer[22-1] = '-';
+		}
+		if (menu_animation == 3)
+		{
+			text_buffer[22-1] = '\\';
+		}				
+		gfx_mono_draw_string(&text_buffer[22-1], 10*6, 20, &sysfont);
+		menu_animation = (menu_animation + 1) % 4;
+	}
+
+	if (menu_index == 7)
+	{
+		if (settings.usart_enabled)
+		{
+			convert_to_decimal(&text_buffer[22], usart_tx_counter, 5);
+			gfx_mono_draw_string(&text_buffer[22-5], 8*6, 10, &sysfont);
+			convert_to_decimal(&text_buffer[22], usart_rx_counter, 5);
+			gfx_mono_draw_string(&text_buffer[22-5], 16*6, 10, &sysfont);
+		}
+	}
+
+	if (menu_index == 8)
+	{
+		/*
+		if (settings.usart_mode == 2)
+		{
+			convert_to_hex(&char_ascii_buf[4], usart_source[0]);
+		}
+		if ((settings.usart_mode == 1) || (settings.usart_mode == 3))
+		{
+			convert_to_hex(&char_ascii_buf[4], usart_destination[0]);
+		}
+
+		usart_error = (usart_destination[1] != usart_destination[0] + 1);
+		if (usart_error) char_ascii_buf[0] = '!'; else char_ascii_buf[0] = '0';
+		gfx_mono_draw_string(char_ascii_buf, 102, 10, &sysfont);
+		*/
+	}
+}
+
 
 
 static void usart_send_mpcm_data(usart_if usart, uint8_t data, bool is_address)
@@ -110,9 +346,10 @@ ISR(USARTC0_RXC_vect)
 	if (usart_receive_mpcm_data(&USARTC0, &usart_destination[usart_interrupt_counter], settings.device_index))
 	{
 		usart_interrupt_counter = (usart_interrupt_counter+1) % USART_BUFFER_SIZE;
-		rx_counter += 1;	
+		usart_rx_counter += 1;	
 	}
 }
+
 
 
 void main_suspend_action(void)
@@ -150,12 +387,12 @@ void main_phdc_disable(void)
 
 static void usb_heartbeat_sent(udd_ep_status_t status, iram_size_t nb_send, udd_ep_id_t ep)
 {
-	tx_counter += 1;
+	usb_tx_counter += 1;
 }
 
 static void usb_adc_data_sent(udd_ep_status_t status, iram_size_t nb_send, udd_ep_id_t ep)
 {
-	tx_counter += 1;
+	usb_tx_counter += 1;
 
 	dataLEDState = !dataLEDState;
 	if (dataLEDState)
@@ -169,7 +406,7 @@ static void usb_adc_data_sent(udd_ep_status_t status, iram_size_t nb_send, udd_e
 
 static void usb_unknown_metadata_received(udd_ep_status_t status, iram_size_t nb_received, udd_ep_id_t ep, uint8_t *metadata)
 {
-	rx_counter += 1;
+	usart_rx_counter += 1;
 
 	if ((metadata[0] == 0xF0) && (metadata[1] == 0x01))
 	{
@@ -192,7 +429,7 @@ static void usart_heartbeat_sent(enum dma_channel_status status)
 {
 	if (status == DMA_CH_TRANSFER_COMPLETED)
 	{
-		tx_counter += 1000;
+		usart_tx_counter += 1;
 	}
 }
 
@@ -201,12 +438,12 @@ static void usart_heartbeat_received(enum dma_channel_status status)
 	//if ((status == DMA_CH_TRANSFER_COMPLETED) && (heartbeat_received.choice == 0xF005))
 	if ((status == DMA_CH_TRANSFER_COMPLETED) && (usart_destination[0] == 0xF0))
 	{
-		rx_counter += 1000;
+		usart_rx_counter += 1;
 	}
 
 	if (status != DMA_CH_TRANSFER_COMPLETED)
 	{
-		rx_counter += 10000;
+		usart_rx_counter += 1;
 	}
 
 }
@@ -305,9 +542,6 @@ static void usart_init(CellSettings_t settings)
 		ioport_configure_pin(IOPORT_CREATE_PIN(PORTC, 1), IOPORT_DIR_INPUT);
 		// Do not output the clock signal.
 		PORTCFG.CLKEVOUT = PORTCFG_CLKOUT_OFF_gc;
-
-		// HACK: display the slave address in the TX counter
-		tx_counter = settings.device_index;
 	}
 
 	//usart_set_rx_interrupt_level(USART_SERIAL, USART_RXCINTLVL_MED_gc);
@@ -325,7 +559,7 @@ static void usart_send_receive_data_dma(void)
 		while (dma_channel_is_busy(DMA_CHANNEL_USART_OUT));
 		dma_channel_disable(DMA_CHANNEL_USART_OUT);
 
-		tx_counter++;
+		usart_tx_counter++;
 	}
 
 	if ((settings.usart_mode == 1) || (settings.usart_mode == 3))
@@ -334,7 +568,7 @@ static void usart_send_receive_data_dma(void)
 		while (dma_channel_is_busy(DMA_CHANNEL_USART_IN));
 		dma_channel_enable(DMA_CHANNEL_USART_IN);
 
-		rx_counter++;
+		usart_rx_counter++;
 	}
 }
 
@@ -344,54 +578,32 @@ static void usart_send_receive_data_serial(void)
 	{
 		if ((settings.usart_mode == 1) || (settings.usart_mode == 2))
 		{
-			if (tx_counter % 48 == 0)
+			if (usart_tx_counter % 48 == 0)
 			{
 				usart_send_mpcm_data(USART_SERIAL, 0x00, true); // change the target address to 0x00, so it's broadcasting
-				rx_counter = 0x00;
+				usart_rx_counter = 0x00;
 			}
 
 			if (settings.test_mode == 2)
 			{
-				if (tx_counter % 48 == 16)
+				if (usart_tx_counter % 48 == 16)
 				{
 					usart_send_mpcm_data(USART_SERIAL, 0x11, true); // change the target address to 0x11, so it's targeting the client with the ID of 0x11 (SlaveID:00017 on the LCD screen)
-					rx_counter = 0x11;
+					usart_rx_counter = 0x11;
 				}
 
-				if (tx_counter % 48 == 32)
+				if (usart_tx_counter % 48 == 32)
 				{
 					usart_send_mpcm_data(USART_SERIAL, 0x22, true); // change the target address to 0x22, so it's targeting the client with the ID of 0x22 (SlaveID:00034 on the LCD screen)
-					rx_counter = 0x22;
+					usart_rx_counter = 0x22;
 				}
 			}
 
 			usart_send_mpcm_data(USART_SERIAL, usart_source[i], false);
 
-			tx_counter++;
+			usart_tx_counter++;
 		}
 	}
-}
-
-void gfx_update_tx_rx(void)
-{
-	/* Update the Tx Rx counters */
-	convert_to_ascii_5digit(&rxtxcounter_ascii_buf[5], tx_counter);
-	gfx_mono_draw_string(rxtxcounter_ascii_buf, 48, 20, &sysfont);
-	convert_to_ascii_5digit(&rxtxcounter_ascii_buf[5], rx_counter);
-	gfx_mono_draw_string(rxtxcounter_ascii_buf, 96, 20, &sysfont);
-
-	if (settings.usart_mode == 2)
-	{
-		convert_to_hex(&char_ascii_buf[4], usart_source[0]);
-	}
-	if ((settings.usart_mode == 1) || (settings.usart_mode == 3))
-	{
-		convert_to_hex(&char_ascii_buf[4], usart_destination[0]);
-	}
-
-	usart_error = (usart_destination[1] != usart_destination[0] + 1);
-	if (usart_error) char_ascii_buf[0] = '!'; else char_ascii_buf[0] = '0';
-	gfx_mono_draw_string(char_ascii_buf, 102, 10, &sysfont);
 }
 
 
@@ -400,27 +612,49 @@ void check_reset_button()
 {
 	// reset button event handler
 	if (gpio_pin_is_low(GPIO_PUSH_BUTTON_0)) {
-		do                          
-		{              
+		do
+		{
 			wdt_set_timeout_period(WDT_TIMEOUT_PERIOD_16CLK);
-			wdt_enable();  
-			for(;;)                 
-			{                       
-			}                       
+			wdt_enable();
+			for(;;)
+			{
+			}
 		} while(0);
 	}
 }
 
 void check_menu_buttons()
 {
-	if (gpio_pin_is_low(GPIO_PUSH_BUTTON_1) && (menu_index > 0)) {
-		menu_index--;
+	if (gpio_pin_is_low(GPIO_PUSH_BUTTON_1)) {
+		menu_index = (menu_index - 1 + menu_number) % menu_number;
+		lcd_change_menu(menu_index);
 	}
 
-	if (gpio_pin_is_low(GPIO_PUSH_BUTTON_2) && (menu_index < 3)) {
-		menu_index++;
+	if (gpio_pin_is_low(GPIO_PUSH_BUTTON_2)) {
+		menu_index = (menu_index + 1 + menu_number) % menu_number;
+		lcd_change_menu(menu_index);
 	}
 }
+
+
+
+static void counter_callback()
+{
+	check_reset_button();	// if SW0 is pressed let's reset
+	check_menu_buttons();	// if the menu buttons (SW1 or SW2) were pressed, change the menu
+	lcd_update_menu(menu_index);
+}
+
+static void counter_init()
+{
+	tc_enable(&TCC1);
+	tc_set_overflow_interrupt_level(&TCC1, TC_INT_LVL_LO);
+	tc_write_clock_source(&TCC1, TC_CLKSEL_DIV256_gc);
+	tc_set_overflow_interrupt_callback(&TCC1, counter_callback);
+}
+
+
+
 
 int main( void )
 {
@@ -443,13 +677,6 @@ int main( void )
 	///* Initialize ST7565R controller and LCD display */
 	gfx_mono_init();
 
-	/* Display headings on LCD for oversampled result */
-	gfx_mono_draw_string("Bio Balance Detector", 0, 0, &sysfont);
-
-	/* Display headings on LCD for normal result */
-	gfx_mono_draw_string("Mercury-16 | m: ", 0, 10, &sysfont);	
-	mode_ascii_buf[0] = settings.usart_mode + 48;
-	gfx_mono_draw_string(mode_ascii_buf, 90, 10, &sysfont);
 
 	/* Switch ON LCD back light */
 	ioport_set_pin_high(NHD_C12832A1Z_BACKLIGHT);
@@ -460,7 +687,7 @@ int main( void )
 
 	if (settings.usb_enabled)
 	{
-		gfx_mono_draw_string("Initializing USB...  \0", 0, 20, &sysfont);
+		lcd_show_message("Initializing USB...  \0");
 
 		/* Start USB stack to authorize VBus monitoring */
 		adc_data_sent_callback = usb_adc_data_sent;
@@ -474,13 +701,13 @@ int main( void )
 
 	if (settings.usart_enabled)
 	{
-		gfx_mono_draw_string("Initializing USART...\0", 0, 20, &sysfont);
+		lcd_show_message("Initializing USART...\0");
 
 		usart_init(settings);
 		delay_ms(200);
 
 
-		gfx_mono_draw_string("Initializing DMA...  \0", 0, 20, &sysfont);
+		lcd_show_message("Initializing DMA...  \0");
 
 		// DMA setup for USART to RAM transfer
 		dma_enable();
@@ -491,7 +718,7 @@ int main( void )
 
 	if (settings.dac_enabled)
 	{
-		gfx_mono_draw_string("Initializing DAC...  \0", 0, 20, &sysfont);
+		lcd_show_message("Initializing DAC...  \0");
 		// Initialize the dac configuration.
 		dac_read_configuration(&SPEAKER_DAC, &dac_conf);
 
@@ -513,22 +740,6 @@ int main( void )
 		delay_ms(200);
 	}
 	
-	if (settings.usart_enabled)
-	{
-		if (settings.usart_mode == 2)
-		{
-			gfx_mono_draw_string("Mster Tx00000 Rx00000", 0, 20, &sysfont);
-		} else if (settings.usart_mode == 3) {
-			gfx_mono_draw_string("SlaveID:00000 Rx00000", 0, 20, &sysfont);
-		} else {
-			gfx_mono_draw_string("Data  Tx00000 Rx00000", 0, 20, &sysfont);
-		}
-		gfx_update_tx_rx();
-	} else 
-	{
-		gfx_mono_draw_string("USART disabled       ", 0, 20, &sysfont);
-	}
-
 	if (settings.adc_enabled)
 	{
 		/* Initialize ADC ,to read ADC offset and configure ADC for oversampling 
@@ -557,6 +768,12 @@ int main( void )
 		tc_write_clock_source(&TCC0, TC_CLKSEL_DIV8_gc);
 	}
 
+	/* Reset LCD */
+	lcd_change_menu(menu_index);
+
+	/* Enable LCD update */
+	counter_init();
+
 	/* Enable global interrupt */
 	//cpu_irq_enable();
 
@@ -570,16 +787,7 @@ int main( void )
 
 	/* Continuous Execution Loop */
 	while (true) {
-	
-		check_reset_button();	// if SW0 is pressed let's reset 		
-		check_menu_buttons();	// if the menu buttons (SW1 or SW2) were pressed, change the menu
-
 		sleepmgr_enter_sleep();
-		
-		if (menu_index == 0)
-		{
-			gfx_update_tx_rx();
-		}
 
 		if (main_b_phdc_enable) {
 			if (ieee11073_skeleton_process()) {

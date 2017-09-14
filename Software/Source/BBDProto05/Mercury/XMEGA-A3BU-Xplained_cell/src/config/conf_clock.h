@@ -67,11 +67,14 @@
 
 // Clk pll0 = (2MHz * PLL_MUL) / PLL_DIV
 #define CONFIG_PLL0_SOURCE          PLL_SRC_RC2MHZ
-#define CONFIG_PLL0_MUL             16
+#define CONFIG_PLL0_MUL             24
 #define CONFIG_PLL0_DIV             1
 
 // Clk cpu/per = Clk sys / (2 ^ BUS_div)
 #define CONFIG_SYSCLK_PSADIV        SYSCLK_PSADIV_1
 #define CONFIG_SYSCLK_PSBCDIV       SYSCLK_PSBCDIV_1_1
+
+// RTC has a separate clock, and it is only used for the LCD display update
+#define CONFIG_RTC_SOURCE			SYSCLK_RTCSRC_RCOSC		// 32.768kHz from internal RC oscillator
 
 #endif /* CONF_CLOCK_H_INCLUDED */

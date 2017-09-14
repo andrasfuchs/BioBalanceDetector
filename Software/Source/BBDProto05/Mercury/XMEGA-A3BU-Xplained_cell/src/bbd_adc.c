@@ -1,57 +1,8 @@
-/**
- * \file
- *
- * \brief This file contains the function implementations for XMEGA ADC
- *        Oversampling Application.It shows how to use oversampling to
- *        increase the resolution.In this example configuration has been been
- *        selected for oversampling from 12 bit signed to 16 bit signed result
- *
- * Copyright (C) 2014-2015 Atmel Corporation. All rights reserved.
- *
- * \asf_license_start
- *
- * \page License
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- *
- * 3. The name of Atmel may not be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- * 4. This software may only be redistributed and used in connection with an
- *    Atmel microcontroller product.
- *
- * THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
- * EXPRESSLY AND SPECIFICALLY DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- * \asf_license_stop
- *
- */
-/*
- * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
- */
-
 #include <compiler.h>
 #include <sleepmgr.h>
 #include <sysclk.h>
 #include <conf_oversampling.h>
-#include <adc_oversampling.h>
+#include <bbd_adc.h>
 #include <asf.h>
 #include <math.h>
 
@@ -148,14 +99,16 @@ void convert_to_ascii(char *buf_index, uint64_t dec_val)
 	}
 }
 
-void convert_to_hex(char *buf_index, uint8_t dec_val)
+void convert_to_hex(char *buf_index, uint64_t dec_val, uint8_t digit_number)
 {
 	// set the ending to 0
 	*buf_index = 0;
 	buf_index--;
 
-	for (int i=0; i<2; i++)
+	for (int i=0; i<digit_number; i++)
 	{
+		*buf_index = (dec_val % 10) + 48;
+
 		if (dec_val	% 16 >= 10)
 		{
 			*buf_index = (dec_val % 16) + 55;
@@ -175,7 +128,7 @@ void convert_to_hex(char *buf_index, uint8_t dec_val)
 	}
 }
 
-void convert_to_ascii_5digit(char *buf_index, uint64_t dec_val)
+void convert_to_decimal(char *buf_index, uint64_t dec_val, uint8_t digit_number)
 {
 	uint8_t digit_count = 0;
 
@@ -184,14 +137,21 @@ void convert_to_ascii_5digit(char *buf_index, uint64_t dec_val)
 	buf_index--;
 
 	/* Loop through all digits to convert to ASCII */
-	for (digit_count = 0; digit_count < 5; digit_count++) 
+	for (digit_count = 0; digit_count < digit_number; digit_count++) 
 	{
 		/*
 		 * Extract each Digit by doing %10 and convert to ASCII,
 		 *  - Then store to buffer index
 		 *	- Initially we will get the right most digit and so on
 		 */
-		*buf_index = (dec_val % 10) + 48;
+		 if ((dec_val > 0) || (digit_count == 0))
+		 {
+			*buf_index = (dec_val % 10) + 48;
+		 }
+		 else
+		 {
+			*buf_index = 32;
+		 }
 
 		/* Remove extracted digit by doing divide with 10 */
 		dec_val = (dec_val / 10);
