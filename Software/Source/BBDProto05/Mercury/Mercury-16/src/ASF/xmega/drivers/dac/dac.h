@@ -3,7 +3,7 @@
  *
  * \brief AVR XMEGA Digital to Analog Converter driver
  *
- * Copyright (c) 2010-2015 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2010-2016 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -379,8 +379,14 @@ __always_inline static void dac_set_active_channel(struct dac_config *conf,
 			(int_out_ch_mask ? DAC_IDOEN_bm : 0);
 
 	// Enable the specified number of DAC channels.
-	if ((ch_mask == DAC_CH0) || (ch_mask == DAC_CH1)) {
+	if (ch_mask == DAC_CH0) {
 		setting = DAC_CHSEL_SINGLE_gc;
+	} else if (ch_mask == DAC_CH1) {
+#ifdef DAC_CHSEL_SINGLE1_gc
+		setting = DAC_CHSEL_SINGLE1_gc;
+#else
+		Assert(false);
+#endif
 	} else {
 		setting = DAC_CHSEL_DUAL_gc;
 	}

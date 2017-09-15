@@ -72,7 +72,7 @@
  * \name UDD Configuration
  * @{
  */
-#undef USB_DEVICE_MAX_EP   // undefine this definition in header file 
+#undef USB_DEVICE_MAX_EP   // undefine this definition in header file
 /* ! 2 or 3 endpoints used by PHDC interface */
 #if ((UDI_PHDC_QOS_IN & USB_PHDC_QOS_LOW_GOOD) == USB_PHDC_QOS_LOW_GOOD)
 #define  USB_DEVICE_MAX_EP             3
