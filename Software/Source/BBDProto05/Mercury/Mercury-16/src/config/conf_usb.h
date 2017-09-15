@@ -88,7 +88,7 @@
  * USB Device Callbacks definitions (Optional)
  * @{
  */
-#define  UDC_VBUS_EVENT(b_vbus_high)	// user_callback_vbus_action(b_vbus_high)
+#define  UDC_VBUS_EVENT(b_vbus_high)
 /* extern void user_callback_vbus_action(bool b_vbus_high); */
 #define  UDC_SOF_EVENT()                  main_sof_action()
 /* extern void user_callback_sof_action(void); */

@@ -18,7 +18,7 @@
 #include "ieee11073_skeleton.h"
 
 // USB
-static volatile bool main_b_phdc_enable = false;
+static volatile bool main_b_phdc_enable = true;
 static int64_t usb_tx_counter = 0;
 static int64_t usb_rx_counter = 0;
 
@@ -116,6 +116,36 @@ void lcd_change_menu(uint8_t menu_index)
 		{
 			gfx_mono_draw_string("ADC  enabled ????kSPS\0", 0, 10, &sysfont);
 			gfx_mono_draw_string("?ch ???k ??bit ??? x?\0", 0, 20, &sysfont);
+
+			convert_to_decimal(&text_buffer[22], settings.clk_adc / 1000, 4);
+			gfx_mono_draw_string(&text_buffer[22-4], 13*6, 10, &sysfont);
+
+			convert_to_decimal(&text_buffer[22], settings.channel_count, 1);
+			gfx_mono_draw_string(&text_buffer[22-1], 0*6, 20, &sysfont);
+
+			convert_to_decimal(&text_buffer[22], settings.sample_rate / 1000, 3);
+			gfx_mono_draw_string(&text_buffer[22-3], 4*6, 20, &sysfont);
+
+			convert_to_decimal(&text_buffer[22], settings.adc_bits, 2);
+			gfx_mono_draw_string(&text_buffer[22-2], 9*6, 20, &sysfont);
+
+			if (settings.adc_ref == (uint8_t)ADC_REFSEL_INT1V_gc)
+			{
+				gfx_mono_draw_string("i1V", 15*6, 20, &sysfont);
+			}	
+
+			if (settings.adc_ref == (uint8_t)ADC_REFSEL_INTVCC_gc)
+			{
+				gfx_mono_draw_string("Vcc", 15*6, 20, &sysfont);
+			}	
+
+			if (settings.adc_ref == (uint8_t)ADC_REFSEL_AREFA_gc)
+			{
+				gfx_mono_draw_string("Ref", 15*6, 20, &sysfont);
+			}	
+
+			convert_to_decimal(&text_buffer[22], settings.adc_gain, 1);
+			gfx_mono_draw_string(&text_buffer[22-1], 20*6, 20, &sysfont);
 		} else 
 		{
 			gfx_mono_draw_string("ADC disabled         \0", 0, 10, &sysfont);
@@ -142,13 +172,13 @@ void lcd_change_menu(uint8_t menu_index)
 		if (settings.usb_enabled)
 		{
 			gfx_mono_draw_string("USB  enabled   ?? Mhz\0", 0, 10, &sysfont);
-			gfx_mono_draw_string("Address: 0x??        \0", 0, 20, &sysfont);
+			gfx_mono_draw_string("#0x?? Tx00000 Rx00000\0", 0, 20, &sysfont);
 
 			convert_to_decimal(&text_buffer[22], settings.usb_speed / 1000 / 1000, 2);
 			gfx_mono_draw_string(&text_buffer[22-2], 15*6, 10, &sysfont);
 
 			convert_to_hex(&text_buffer[22], settings.usb_address, 2);
-			gfx_mono_draw_string(&text_buffer[22-2], 11*6, 20, &sysfont);
+			gfx_mono_draw_string(&text_buffer[22-2], 3*6, 20, &sysfont);
 		}
 		else
 		{
@@ -249,6 +279,17 @@ void lcd_update_menu(uint8_t menu_index)
 		}				
 		gfx_mono_draw_string(&text_buffer[22-1], 10*6, 20, &sysfont);
 		menu_animation = (menu_animation + 1) % 4;
+	}
+
+	if (menu_index == 4)
+	{
+		if (settings.usb_enabled)
+		{
+			convert_to_decimal(&text_buffer[22], usb_tx_counter, 5);
+			gfx_mono_draw_string(&text_buffer[22-5], 8*6, 20, &sysfont);
+			convert_to_decimal(&text_buffer[22], usb_rx_counter, 5);
+			gfx_mono_draw_string(&text_buffer[22-5], 16*6, 20, &sysfont);
+		}
 	}
 
 	if (menu_index == 7)
@@ -406,7 +447,7 @@ static void usb_adc_data_sent(udd_ep_status_t status, iram_size_t nb_send, udd_e
 
 static void usb_unknown_metadata_received(udd_ep_status_t status, iram_size_t nb_received, udd_ep_id_t ep, uint8_t *metadata)
 {
-	usart_rx_counter += 1;
+	usb_rx_counter += 1;
 
 	if ((metadata[0] == 0xF0) && (metadata[1] == 0x01))
 	{
@@ -796,7 +837,7 @@ int main( void )
 				ui_association(false); /* No association */
 			}
 		} else {
-			/* Blink the heartbeat LED */
+			///* Blink the heartbeat LED */
 			//delay_ms(1100);
 			//ioport_set_pin_low(LED1_GPIO);
 			//delay_ms(300);
