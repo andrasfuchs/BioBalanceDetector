@@ -202,10 +202,11 @@ int main( void )
 	{
 		adc_data_ready_callback = adc_send_data;
 
-		/* Initialize ADC ,to read ADC offset and configure ADC for oversampling 
-		**/
 		init_adc(&ADCA, &settings);
 		init_adc(&ADCB, &settings);
+
+		settings.adca_enabled = adc_is_enabled(&ADCA);
+		settings.adcb_enabled = adc_is_enabled(&ADCB);
 
 		// Initialize ADC test data settings
 		adc_test_mode = settings.test_mode;
@@ -255,20 +256,14 @@ int main( void )
 				} else {
 				ui_association(false); /* No association */
 			}
-		} else {
-			///* Blink the heartbeat LED */
-			//delay_ms(1100);
-			//ioport_set_pin_low(LED1_GPIO);
-			//delay_ms(300);
-			//ioport_set_pin_high(LED1_GPIO);
 		}
 		
 		heartbeat.ticks++;
 
-		if (settings.usb_enabled)
+		if ((settings.usb_enabled) && (!settings.adc_value_packet_to_usb))
 		{
 			/* Send heartbeat packet to USB */
-			udd_ep_run(UDI_PHDC_EP_BULK_IN, false, (uint8_t*)&heartbeat, sizeof(heartbeat), usb_heartbeat_sent);
+			udd_ep_run(UDI_PHDC_EP_BULK_IN, false, (uint8_t*)&heartbeat, sizeof(heartbeat), usb_data_sent);
 		}		
 
 		if (settings.test_mode == 1)

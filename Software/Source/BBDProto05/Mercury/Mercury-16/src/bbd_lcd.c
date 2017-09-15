@@ -2,7 +2,7 @@
 #include <bbd_usart.h>
 #include <bbd_usb.h>
 
-static char text_buffer[22] = {"\0"};
+static char text_buffer[23] = {"\0"};
 static uint8_t menu_animation;
 
 void lcd_init(void)
@@ -75,11 +75,28 @@ void lcd_change_menu(uint8_t menu_index)
 	{
 		if (settings.adc_enabled)
 		{
-			gfx_mono_draw_string("ADC  enabled ????kSPS\0", 0, 10, &sysfont);
+			gfx_mono_draw_string("ADC A+B:???   ????kHz\0", 0, 10, &sysfont);
 			gfx_mono_draw_string("?ch ???k ??bit ??? x?\0", 0, 20, &sysfont);
 
+			if ((settings.adca_enabled) && (settings.adcb_enabled))
+			{
+				gfx_mono_draw_string("A+B: on", 4*6, 10, &sysfont);
+			} 
+			else if ((settings.adca_enabled) && (!settings.adcb_enabled))
+			{
+				gfx_mono_draw_string("A: on  ", 4*6, 10, &sysfont);
+			}
+			else if ((!settings.adca_enabled) && (settings.adcb_enabled))
+			{
+				gfx_mono_draw_string("B: on  ", 4*6, 10, &sysfont);
+			}
+			else if ((!settings.adca_enabled) && (!settings.adcb_enabled))
+			{
+				gfx_mono_draw_string("A+B:off", 4*6, 10, &sysfont);
+			}
+
 			convert_to_decimal(&text_buffer[22], settings.clk_adc / 1000, 4);
-			gfx_mono_draw_string(&text_buffer[22-4], 13*6, 10, &sysfont);
+			gfx_mono_draw_string(&text_buffer[22-4], 14*6, 10, &sysfont);
 
 			convert_to_decimal(&text_buffer[22], settings.channel_count, 1);
 			gfx_mono_draw_string(&text_buffer[22-1], 0*6, 20, &sysfont);

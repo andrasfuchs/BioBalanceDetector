@@ -9,7 +9,7 @@ bool send_adc_data_to_usb;
 int64_t usb_tx_counter;
 int64_t usb_rx_counter;
 
-void usb_heartbeat_sent(udd_ep_status_t status, iram_size_t nb_send, udd_ep_id_t ep);
+void usb_data_sent(udd_ep_status_t status, iram_size_t nb_send, udd_ep_id_t ep);
 
 void usb_adc_data_sent(udd_ep_status_t status, iram_size_t nb_send, udd_ep_id_t ep);
 

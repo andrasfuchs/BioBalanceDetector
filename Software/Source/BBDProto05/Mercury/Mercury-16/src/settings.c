@@ -33,7 +33,7 @@
 	 settings.device_id = (device_id.devid0 * 65536) + (device_id.devid1 * 256) + device_id.devid2;
 	 settings.device_serial = (device_serial.lotnum0 * 16777216) + (device_serial.wafnum * 65536) + (device_serial.coordx0 * 256) + device_serial.coordy0;
 	 settings.clk_sys = sysclk_get_per_hz();
-	 settings.clk_adc = 2000000UL;
+	 settings.clk_adc = 93750UL;
 	 settings.adc_enabled = true;  // (!!) ADC should be enabled for cells and disabled for the organizer
 	 settings.adca_enabled = adc_is_enabled(&ADCA);
 	 settings.adcb_enabled = adc_is_enabled(&ADCB);
