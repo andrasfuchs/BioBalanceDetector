@@ -28,8 +28,8 @@
 	 settings.firmware_version = 0x0002;
 	 settings.test_mode = 0; // 0 - test mode off, 1 - simple test mode, send ticks, 2 - send 
 	 settings.device_status = 1;
-	 settings.device_type = 2;	// (!!) 0 - unknown, 1 - cell , 2 - organizer
-	 settings.device_index = 0x36; // (!!) master: 0x36, slaves: 0x11 0x22
+	 settings.device_type = 1;	// (!!) 0 - unknown, 1 - cell , 2 - organizer
+	 settings.device_index = 0x11; // (!!) master: 0x36, slaves: 0x11 0x22
 	 settings.device_id = (device_id.devid0 * 65536) + (device_id.devid1 * 256) + device_id.devid2;
 	 settings.device_serial = (device_serial.lotnum0 * 16777216) + (device_serial.wafnum * 65536) + (device_serial.coordx0 * 256) + device_serial.coordy0;
 	 settings.clk_sys = sysclk_get_per_hz();
@@ -48,11 +48,33 @@
 	 settings.usb_enabled = true;  // (!!) USB should be enabled for the organizer and disabled for the cells
 	 settings.usb_address = udd_getaddress();
 	 settings.usb_speed = (udd_is_high_speed() ? 480000000UL : 12000000UL);
-	 settings.usart_enabled = false;  // USART should be enabled for both the cells and the organizer
-	 settings.usart_mode = 2; // (!!) 1 - async, 2 - sync master (organizer), 3 - sync slave (cell)
+	 settings.usart_enabled = true;  // USART should be enabled for both the cells and the organizer
+	 settings.usart_mode = 3; // (!!) 1 - async, 2 - sync master (organizer), 3 - sync slave (cell)
 	 settings.usart_speed = 1200; // the minumum speed should be [adc_value_bits] * [sample rate] * [channel_count] * [cell count] * 1.2 (for the overhead)
 	 settings.adc_value_bits = 16;
 	 settings.adc_value_count_per_packet = ADC_RESULT_BUFFER_SIZE;
-	 settings.adc_value_packet_to_usb = true;  // (!!)
-	 settings.adc_value_packet_to_usart = false;  // (!!)
+	 settings.adc_value_packet_to_usb = false;  // (!!)
+	 settings.adc_value_packet_to_usart = true;  // (!!)
+
+
+	 // it just makes the testing easier, comment it in production
+	 if (settings.device_index == 0x36)
+	 {
+		 settings.device_type = 2;						// (!!) 0 - unknown, 1 - cell , 2 - organizer
+		 settings.adc_enabled = false;					// (!!) ADC should be enabled for cells and disabled for the organizer
+		 settings.usb_enabled = true;					// (!!) USB should be enabled for the organizer and disabled for the cells
+		 settings.usart_mode = 2;						// (!!) 1 - async, 2 - sync master (organizer), 3 - sync slave (cell)
+		 settings.adc_value_packet_to_usb = false;		// (!!)
+		 settings.adc_value_packet_to_usart = false;	// (!!)
+	 }
+
+	 if ((settings.device_index == 0x11) || (settings.device_index == 0x22))
+	 {
+		settings.device_type = 1;						// (!!) 0 - unknown, 1 - cell , 2 - organizer
+		settings.adc_enabled = true;					// (!!) ADC should be enabled for cells and disabled for the organizer
+		settings.usb_enabled = false;					// (!!) USB should be enabled for the organizer and disabled for the cells
+		settings.usart_mode = 3;						// (!!) 1 - async, 2 - sync master (organizer), 3 - sync slave (cell)
+		settings.adc_value_packet_to_usb = false;		// (!!)
+		settings.adc_value_packet_to_usart = true;		// (!!)
+	 }
  }

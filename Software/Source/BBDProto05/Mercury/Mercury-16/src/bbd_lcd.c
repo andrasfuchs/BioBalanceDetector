@@ -31,6 +31,7 @@ void lcd_change_menu(uint8_t menu_index)
 {
 	gfx_mono_draw_string("Bio Balance Detector\0", 0, 0, &sysfont);
 
+	text_buffer[22] = 0;
 	if (menu_index == 0)
 	{
 		gfx_mono_draw_string("Mercury-16 index:0x??\0", 0, 10, &sysfont);
