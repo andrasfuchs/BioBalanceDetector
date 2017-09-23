@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.16
+VisualStudioVersion = 15.0.26730.8
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BBDDriver", "BBDDriver\BBDDriver.csproj", "{A58BBA86-239A-4280-99B8-CABA065ED3EF}"
 EndProject
@@ -9,6 +9,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFTWSharp", "FFTWSharp\FFTWSharp.csproj", "{BEA875B8-E28A-49C5-8E7E-6512DA65F7E1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BBDInterface", "BBDInterface\BBDInterface.csproj", "{AC447A78-666E-47FE-AC17-E1EA94950198}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KiCad_Pcbnew_generator", "KiCad_Pcbnew_generator\KiCad_Pcbnew_generator.csproj", "{013F4C3D-C1EA-4020-8E16-E28E1692099A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -32,8 +34,15 @@ Global
 		{AC447A78-666E-47FE-AC17-E1EA94950198}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AC447A78-666E-47FE-AC17-E1EA94950198}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AC447A78-666E-47FE-AC17-E1EA94950198}.Release|Any CPU.Build.0 = Release|Any CPU
+		{013F4C3D-C1EA-4020-8E16-E28E1692099A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{013F4C3D-C1EA-4020-8E16-E28E1692099A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{013F4C3D-C1EA-4020-8E16-E28E1692099A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{013F4C3D-C1EA-4020-8E16-E28E1692099A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DE243048-5F29-4D89-BF01-FA0589066205}
 	EndGlobalSection
 EndGlobal
