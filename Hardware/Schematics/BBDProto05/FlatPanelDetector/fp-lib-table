@@ -1,0 +1,3 @@
+(fp_lib_table
+  (lib (name BBDProto05FootprintLib)(type KiCad)(uri "$(KIPRJMOD)/BBDProto05FootprintLib.pretty")(options "")(descr ""))
+)

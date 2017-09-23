@@ -1,0 +1,590 @@
+(pcb C:\Work\BioBalanceDetector\Hardware\Schematics\BBDProto04\FlatPanelDetector\BBDProto04_FlatPanelDetector.dsn
+  (parser
+    (string_quote ")
+    (space_in_quoted_tokens on)
+    (host_cad "KiCad's Pcbnew")
+    (host_version "4.0.1-stable")
+  )
+  (resolution um 10)
+  (unit um)
+  (structure
+    (layer F.Cu
+      (type signal)
+      (property
+        (index 0)
+      )
+    )
+    (layer B.Cu
+      (type signal)
+      (property
+        (index 1)
+      )
+    )
+    (boundary
+      (path pcb 0  35560 -256540  25400 -256540  25400 -246380  25400 -17780
+            35560 -17780  238760 -17780  248920 -17780  248920 -246380  248920 -256540
+            238760 -256540  35560 -256540  35560 -256540)
+    )
+    (plane "Net-(P1-01-Pad1)" (polygon B.Cu 0  60325 -67945  36195 -67945  36195 -43815  60325 -43815
+            60325 -67945))
+    (plane "Net-(P1-02-Pad1)" (polygon B.Cu 0  60325 -93345  36195 -93345  36195 -69215  60325 -69215
+            60325 -93345))
+    (plane "Net-(P1-03-Pad1)" (polygon B.Cu 0  36195 -94615  60325 -94615  60325 -118745  36195 -118745
+            36195 -114935))
+    (plane "Net-(P1-04-Pad1)" (polygon B.Cu 0  60325 -144145  36195 -144145  36195 -120015  60325 -120015
+            60325 -144145))
+    (plane "Net-(P1-05-Pad1)" (polygon B.Cu 0  60325 -169545  36195 -169545  36195 -145415  60325 -145415
+            60325 -169545))
+    (plane "Net-(P1-06-Pad1)" (polygon B.Cu 0  36195 -170815  60325 -170815  60325 -194945  36195 -194945
+            36195 -184150))
+    (plane "Net-(P1-07-Pad1)" (polygon B.Cu 0  36195 -196215  60325 -196215  60325 -220345  36195 -220345
+            36195 -203835))
+    (plane "Net-(P1-08-Pad1)" (polygon B.Cu 0  36195 -221615  60325 -221615  60325 -245745  36195 -245745))
+    (plane "Net-(P1-09-Pad1)" (polygon B.Cu 0  61595 -43815  85725 -43815  85725 -67945  61595 -67945))
+    (plane "Net-(P1-10-Pad1)" (polygon B.Cu 0  61595 -69215  85725 -69215  85725 -93345  61595 -93345))
+    (plane "Net-(P1-11-Pad1)" (polygon B.Cu 0  61595 -94615  85725 -94615  85725 -118745  61595 -118745))
+    (plane "Net-(P1-12-Pad1)" (polygon B.Cu 0  61595 -120015  85725 -120015  85725 -144145  61595 -144145))
+    (plane "Net-(P1-13-Pad1)" (polygon B.Cu 0  61595 -145415  85725 -145415  85725 -169545  61595 -169545))
+    (plane "Net-(P1-14-Pad1)" (polygon B.Cu 0  61595 -170815  85725 -170815  85725 -194945  61595 -194945))
+    (plane "Net-(P1-15-Pad1)" (polygon B.Cu 0  61595 -196215  85725 -196215  85725 -220345  61595 -220345))
+    (plane "Net-(P1-16-Pad1)" (polygon B.Cu 0  61595 -221615  85725 -221615  85725 -245745  61595 -245745))
+    (plane "Net-(P2-01-Pad1)" (polygon B.Cu 0  86995 -43815  111125 -43815  111125 -67945  86995 -67945))
+    (plane "Net-(P2-02-Pad1)" (polygon B.Cu 0  86995 -69215  111125 -69215  111125 -93345  86995 -93345))
+    (plane "Net-(P2-03-Pad1)" (polygon B.Cu 0  86995 -94615  111125 -94615  111125 -118745  86995 -118745))
+    (plane "Net-(P2-04-Pad1)" (polygon B.Cu 0  86995 -120015  111125 -120015  111125 -144145  86995 -144145))
+    (plane "Net-(P2-05-Pad1)" (polygon B.Cu 0  86995 -145415  111125 -145415  111125 -169545  86995 -169545))
+    (plane "Net-(P2-06-Pad1)" (polygon B.Cu 0  86995 -170815  111125 -170815  111125 -194945  86995 -194945))
+    (plane "Net-(P2-07-Pad1)" (polygon B.Cu 0  86995 -196215  111125 -196215  111125 -220345  86995 -220345))
+    (plane "Net-(P2-08-Pad1)" (polygon B.Cu 0  86995 -221615  111125 -221615  111125 -245745  86995 -245745))
+    (plane "Net-(P2-09-Pad1)" (polygon B.Cu 0  112395 -43815  136525 -43815  136525 -67945  112395 -67945))
+    (plane "Net-(P2-10-Pad1)" (polygon B.Cu 0  112395 -69215  136525 -69215  136525 -93345  112395 -93345))
+    (plane "Net-(P2-11-Pad1)" (polygon B.Cu 0  112395 -94615  136525 -94615  136525 -118745  112395 -118745))
+    (plane "Net-(P2-12-Pad1)" (polygon B.Cu 0  112395 -120015  136525 -120015  136525 -144145  112395 -144145))
+    (plane "Net-(P2-13-Pad1)" (polygon B.Cu 0  112395 -145415  136525 -145415  136525 -169545  112395 -169545))
+    (plane "Net-(P2-14-Pad1)" (polygon B.Cu 0  112395 -170815  136525 -170815  136525 -194945  112395 -194945))
+    (plane "Net-(P2-15-Pad1)" (polygon B.Cu 0  112395 -196215  136525 -196215  136525 -220345  112395 -220345))
+    (plane "Net-(P2-16-Pad1)" (polygon B.Cu 0  112395 -221615  136525 -221615  136525 -245745  112395 -245745))
+    (plane "Net-(P3-01-Pad1)" (polygon B.Cu 0  137795 -43815  161925 -43815  161925 -67945  137795 -67945))
+    (plane "Net-(P3-02-Pad1)" (polygon B.Cu 0  137795 -69215  161925 -69215  161925 -93345  137795 -93345))
+    (plane "Net-(P3-03-Pad1)" (polygon B.Cu 0  137795 -94615  161925 -94615  161925 -118745  137795 -118745))
+    (plane "Net-(P3-04-Pad1)" (polygon B.Cu 0  137795 -120015  161925 -120015  161925 -144145  137795 -144145))
+    (plane "Net-(P3-05-Pad1)" (polygon B.Cu 0  137795 -145415  161925 -145415  161925 -169545  137795 -169545))
+    (plane "Net-(P3-06-Pad1)" (polygon B.Cu 0  137795 -170815  161925 -170815  161925 -194945  137795 -194945))
+    (plane "Net-(P3-07-Pad1)" (polygon B.Cu 0  137795 -196215  161925 -196215  161925 -220345  137795 -220345))
+    (plane "Net-(P3-08-Pad1)" (polygon B.Cu 0  137795 -221615  161925 -221615  161925 -245745  137795 -245745))
+    (plane "Net-(P3-09-Pad1)" (polygon B.Cu 0  163195 -43815  187325 -43815  187325 -67945  163195 -67945))
+    (plane "Net-(P3-10-Pad1)" (polygon B.Cu 0  163195 -69215  187325 -69215  187325 -93345  163195 -93345))
+    (plane "Net-(P3-11-Pad1)" (polygon B.Cu 0  163195 -94615  187325 -94615  187325 -118745  163195 -118745))
+    (plane "Net-(P3-12-Pad1)" (polygon B.Cu 0  163195 -120015  187325 -120015  187325 -144145  163195 -144145))
+    (plane "Net-(P3-13-Pad1)" (polygon B.Cu 0  163195 -145415  187325 -145415  187325 -169545  163195 -169545))
+    (plane "Net-(P3-14-Pad1)" (polygon B.Cu 0  163195 -170815  187325 -170815  187325 -194945  163195 -194945))
+    (plane "Net-(P3-15-Pad1)" (polygon B.Cu 0  163195 -196215  187325 -196215  187325 -220345  163195 -220345))
+    (plane "Net-(P3-16-Pad1)" (polygon B.Cu 0  163195 -221615  187325 -221615  187325 -245745  163195 -245745))
+    (plane "Net-(P4-01-Pad1)" (polygon B.Cu 0  188595 -43815  212725 -43815  212725 -67945  188595 -67945))
+    (plane "Net-(P4-02-Pad1)" (polygon B.Cu 0  188595 -69215  212725 -69215  212725 -93345  188595 -93345))
+    (plane "Net-(P4-03-Pad1)" (polygon B.Cu 0  188595 -94615  212725 -94615  212725 -118745  188595 -118745))
+    (plane "Net-(P4-04-Pad1)" (polygon B.Cu 0  188595 -120015  212725 -120015  212725 -144145  188595 -144145))
+    (plane "Net-(P4-05-Pad1)" (polygon B.Cu 0  188595 -145415  212725 -145415  212725 -169545  188595 -169545))
+    (plane "Net-(P4-06-Pad1)" (polygon B.Cu 0  188595 -170815  212725 -170815  212725 -194945  188595 -194945))
+    (plane "Net-(P4-07-Pad1)" (polygon B.Cu 0  188595 -196215  212725 -196215  212725 -220345  188595 -220345))
+    (plane "Net-(P4-08-Pad1)" (polygon B.Cu 0  188595 -221615  212725 -221615  212725 -245745  188595 -245745))
+    (plane "Net-(P4-09-Pad1)" (polygon B.Cu 0  213995 -43815  238125 -43815  238125 -67945  213995 -67945))
+    (plane "Net-(P4-10-Pad1)" (polygon B.Cu 0  213995 -69215  238125 -69215  238125 -93345  213995 -93345))
+    (plane "Net-(P4-11-Pad1)" (polygon B.Cu 0  213995 -94615  238125 -94615  238125 -118745  213995 -118745))
+    (plane "Net-(P4-12-Pad1)" (polygon B.Cu 0  213995 -120015  238125 -120015  238125 -144145  213995 -144145))
+    (plane "Net-(P4-13-Pad1)" (polygon B.Cu 0  213995 -145415  238125 -145415  238125 -169545  213995 -169545))
+    (plane "Net-(P4-14-Pad1)" (polygon B.Cu 0  213995 -170815  238125 -170815  238125 -194945  213995 -194945))
+    (plane "Net-(P4-15-Pad1)" (polygon B.Cu 0  213995 -196215  238125 -196215  238125 -220345  213995 -220345))
+    (plane "Net-(P4-16-Pad1)" (polygon B.Cu 0  213995 -221615  238125 -221615  238125 -245745  213995 -245745))
+    (via "Via[0-1]_600:400_um")
+    (rule
+      (width 254)
+      (clearance 254.1)
+      (clearance 254.1 (type default_smd))
+      (clearance 63.5 (type smd_smd))
+    )
+  )
+  (placement
+    (component Socket_Strips:Socket_Strip_Straight_2x08
+      (place P1 48260 -30480 front 0 (PN CONN_02X08))
+      (place P2 99060 -30480 front 0 (PN CONN_02X08))
+      (place P3 149860 -30480 front 0 (PN CONN_02X08))
+      (place P4 200660 -30480 front 0 (PN CONN_02X08))
+    )
+    (component Pin_Headers:Pin_Header_Straight_1x01
+      (place "P1-01" 48260 -55880 front 0 (PN CONN_01X01))
+      (place "P1-02" 48260 -81280 front 0 (PN CONN_01X01))
+      (place "P1-03" 48260 -106680 front 0 (PN CONN_01X01))
+      (place "P1-04" 48260 -132080 front 0 (PN CONN_01X01))
+      (place "P1-05" 48260 -157480 front 0 (PN CONN_01X01))
+      (place "P1-06" 48260 -182880 front 0 (PN CONN_01X01))
+      (place "P1-07" 48260 -208280 front 0 (PN CONN_01X01))
+      (place "P1-08" 48260 -233680 front 0 (PN CONN_01X01))
+      (place "P1-09" 73660 -55880 front 0 (PN CONN_01X01))
+      (place "P1-10" 73660 -81280 front 0 (PN CONN_01X01))
+      (place "P1-11" 73660 -106680 front 0 (PN CONN_01X01))
+      (place "P1-12" 73660 -132080 front 0 (PN CONN_01X01))
+      (place "P1-13" 73660 -157480 front 0 (PN CONN_01X01))
+      (place "P1-14" 73660 -182880 front 0 (PN CONN_01X01))
+      (place "P1-15" 73660 -208280 front 0 (PN CONN_01X01))
+      (place "P1-16" 73660 -233680 front 0 (PN CONN_01X01))
+      (place "P2-01" 99060 -55880 front 0 (PN CONN_01X01))
+      (place "P2-02" 99060 -81280 front 0 (PN CONN_01X01))
+      (place "P2-03" 99060 -106680 front 0 (PN CONN_01X01))
+      (place "P2-04" 99060 -132080 front 0 (PN CONN_01X01))
+      (place "P2-05" 99060 -157480 front 0 (PN CONN_01X01))
+      (place "P2-06" 99060 -182880 front 0 (PN CONN_01X01))
+      (place "P2-07" 99060 -208280 front 0 (PN CONN_01X01))
+      (place "P2-08" 99060 -233680 front 0 (PN CONN_01X01))
+      (place "P2-09" 124460 -55880 front 0 (PN CONN_01X01))
+      (place "P2-10" 124460 -81280 front 0 (PN CONN_01X01))
+      (place "P2-11" 124460 -106680 front 0 (PN CONN_01X01))
+      (place "P2-12" 124460 -132080 front 0 (PN CONN_01X01))
+      (place "P2-13" 124460 -157480 front 0 (PN CONN_01X01))
+      (place "P2-14" 124460 -182880 front 0 (PN CONN_01X01))
+      (place "P2-15" 124460 -208280 front 0 (PN CONN_01X01))
+      (place "P2-16" 124460 -233680 front 0 (PN CONN_01X01))
+      (place "P3-01" 149860 -55880 front 0 (PN CONN_01X01))
+      (place "P3-02" 149860 -81280 front 0 (PN CONN_01X01))
+      (place "P3-03" 149860 -106680 front 0 (PN CONN_01X01))
+      (place "P3-04" 149860 -132080 front 0 (PN CONN_01X01))
+      (place "P3-05" 149860 -157480 front 0 (PN CONN_01X01))
+      (place "P3-06" 149860 -182880 front 0 (PN CONN_01X01))
+      (place "P3-07" 149860 -208280 front 0 (PN CONN_01X01))
+      (place "P3-08" 149860 -233680 front 0 (PN CONN_01X01))
+      (place "P3-09" 175260 -55880 front 0 (PN CONN_01X01))
+      (place "P3-10" 175260 -81280 front 0 (PN CONN_01X01))
+      (place "P3-11" 175260 -106680 front 0 (PN CONN_01X01))
+      (place "P3-12" 175260 -132080 front 0 (PN CONN_01X01))
+      (place "P3-13" 175260 -157480 front 0 (PN CONN_01X01))
+      (place "P3-14" 175260 -182880 front 0 (PN CONN_01X01))
+      (place "P3-15" 175260 -208280 front 0 (PN CONN_01X01))
+      (place "P3-16" 175260 -233680 front 0 (PN CONN_01X01))
+      (place "P4-01" 200660 -55880 front 0 (PN CONN_01X01))
+      (place "P4-02" 200660 -81280 front 0 (PN CONN_01X01))
+      (place "P4-03" 200660 -106680 front 0 (PN CONN_01X01))
+      (place "P4-04" 200660 -132080 front 0 (PN CONN_01X01))
+      (place "P4-05" 200660 -157480 front 0 (PN CONN_01X01))
+      (place "P4-06" 200660 -182880 front 0 (PN CONN_01X01))
+      (place "P4-07" 200660 -208280 front 0 (PN CONN_01X01))
+      (place "P4-08" 200660 -233680 front 0 (PN CONN_01X01))
+      (place "P4-09" 226060 -55880 front 0 (PN CONN_01X01))
+      (place "P4-10" 226060 -81280 front 0 (PN CONN_01X01))
+      (place "P4-11" 226060 -106680 front 0 (PN CONN_01X01))
+      (place "P4-12" 226060 -132080 front 0 (PN CONN_01X01))
+      (place "P4-13" 226060 -157480 front 0 (PN CONN_01X01))
+      (place "P4-14" 226060 -182880 front 0 (PN CONN_01X01))
+      (place "P4-15" 226060 -208280 front 0 (PN CONN_01X01))
+      (place "P4-16" 226060 -233680 front 0 (PN CONN_01X01))
+    )
+    (component Arduino_Uno:Arduino_1pin
+      (place H1 30480 -27940 front 0 (PN CONN_01X01))
+      (place H2 30480 -55880 front 0 (PN CONN_01X01))
+      (place H3 30480 -83820 front 0 (PN CONN_01X01))
+      (place H4 30480 -111760 front 0 (PN CONN_01X01))
+      (place H5 30480 -139700 front 0 (PN CONN_01X01))
+      (place H6 30480 -167640 front 0 (PN CONN_01X01))
+      (place H7 30480 -195580 front 0 (PN CONN_01X01))
+      (place H8 30480 -223520 front 0 (PN CONN_01X01))
+      (place H9 55880 -251460 front 0 (PN CONN_01X01))
+      (place H10 83820 -251460 front 0 (PN CONN_01X01))
+      (place H11 111760 -251460 front 0 (PN CONN_01X01))
+      (place H12 139700 -251460 front 0 (PN CONN_01X01))
+      (place H13 167640 -251460 front 0 (PN CONN_01X01))
+      (place H14 195580 -251460 front 0 (PN CONN_01X01))
+      (place H15 223520 -251460 front 0 (PN CONN_01X01))
+      (place H16 243840 -223520 front 0 (PN CONN_01X01))
+      (place H17 243840 -195580 front 0 (PN CONN_01X01))
+      (place H18 243840 -167640 front 0 (PN CONN_01X01))
+      (place H19 243840 -139700 front 0 (PN CONN_01X01))
+      (place H20 243840 -111760 front 0 (PN CONN_01X01))
+      (place H21 243840 -83820 front 0 (PN CONN_01X01))
+      (place H22 243840 -55880 front 0 (PN CONN_01X01))
+      (place H23 243840 -27940 front 0 (PN CONN_01X01))
+      (place H24 187960 -27940 front 0 (PN CONN_01X01))
+      (place H25 137160 -27940 front 0 (PN CONN_01X01))
+      (place H26 86360 -27940 front 0 (PN CONN_01X01))
+    )
+  )
+  (library
+    (image Socket_Strips:Socket_Strip_Straight_2x08
+      (outline (path signal 50  -1750 1750  -1750 -4300))
+      (outline (path signal 50  19550 1750  19550 -4300))
+      (outline (path signal 50  -1750 1750  19550 1750))
+      (outline (path signal 50  -1750 -4300  19550 -4300))
+      (outline (path signal 150  19050 -3810  -1270 -3810))
+      (outline (path signal 150  1270 1270  19050 1270))
+      (outline (path signal 150  19050 -3810  19050 1270))
+      (outline (path signal 150  -1270 -3810  -1270 -1270))
+      (outline (path signal 150  0 1550  -1550 1550))
+      (outline (path signal 150  -1270 -1270  1270 -1270))
+      (outline (path signal 150  1270 -1270  1270 1270))
+      (outline (path signal 150  -1550 1550  -1550 0))
+      (pin Rect[A]Pad_1727.2x1727.2_um 1 0 0)
+      (pin Oval[A]Pad_1727.2x1727.2_um 2 0 -2540)
+      (pin Oval[A]Pad_1727.2x1727.2_um 3 2540 0)
+      (pin Oval[A]Pad_1727.2x1727.2_um 4 2540 -2540)
+      (pin Oval[A]Pad_1727.2x1727.2_um 5 5080 0)
+      (pin Oval[A]Pad_1727.2x1727.2_um 6 5080 -2540)
+      (pin Oval[A]Pad_1727.2x1727.2_um 7 7620 0)
+      (pin Oval[A]Pad_1727.2x1727.2_um 8 7620 -2540)
+      (pin Oval[A]Pad_1727.2x1727.2_um 9 10160 0)
+      (pin Oval[A]Pad_1727.2x1727.2_um 10 10160 -2540)
+      (pin Oval[A]Pad_1727.2x1727.2_um 11 12700 0)
+      (pin Oval[A]Pad_1727.2x1727.2_um 12 12700 -2540)
+      (pin Oval[A]Pad_1727.2x1727.2_um 13 15240 0)
+      (pin Oval[A]Pad_1727.2x1727.2_um 14 15240 -2540)
+      (pin Oval[A]Pad_1727.2x1727.2_um 15 17780 0)
+      (pin Oval[A]Pad_1727.2x1727.2_um 16 17780 -2540)
+    )
+    (image Pin_Headers:Pin_Header_Straight_1x01
+      (outline (path signal 150  1550 1550  1550 0))
+      (outline (path signal 50  -1750 1750  -1750 -1750))
+      (outline (path signal 50  1750 1750  1750 -1750))
+      (outline (path signal 50  -1750 1750  1750 1750))
+      (outline (path signal 50  -1750 -1750  1750 -1750))
+      (outline (path signal 150  -1550 0  -1550 1550))
+      (outline (path signal 150  -1550 1550  1550 1550))
+      (outline (path signal 150  -1270 -1270  1270 -1270))
+      (pin Rect[A]Pad_2235.2x2235.2_um 1 0 0)
+    )
+    (image Arduino_Uno:Arduino_1pin
+      (outline (path signal 150  2286 0  2174.11 -706.413  1849.41 -1343.68  1343.68 -1849.41
+            706.413 -2174.11  0 -2286  -706.413 -2174.11  -1343.68 -1849.41
+            -1849.41 -1343.68  -2174.11 -706.413  -2286 0  -2174.11 706.413
+            -1849.41 1343.68  -1343.68 1849.41  -706.413 2174.11  0 2286
+            706.413 2174.11  1343.68 1849.41  1849.41 1343.68  2174.11 706.413))
+      (pin Round[A]Pad_4064_um 1 0 0)
+    )
+    (padstack Round[A]Pad_4064_um
+      (shape (circle F.Cu 4064))
+      (shape (circle B.Cu 4064))
+      (attach off)
+    )
+    (padstack Oval[A]Pad_1727.2x1727.2_um
+      (shape (path F.Cu 1727.2  0 0  0 0))
+      (shape (path B.Cu 1727.2  0 0  0 0))
+      (attach off)
+    )
+    (padstack Rect[A]Pad_2235.2x2235.2_um
+      (shape (rect F.Cu -1117.6 -1117.6 1117.6 1117.6))
+      (shape (rect B.Cu -1117.6 -1117.6 1117.6 1117.6))
+      (attach off)
+    )
+    (padstack Rect[A]Pad_1727.2x1727.2_um
+      (shape (rect F.Cu -863.6 -863.6 863.6 863.6))
+      (shape (rect B.Cu -863.6 -863.6 863.6 863.6))
+      (attach off)
+    )
+    (padstack "Via[0-1]_600:400_um"
+      (shape (circle F.Cu 600))
+      (shape (circle B.Cu 600))
+      (attach off)
+    )
+  )
+  (network
+    (net "Net-(P1-01-Pad1)"
+      (pins P1-1 "P1-01"-1)
+    )
+    (net "Net-(P1-02-Pad1)"
+      (pins P1-2 "P1-02"-1)
+    )
+    (net "Net-(P1-03-Pad1)"
+      (pins P1-3 "P1-03"-1)
+    )
+    (net "Net-(P1-04-Pad1)"
+      (pins P1-4 "P1-04"-1)
+    )
+    (net "Net-(P1-05-Pad1)"
+      (pins P1-5 "P1-05"-1)
+    )
+    (net "Net-(P1-06-Pad1)"
+      (pins P1-6 "P1-06"-1)
+    )
+    (net "Net-(P1-07-Pad1)"
+      (pins P1-7 "P1-07"-1)
+    )
+    (net "Net-(P1-08-Pad1)"
+      (pins P1-8 "P1-08"-1)
+    )
+    (net "Net-(P1-09-Pad1)"
+      (pins P1-9 "P1-09"-1)
+    )
+    (net "Net-(P1-10-Pad1)"
+      (pins P1-10 "P1-10"-1)
+    )
+    (net "Net-(P1-11-Pad1)"
+      (pins P1-11 "P1-11"-1)
+    )
+    (net "Net-(P1-12-Pad1)"
+      (pins P1-12 "P1-12"-1)
+    )
+    (net "Net-(P1-13-Pad1)"
+      (pins P1-13 "P1-13"-1)
+    )
+    (net "Net-(P1-14-Pad1)"
+      (pins P1-14 "P1-14"-1)
+    )
+    (net "Net-(P1-15-Pad1)"
+      (pins P1-15 "P1-15"-1)
+    )
+    (net "Net-(P1-16-Pad1)"
+      (pins P1-16 "P1-16"-1)
+    )
+    (net "Net-(P2-01-Pad1)"
+      (pins P2-1 "P2-01"-1)
+    )
+    (net "Net-(P2-02-Pad1)"
+      (pins P2-2 "P2-02"-1)
+    )
+    (net "Net-(P2-03-Pad1)"
+      (pins P2-3 "P2-03"-1)
+    )
+    (net "Net-(P2-04-Pad1)"
+      (pins P2-4 "P2-04"-1)
+    )
+    (net "Net-(P2-05-Pad1)"
+      (pins P2-5 "P2-05"-1)
+    )
+    (net "Net-(P2-06-Pad1)"
+      (pins P2-6 "P2-06"-1)
+    )
+    (net "Net-(P2-07-Pad1)"
+      (pins P2-7 "P2-07"-1)
+    )
+    (net "Net-(P2-08-Pad1)"
+      (pins P2-8 "P2-08"-1)
+    )
+    (net "Net-(P2-09-Pad1)"
+      (pins P2-9 "P2-09"-1)
+    )
+    (net "Net-(P2-10-Pad1)"
+      (pins P2-10 "P2-10"-1)
+    )
+    (net "Net-(P2-11-Pad1)"
+      (pins P2-11 "P2-11"-1)
+    )
+    (net "Net-(P2-12-Pad1)"
+      (pins P2-12 "P2-12"-1)
+    )
+    (net "Net-(P2-13-Pad1)"
+      (pins P2-13 "P2-13"-1)
+    )
+    (net "Net-(P2-14-Pad1)"
+      (pins P2-14 "P2-14"-1)
+    )
+    (net "Net-(P2-15-Pad1)"
+      (pins P2-15 "P2-15"-1)
+    )
+    (net "Net-(P2-16-Pad1)"
+      (pins P2-16 "P2-16"-1)
+    )
+    (net "Net-(P3-01-Pad1)"
+      (pins P3-1 "P3-01"-1)
+    )
+    (net "Net-(P3-02-Pad1)"
+      (pins P3-2 "P3-02"-1)
+    )
+    (net "Net-(P3-03-Pad1)"
+      (pins P3-3 "P3-03"-1)
+    )
+    (net "Net-(P3-04-Pad1)"
+      (pins P3-4 "P3-04"-1)
+    )
+    (net "Net-(P3-05-Pad1)"
+      (pins P3-5 "P3-05"-1)
+    )
+    (net "Net-(P3-06-Pad1)"
+      (pins P3-6 "P3-06"-1)
+    )
+    (net "Net-(P3-07-Pad1)"
+      (pins P3-7 "P3-07"-1)
+    )
+    (net "Net-(P3-08-Pad1)"
+      (pins P3-8 "P3-08"-1)
+    )
+    (net "Net-(P3-09-Pad1)"
+      (pins P3-9 "P3-09"-1)
+    )
+    (net "Net-(P3-10-Pad1)"
+      (pins P3-10 "P3-10"-1)
+    )
+    (net "Net-(P3-11-Pad1)"
+      (pins P3-11 "P3-11"-1)
+    )
+    (net "Net-(P3-12-Pad1)"
+      (pins P3-12 "P3-12"-1)
+    )
+    (net "Net-(P3-13-Pad1)"
+      (pins P3-13 "P3-13"-1)
+    )
+    (net "Net-(P3-14-Pad1)"
+      (pins P3-14 "P3-14"-1)
+    )
+    (net "Net-(P3-15-Pad1)"
+      (pins P3-15 "P3-15"-1)
+    )
+    (net "Net-(P3-16-Pad1)"
+      (pins P3-16 "P3-16"-1)
+    )
+    (net "Net-(P4-01-Pad1)"
+      (pins P4-1 "P4-01"-1)
+    )
+    (net "Net-(P4-02-Pad1)"
+      (pins P4-2 "P4-02"-1)
+    )
+    (net "Net-(P4-03-Pad1)"
+      (pins P4-3 "P4-03"-1)
+    )
+    (net "Net-(P4-04-Pad1)"
+      (pins P4-4 "P4-04"-1)
+    )
+    (net "Net-(P4-05-Pad1)"
+      (pins P4-5 "P4-05"-1)
+    )
+    (net "Net-(P4-06-Pad1)"
+      (pins P4-6 "P4-06"-1)
+    )
+    (net "Net-(P4-07-Pad1)"
+      (pins P4-7 "P4-07"-1)
+    )
+    (net "Net-(P4-08-Pad1)"
+      (pins P4-8 "P4-08"-1)
+    )
+    (net "Net-(P4-09-Pad1)"
+      (pins P4-9 "P4-09"-1)
+    )
+    (net "Net-(P4-10-Pad1)"
+      (pins P4-10 "P4-10"-1)
+    )
+    (net "Net-(P4-11-Pad1)"
+      (pins P4-11 "P4-11"-1)
+    )
+    (net "Net-(P4-12-Pad1)"
+      (pins P4-12 "P4-12"-1)
+    )
+    (net "Net-(P4-13-Pad1)"
+      (pins P4-13 "P4-13"-1)
+    )
+    (net "Net-(P4-14-Pad1)"
+      (pins P4-14 "P4-14"-1)
+    )
+    (net "Net-(P4-15-Pad1)"
+      (pins P4-15 "P4-15"-1)
+    )
+    (net "Net-(P4-16-Pad1)"
+      (pins P4-16 "P4-16"-1)
+    )
+    (net "Net-(H1-Pad1)"
+      (pins H1-1)
+    )
+    (net "Net-(H2-Pad1)"
+      (pins H2-1)
+    )
+    (net "Net-(H3-Pad1)"
+      (pins H3-1)
+    )
+    (net "Net-(H4-Pad1)"
+      (pins H4-1)
+    )
+    (net "Net-(H5-Pad1)"
+      (pins H5-1)
+    )
+    (net "Net-(H6-Pad1)"
+      (pins H6-1)
+    )
+    (net "Net-(H7-Pad1)"
+      (pins H7-1)
+    )
+    (net "Net-(H8-Pad1)"
+      (pins H8-1)
+    )
+    (net "Net-(H9-Pad1)"
+      (pins H9-1)
+    )
+    (net "Net-(H10-Pad1)"
+      (pins H10-1)
+    )
+    (net "Net-(H11-Pad1)"
+      (pins H11-1)
+    )
+    (net "Net-(H12-Pad1)"
+      (pins H12-1)
+    )
+    (net "Net-(H13-Pad1)"
+      (pins H13-1)
+    )
+    (net "Net-(H14-Pad1)"
+      (pins H14-1)
+    )
+    (net "Net-(H15-Pad1)"
+      (pins H15-1)
+    )
+    (net "Net-(H16-Pad1)"
+      (pins H16-1)
+    )
+    (net "Net-(H17-Pad1)"
+      (pins H17-1)
+    )
+    (net "Net-(H18-Pad1)"
+      (pins H18-1)
+    )
+    (net "Net-(H19-Pad1)"
+      (pins H19-1)
+    )
+    (net "Net-(H20-Pad1)"
+      (pins H20-1)
+    )
+    (net "Net-(H21-Pad1)"
+      (pins H21-1)
+    )
+    (net "Net-(H22-Pad1)"
+      (pins H22-1)
+    )
+    (net "Net-(H23-Pad1)"
+      (pins H23-1)
+    )
+    (net "Net-(H24-Pad1)"
+      (pins H24-1)
+    )
+    (net "Net-(H25-Pad1)"
+      (pins H25-1)
+    )
+    (net "Net-(H26-Pad1)"
+      (pins H26-1)
+    )
+    (class kicad_default "" "Net-(H1-Pad1)" "Net-(H10-Pad1)" "Net-(H11-Pad1)"
+      "Net-(H12-Pad1)" "Net-(H13-Pad1)" "Net-(H14-Pad1)" "Net-(H15-Pad1)"
+      "Net-(H16-Pad1)" "Net-(H17-Pad1)" "Net-(H18-Pad1)" "Net-(H19-Pad1)"
+      "Net-(H2-Pad1)" "Net-(H20-Pad1)" "Net-(H21-Pad1)" "Net-(H22-Pad1)" "Net-(H23-Pad1)"
+      "Net-(H24-Pad1)" "Net-(H25-Pad1)" "Net-(H26-Pad1)" "Net-(H27-Pad1)"
+      "Net-(H28-Pad1)" "Net-(H29-Pad1)" "Net-(H3-Pad1)" "Net-(H30-Pad1)" "Net-(H4-Pad1)"
+      "Net-(H5-Pad1)" "Net-(H6-Pad1)" "Net-(H7-Pad1)" "Net-(H8-Pad1)" "Net-(H9-Pad1)"
+      "Net-(P1-01-Pad1)" "Net-(P1-02-Pad1)" "Net-(P1-03-Pad1)" "Net-(P1-04-Pad1)"
+      "Net-(P1-05-Pad1)" "Net-(P1-06-Pad1)" "Net-(P1-07-Pad1)" "Net-(P1-08-Pad1)"
+      "Net-(P1-09-Pad1)" "Net-(P1-10-Pad1)" "Net-(P1-11-Pad1)" "Net-(P1-12-Pad1)"
+      "Net-(P1-13-Pad1)" "Net-(P1-14-Pad1)" "Net-(P1-15-Pad1)" "Net-(P1-16-Pad1)"
+      "Net-(P2-01-Pad1)" "Net-(P2-02-Pad1)" "Net-(P2-03-Pad1)" "Net-(P2-04-Pad1)"
+      "Net-(P2-05-Pad1)" "Net-(P2-06-Pad1)" "Net-(P2-07-Pad1)" "Net-(P2-08-Pad1)"
+      "Net-(P2-09-Pad1)" "Net-(P2-10-Pad1)" "Net-(P2-11-Pad1)" "Net-(P2-12-Pad1)"
+      "Net-(P2-13-Pad1)" "Net-(P2-14-Pad1)" "Net-(P2-15-Pad1)" "Net-(P2-16-Pad1)"
+      "Net-(P3-01-Pad1)" "Net-(P3-02-Pad1)" "Net-(P3-03-Pad1)" "Net-(P3-04-Pad1)"
+      "Net-(P3-05-Pad1)" "Net-(P3-06-Pad1)" "Net-(P3-07-Pad1)" "Net-(P3-08-Pad1)"
+      "Net-(P3-09-Pad1)" "Net-(P3-10-Pad1)" "Net-(P3-11-Pad1)" "Net-(P3-12-Pad1)"
+      "Net-(P3-13-Pad1)" "Net-(P3-14-Pad1)" "Net-(P3-15-Pad1)" "Net-(P3-16-Pad1)"
+      "Net-(P4-01-Pad1)" "Net-(P4-02-Pad1)" "Net-(P4-03-Pad1)" "Net-(P4-04-Pad1)"
+      "Net-(P4-05-Pad1)" "Net-(P4-06-Pad1)" "Net-(P4-07-Pad1)" "Net-(P4-08-Pad1)"
+      "Net-(P4-09-Pad1)" "Net-(P4-10-Pad1)" "Net-(P4-11-Pad1)" "Net-(P4-12-Pad1)"
+      "Net-(P4-13-Pad1)" "Net-(P4-14-Pad1)" "Net-(P4-15-Pad1)" "Net-(P4-16-Pad1)"
+      (circuit
+        (use_via Via[0-1]_600:400_um)
+      )
+      (rule
+        (width 254)
+        (clearance 254.1)
+      )
+    )
+  )
+  (wiring
+  )
+)
