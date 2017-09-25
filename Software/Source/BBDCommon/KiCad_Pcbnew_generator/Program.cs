@@ -17,13 +17,20 @@ namespace KiCad_Pcbnew_generator
         {
             get
             {
-                return (float)Math.Sqrt((E.X - S.X) * (E.X - S.X) + (E.Y - S.Y) * (E.Y - S.Y));
+                return Edge.Distance(E, S);
             }
         }
+
+        public float W = 0.254f;
 
         public override string ToString()
         {
             return $"({this.S.X} {this.S.Y})->({this.E.X} {this.E.Y}) [{this.L}]";
+        }
+
+        public static float Distance(PointF a, PointF b)
+        {
+            return (float)Math.Sqrt((a.X - b.X) * (a.X - b.X) + (a.Y - b.Y) * (a.Y - b.Y));
         }
     }
 
@@ -141,7 +148,7 @@ namespace KiCad_Pcbnew_generator
                     }
 
                     // Spiral antenna
-                    if ((x >= 4) && (x <= 6))
+                    if ((x >= 4) && (x <= 6) && (y <= 3))
                     {
                         float radius = 1.5f;
                         float alfa = (7.0f / 8.0f) * (2 * (float)Math.PI);
@@ -169,19 +176,121 @@ namespace KiCad_Pcbnew_generator
                         sb.AppendLine();
                     }
 
+                    // Exponential gap
+                    if ((x >= 4) && (x <= 6) && (y >= 4))
+                    {
+                        float scale = 0.9f;
+                        float minX = centerX - sizeX * scale / 2;
+                        float maxX = centerX + sizeX * scale / 2;
+                        float minY = centerY - sizeY * scale / 2;
+                        float maxY = centerY + sizeY * scale / 2;
+                        float lastXLeft = minX;
+                        float lastXRight = maxX;
+
+                        List <Edge> edges = new List<Edge>();
+                        for (float coorY = minY; coorY <= maxY; coorY += 0.254f)
+                        {
+                            float valueX = ((float)Math.Log(coorY - minY + 1.0f, sizeY + 1.0f)) * (sizeX / 2) / 2;
+                            float valueW = valueX * 2.0f;
+
+                            //edges.Add(new Edge() { S = new PointF(lastXLeft, coorY), E = new PointF(minX + valueX, coorY + 0.254f), W = valueW });
+                            //edges.Add(new Edge() { S = new PointF(lastXRight, coorY), E = new PointF(maxX - valueX, coorY + 0.254f), W = valueW });
+                            edges.Add(new Edge() { S = new PointF(minX, coorY), E = new PointF(minX + valueX * 2.0f, coorY) });
+                            edges.Add(new Edge() { S = new PointF(maxX, coorY), E = new PointF(maxX - valueX * 2.0f, coorY) });
+
+                            lastXLeft = minX + valueX;
+                            lastXRight = maxX - valueX;
+                        }
+
+                        edges = CenterFormation(edges.ToArray(), centerX, centerY).ToList();
+
+                        foreach (Edge e in edges)
+                        {
+                            sb.AppendLine(NewSegment(e));
+                        }                        
+                        sb.AppendLine();
+                    }
+
                     // Fractal antenna (Sierpinski carpet)
-                    if ((x >= 7) && (x <= 9) && (y <= 3))
+                    if ((x >= 7) && (x <= 9) && (y >= 4))
                     {
 
                     }
 
+                    // Fractal antenna (grid)
+                    if ((x >= 7) && (x <= 9) && (y <= 3))
+                    {
+                        float minDistance = 0.5f;
+                        float distanceStep = 0.45f;
+
+                        float scale = 0.93333333333333333333333f;
+                        float minX = centerX - sizeX * scale / 2;
+                        float maxX = centerX + sizeX * scale / 2;
+                        float minY = centerY - sizeY * scale / 2;
+                        float maxY = centerY + sizeY * scale / 2;
+
+                        PointF startPoint = new PointF(0, minY);
+                        PointF endPoint = new PointF(0, maxY);
+                        float distance = minDistance;
+                        int lineCount = 0;
+
+                        List<Edge> edges = new List<Edge>();
+                        for (float coorX = minX; coorX <= maxX;)
+                        {
+                            startPoint.X = coorX;
+                            endPoint.X = coorX;
+
+                            edges.Add(new Edge() { S = new PointF(startPoint.X, startPoint.Y), E = new PointF(endPoint.X, endPoint.Y) });
+
+                            lineCount += (coorX < centerX ? 1 : -1);
+                            if (lineCount == 0) break;
+
+                            coorX += distance;
+                            distance += (coorX < centerX ? distanceStep : -distanceStep);
+                        }
+
+                        edges = CenterFormation(edges.ToArray(), centerX, centerY).ToList();
+
+                        foreach (Edge e in edges)
+                        {
+                            sb.AppendLine(NewSegment(e));
+                        }
+
+                        startPoint = new PointF(minX, 0);
+                        endPoint = new PointF(maxX, 0);
+                        edges.Clear();
+                        for (float coorY = minY; coorY <= maxY;)
+                        {
+                            startPoint.Y = coorY;
+                            endPoint.Y = coorY;
+
+                            edges.Add(new Edge() { S = new PointF(startPoint.X, startPoint.Y), E = new PointF(endPoint.X, endPoint.Y) });
+
+                            lineCount += (coorY < centerY ? 1 : -1);
+                            if (lineCount == 0) break;
+
+                            coorY += distance;
+                            distance += (coorY < centerY ? distanceStep : -distanceStep);
+                        }
+
+                        edges = CenterFormation(edges.ToArray(), centerX, centerY).ToList();
+
+                        foreach (Edge e in edges)
+                        {
+                            sb.AppendLine(NewSegment(e));
+                        }
+                        sb.AppendLine(NewSegment(new PointF(centerX - 1.0f, centerY + 0.5f), new PointF(centerX + 1.0f, centerY - 0.5f)));
+
+                        sb.AppendLine();
+                    }
+
                     // Fractal antenna (Koch snowflake)
-                    if ((x >= 7) && (x <= 9) && (y >= 1))
-                    //if ((x == 7) && (x <= 9) && (y == 4))
+                    if ((x >= 7) && (x <= 9) && (y >= 4))
                     {
                         float sideLength = Math.Min(sizeX, sizeY) * 0.80f;
                         float minimumSideLength = 0.5f;
                         List<Edge> edges = new List<Edge>();
+                        List<Edge[]> formations = new List<Edge[]>();
 
                         while (sideLength > 5.0)
                         {
@@ -204,11 +313,25 @@ namespace KiCad_Pcbnew_generator
 
                             foreach (Edge e in edges)
                             {
-                                sb.AppendLine($"  (segment (start {e.S.X} {e.S.Y}) (end {e.E.X} {e.E.Y}) (width 0.254) (layer F.Cu) (net 1))");
+                                sb.AppendLine(NewSegment(e));
                             }
-
                             sb.AppendLine();
+                            formations.Add(edges.ToArray());
+                        }
 
+                        PointF pointA = new PointF(centerX - 1.0f, centerY + 0.5f);
+                        PointF pointB = new PointF(centerX + 1.0f, centerY - 0.5f);
+
+                        for (int i = formations.Count - 1; i >= 0; i--)
+                        {
+                            PointF closestToA = FindClosestPointInFormation(formations[i], pointA);
+                            sb.AppendLine(NewSegment(pointA, closestToA));
+
+                            PointF closestToB = FindClosestPointInFormation(formations[i], pointB);
+                            sb.AppendLine(NewSegment(pointB, closestToB));
+
+                            pointA = closestToA;
+                            pointB = closestToB;
                         }
                     }
                 }
@@ -218,6 +341,41 @@ namespace KiCad_Pcbnew_generator
 
             Console.WriteLine(sb.ToString());
             Console.ReadKey();
+        }
+
+        private static string NewSegment(Edge e)
+        {
+            return $"  (segment (start {e.S.X} {e.S.Y}) (end {e.E.X} {e.E.Y}) (width {e.W.ToString("0.000")}) (layer F.Cu))";
+        }
+
+        private static string NewSegment(PointF s, PointF e)
+        {
+            return NewSegment(new Edge() { S = s, E = e });
+        }
+
+        private static PointF FindClosestPointInFormation(Edge[] edges, PointF point)
+        {
+            float minDistance = float.MaxValue;
+            PointF result = new PointF();
+
+            foreach (Edge edge in edges)
+            {
+                float distance = Edge.Distance(edge.S, point);
+                if (distance < minDistance)
+                {
+                    minDistance = distance;
+                    result = edge.S;
+                }
+
+                distance = Edge.Distance(edge.E, point);
+                if (distance < minDistance)
+                {
+                    minDistance = distance;
+                    result = edge.E;
+                }
+            }
+
+            return result;
         }
 
         private static Edge[] CenterFormation(Edge[] edges, float centerX, float centerY)
@@ -250,7 +408,7 @@ namespace KiCad_Pcbnew_generator
 
             foreach (Edge edge in edges)
             {
-                result.Add(new Edge() { S = new PointF(edge.S.X + shiftX, edge.S.Y + shiftY), E = new PointF(edge.E.X + shiftX, edge.E.Y + shiftY) });
+                result.Add(new Edge() { S = new PointF(edge.S.X + shiftX, edge.S.Y + shiftY), E = new PointF(edge.E.X + shiftX, edge.E.Y + shiftY), W = edge.W });
             }
 
             return result.ToArray();
