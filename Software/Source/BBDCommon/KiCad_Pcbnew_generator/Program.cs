@@ -77,7 +77,7 @@ namespace KiCad_Pcbnew_generator
                     if ((x % 3 == 2) && (y % 3 == 2)) continue;
 
                     // Square antenna          
-                    if ((x >= 1) && (x <= 3))
+                    if ((x >= 1) && (x <= 3) && (y <= 3))
                     {
                         sb.AppendLine($"  (segment (start {cornerX + 9.5} {cornerY + 8}) (end {cornerX + 9.5} {cornerY + 9}) (width 0.254) (layer F.Cu) (net 1))");
                         sb.AppendLine($"  (segment (start {cornerX + 11.5} {cornerY + 3.5}) (end {cornerX + 11.5} {cornerY + 11}) (width 0.254) (layer F.Cu) (net 1) (tstamp 59C50B4D))");
@@ -144,6 +144,41 @@ namespace KiCad_Pcbnew_generator
                         sb.AppendLine($"  (segment (start {cornerX + 3} {cornerY + 12}) (end {cornerX + 12.5} {cornerY + 12}) (width 0.254) (layer F.Cu) (net 1) (tstamp 59C50B66))");
                         sb.AppendLine($"  (segment (start {cornerX + 13.5} {cornerY + 1.5}) (end {cornerX + 1} {cornerY + 1.5}) (width 0.254) (layer F.Cu) (net 1))");
                         sb.AppendLine($"  (segment (start {cornerX + 11.5} {cornerY + 3.5}) (end {cornerX + 11.5} {cornerY + 3.5}) (width 0.254) (layer F.Cu) (net 1) (tstamp 59C50B4E))");
+                        sb.AppendLine();
+                    }
+
+                    // Comb antenna
+                    if ((x >= 1) && (x <= 3) && (y >= 4))
+                    {
+                        float scale = 0.9f;
+                        float minX = centerX - sizeX * scale / 2;
+                        float maxX = centerX + sizeX * scale / 2;
+                        float minY = centerY - sizeY * scale / 2;
+                        float maxY = centerY + sizeY * scale / 2;
+                        bool oddEven = false;
+
+                        List<Edge> edges = new List<Edge>();
+                        edges.Add(new Edge() { S = new PointF(minX, minY), E = new PointF(minX, maxY) });
+                        edges.Add(new Edge() { S = new PointF(maxX, minY), E = new PointF(maxX, maxY) });
+
+                        for (float coorY = minY; coorY <= maxY; coorY += 0.254f * 2)
+                        {
+                            oddEven = !oddEven;
+                            if (oddEven)
+                            {
+                                edges.Add(new Edge() { S = new PointF(minX, coorY), E = new PointF(maxX - 0.254f * 2.0f, coorY) });
+                            } else
+                            {
+                                edges.Add(new Edge() { S = new PointF(minX + 0.254f * 2.0f, coorY), E = new PointF(maxX, coorY) });
+                            }
+                        }
+
+                        edges = CenterFormation(edges.ToArray(), centerX, centerY).ToList();
+
+                        foreach (Edge e in edges)
+                        {
+                            sb.AppendLine(NewSegment(e));
+                        }
                         sb.AppendLine();
                     }
 
