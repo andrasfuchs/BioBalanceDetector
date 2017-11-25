@@ -1,0 +1,53 @@
+<UserSettings>
+  <ApplicationIdentity version="14.0"/>
+  <ToolsOptions>
+    <ToolsOptionsCategory name="Environment" RegisteredName="Environment"/>
+  </ToolsOptions>
+  <Category name="Environment_Group" RegisteredName="Environment_Group">
+    <Category name="Environment_KeyBindings" Category="{F09035F1-80D2-4312-8EC4-4D354A4BCB4C}" Package="{DA9FB551-C724-11d0-AE1F-00A0C90FFFC3}" RegisteredName="Environment_KeyBindings" PackageName="Visual Studio Environment Package">
+      <Version>14.0.0.0</Version>
+      <KeyboardShortcuts>
+        <ScopeDefinitions>
+          <Scope Name="XML (Text) Editor" ID="{FA3CD31E-987B-443A-9B81-186104E8DAC1}"/>
+          <Scope Name="AtZipEditor" ID="{0A291321-7A85-424E-A5FA-5296B52461B5}"/>
+          <Scope Name="Text Editor" ID="{8B382828-6202-11D1-8870-0000F87579D2}"/>
+          <Scope Name="Solution Explorer" ID="{3AE79031-E1BC-11D0-8F78-00A0C9110057}"/>
+          <Scope Name="{B2C40B32-3A37-4CA9-97B9-FA44248B69FF}" ID="{B2C40B32-3A37-4CA9-97B9-FA44248B69FF}"/>
+          <Scope Name="WebBrowser" ID="{E8B06F41-6D01-11D2-AA7D-00C04F990343}"/>
+          <Scope Name="DataSet Editor" ID="{B334A759-F450-40A5-BE2A-65937BCD5415}"/>
+          <Scope Name="XAML Designer" ID="{E9B8485C-1217-4277-9ED6-C825A5AC1968}"/>
+          <Scope Name="{B968E165-98E0-41F0-8FBE-A8ED1D246A90}" ID="{B968E165-98E0-41F0-8FBE-A8ED1D246A90}"/>
+          <Scope Name="XAML Editor" ID="{A4F9FF65-A78C-4650-866D-5069CC4127CF}"/>
+          <Scope Name="Global" ID="{5EFC7975-14BC-11CF-9B2B-00AA00573819}"/>
+          <Scope Name="{CFF78A9B-78A3-45A3-9142-0267AFC261FA}" ID="{CFF78A9B-78A3-45A3-9142-0267AFC261FA}"/>
+          <Scope Name="Settings Designer" ID="{515231AD-C9DC-4AA3-808F-E1B65E72081C}"/>
+          <Scope Name="Windows Forms Designer" ID="{BA09E2AF-9DF2-4068-B2F0-4C7E5CC19E2F}"/>
+          <Scope Name="Managed Resources Editor" ID="{FEA4DCC9-3645-44CD-92E7-84B55A16465C}"/>
+          <Scope Name="Difference Viewer" ID="{79D52DDF-52BC-43F1-9663-B3E85CDCA912}"/>
+          <Scope Name="{4194FEE5-6777-419F-A5FC-47A536DF1BDB}" ID="{4194FEE5-6777-419F-A5FC-47A536DF1BDB}"/>
+          <Scope Name="{CB3FCFEA-03DF-11D1-81D2-00A0C91BBEE3}" ID="{CB3FCFEA-03DF-11D1-81D2-00A0C91BBEE3}"/>
+          <Scope Name="{CB3FCFEB-03DF-11D1-81D2-00A0C91BBEE3}" ID="{CB3FCFEB-03DF-11D1-81D2-00A0C91BBEE3}"/>
+        </ScopeDefinitions>
+        <DefaultShortcuts/>
+        <ShortcutsScheme>AtmelStudio</ShortcutsScheme>
+        <UserShortcuts>
+          <Shortcut Command="Debug.StartDebuggingandBreak" Scope="Global">Alt+F5</Shortcut>
+          <Shortcut Command="Debug.StartWithoutDebugging" Scope="Global">Ctrl+F5</Shortcut>
+          <RemoveShortcut Command="Debug.StartWithoutDebugging" Scope="Global">Ctrl+Alt+F5</RemoveShortcut>
+          <Shortcut Command="Edit.CollapsetoDefinitions" Scope="Text Editor">Ctrl+M, O</Shortcut>
+          <Shortcut Command="Edit.ToggleOutliningExpansion" Scope="Text Editor">Ctrl+M, M</Shortcut>
+          <RemoveShortcut Command="EditorContextMenus.CodeWindow.GotoImplementation" Scope="Global">Alt+G</RemoveShortcut>
+          <RemoveShortcut Command="Edit.GoToDeclaration" Scope="Global">Ctrl+Alt+F12</RemoveShortcut>
+          <Shortcut Command="EditorContextMenus.CodeWindow.GotoImplementation" Scope="Text Editor">Ctrl+F12</Shortcut>
+          <RemoveShortcut Command="Debug.StopDebugging" Scope="Global">Ctrl+Shift+F5</RemoveShortcut>
+          <Shortcut Command="Debug.StopDebugging" Scope="Global">Shift+F5</Shortcut>
+          <Shortcut Command="Edit.FindAllReferences" Scope="Global">Ctrl+K, R</Shortcut>
+          <Shortcut Command="Edit.FindAllReferences" Scope="Global">Ctrl+K, Ctrl+R</Shortcut>
+          <Shortcut Command="Edit.FindAllReferences" Scope="Global">Shift+F12</Shortcut>
+        </UserShortcuts>
+      </KeyboardShortcuts>
+    </Category>
+  </Category>
+  <Category name="Environment_Group" RegisteredName="Environment_Group"/>
+  <Category name="Environment_Group" RegisteredName="Environment_Group"/>
+</UserSettings>

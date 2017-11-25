@@ -1,0 +1,2 @@
+Copy the AtmelStudio.vsk to c:\Program Files (x86)\Atmel\Studio\7.0\ and import the AtmelStudio7CSharpKeyboard.vssettings.
+
