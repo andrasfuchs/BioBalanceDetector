@@ -17,7 +17,8 @@ namespace BBDDriver.Models.Source
     {
         // warning: interface guid changes when the driver is regenerated (by zadig)
         // the new DeviceGUID can be found in the .inf file in the 'C:\Users\{username}\usb_driver' folder.
-        private const string DEVICE_INTERFACE_GUID = "{ABA7BA71-CA9E-428F-813C-0B97D8205E31}";
+        //private const string DEVICE_INTERFACE_GUID = "{ABA7BA71-CA9E-428F-813C-0B97D8205E31}"; // Sheldon
+        private const string DEVICE_INTERFACE_GUID = "{1E04662A-6FF7-4864-B7B7-8BBA6658585F}"; // Mr. Pepper
         private const int DEVICE_VID = 0x03EB;
         private const int DEVICE_PID = 0x2405;
         private const string DEVICE_DESC = "Mercury-16";
@@ -138,6 +139,12 @@ namespace BBDDriver.Models.Source
             public UInt32 USARTSpeed;
 
             [MarshalAs(UnmanagedType.U1)]
+            public bool GoertzelEnabled;
+
+            [MarshalAs(UnmanagedType.R4)]
+            public float GoertzelFrequency;
+
+            [MarshalAs(UnmanagedType.U1)]
             public byte ADCValueBits;
 
             [MarshalAs(UnmanagedType.U4)]
@@ -148,6 +155,12 @@ namespace BBDDriver.Models.Source
 
             [MarshalAs(UnmanagedType.U1)]
             public bool ADCValuePacketToUSART;
+
+            [MarshalAs(UnmanagedType.U1)]
+            public bool GoertzelPacketToUSB;
+
+            [MarshalAs(UnmanagedType.U1)]
+            public bool GoertzelPacketToUSART;
         }
 
         public BBDMercury16Input(USBDeviceInfo selectedDevice = null) : base(8000, 8)
