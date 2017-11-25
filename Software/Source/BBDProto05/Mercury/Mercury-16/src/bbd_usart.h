@@ -17,6 +17,10 @@ uint8_t usart_destination[USART_BUFFER_SIZE];
 
 int usart_interrupt_counter;
 bool usart_error;
+bool usart_data_was_requested_by_organizer;
+
+static GetSettings_t getslavesettings;
+//static CellSettings_t[256] slaves;
 
 
 void usart_init(CellSettings_t settings);
@@ -24,5 +28,7 @@ void usart_send_receive_data_serial(void);
 
 void dma_usart_out_init(void);
 void dma_usart_in_init(void);
+
+void usart_get_all_slaves(void);
 
 #endif /* BBD_USART_H_ */

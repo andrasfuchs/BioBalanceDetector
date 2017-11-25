@@ -8,7 +8,7 @@ static uint8_t menu_animation;
 void lcd_init(void)
 {
 	menu_index = 0;
-	menu_number = 8;
+	menu_number = 9;
 
 	///* Initialize ST7565R controller and LCD display */
 	gfx_mono_init();
@@ -65,10 +65,10 @@ void lcd_change_menu(uint8_t menu_index)
 		convert_to_hex(&text_buffer[22], settings.device_serial, 8);
 		gfx_mono_draw_string(&text_buffer[22-8], 5*6, 20, &sysfont);
 
-		convert_to_decimal(&text_buffer[22], settings.clk_sys / 1000 / 1000, 2);
+		convert_to_decimal(&text_buffer[22], settings.clk_sys / 1000 / 1000, 2, true);
 		gfx_mono_draw_string(&text_buffer[22-2], 14*6, 10, &sysfont);
 
-		convert_to_decimal(&text_buffer[22], settings.test_mode, 1);
+		convert_to_decimal(&text_buffer[22], settings.test_mode, 1, true);
 		gfx_mono_draw_string(&text_buffer[22-1], 20*6, 20, &sysfont);
 	}
 
@@ -96,16 +96,16 @@ void lcd_change_menu(uint8_t menu_index)
 				gfx_mono_draw_string("A+B:off", 4*6, 10, &sysfont);
 			}
 
-			convert_to_decimal(&text_buffer[22], settings.clk_adc / 1000, 4);
+			convert_to_decimal(&text_buffer[22], settings.clk_adc / 1000, 4, true);
 			gfx_mono_draw_string(&text_buffer[22-4], 14*6, 10, &sysfont);
 
-			convert_to_decimal(&text_buffer[22], settings.channel_count, 1);
+			convert_to_decimal(&text_buffer[22], settings.channel_count, 1, true);
 			gfx_mono_draw_string(&text_buffer[22-1], 0*6, 20, &sysfont);
 
-			convert_to_decimal(&text_buffer[22], settings.sample_rate / 1000, 3);
+			convert_to_decimal(&text_buffer[22], settings.sample_rate / 1000, 3, true);
 			gfx_mono_draw_string(&text_buffer[22-3], 4*6, 20, &sysfont);
 
-			convert_to_decimal(&text_buffer[22], settings.adc_bits, 2);
+			convert_to_decimal(&text_buffer[22], settings.adc_bits, 2, true);
 			gfx_mono_draw_string(&text_buffer[22-2], 9*6, 20, &sysfont);
 
 			if (settings.adc_ref == (uint8_t)ADC_REFSEL_INT1V_gc)
@@ -123,7 +123,7 @@ void lcd_change_menu(uint8_t menu_index)
 				gfx_mono_draw_string("Ref", 15*6, 20, &sysfont);
 			}	
 
-			convert_to_decimal(&text_buffer[22], settings.adc_gain, 1);
+			convert_to_decimal(&text_buffer[22], settings.adc_gain, 1, true);
 			gfx_mono_draw_string(&text_buffer[22-1], 20*6, 20, &sysfont);
 		} else 
 		{
@@ -153,7 +153,7 @@ void lcd_change_menu(uint8_t menu_index)
 			gfx_mono_draw_string("USB  enabled   ?? Mhz\0", 0, 10, &sysfont);
 			gfx_mono_draw_string("#0x?? Tx00000 Rx00000\0", 0, 20, &sysfont);
 
-			convert_to_decimal(&text_buffer[22], settings.usb_speed / 1000 / 1000, 2);
+			convert_to_decimal(&text_buffer[22], settings.usb_speed / 1000 / 1000, 2, true);
 			gfx_mono_draw_string(&text_buffer[22-2], 15*6, 10, &sysfont);
 
 			convert_to_hex(&text_buffer[22], settings.usb_address, 2);
@@ -210,7 +210,7 @@ void lcd_change_menu(uint8_t menu_index)
 
 			gfx_mono_draw_string("@????????? BAUD      ", 0, 20, &sysfont);
 
-			convert_to_decimal(&text_buffer[22], settings.usart_speed, 9);
+			convert_to_decimal(&text_buffer[22], settings.usart_speed, 9, true);
 			gfx_mono_draw_string(&text_buffer[22-9], 1*6, 20, &sysfont);
 		}
 		else
@@ -230,6 +230,20 @@ void lcd_change_menu(uint8_t menu_index)
 		else
 		{
 			gfx_mono_draw_string("USART is disabled (2)", 0, 10, &sysfont);
+			gfx_mono_draw_string("                     ", 0, 20, &sysfont);
+		}
+	}
+
+	if (menu_index == 8)
+	{
+		if (settings.usart_enabled)
+		{
+			gfx_mono_draw_string("Goertzel @ 100'000.00", 0, 10, &sysfont);
+			gfx_mono_draw_string("100'000.00 100'000.00", 0, 20, &sysfont);
+		}
+		else
+		{
+			gfx_mono_draw_string("Goertzel is disabled ", 0, 10, &sysfont);
 			gfx_mono_draw_string("                     ", 0, 20, &sysfont);
 		}
 	}
@@ -264,9 +278,9 @@ void lcd_update_menu(uint8_t menu_index)
 	{
 		if (settings.usb_enabled)
 		{
-			convert_to_decimal(&text_buffer[22], usb_tx_counter, 5);
+			convert_to_decimal(&text_buffer[22], usb_tx_counter, 5, true);
 			gfx_mono_draw_string(&text_buffer[22-5], 8*6, 20, &sysfont);
-			convert_to_decimal(&text_buffer[22], usb_rx_counter, 5);
+			convert_to_decimal(&text_buffer[22], usb_rx_counter, 5, true);
 			gfx_mono_draw_string(&text_buffer[22-5], 16*6, 20, &sysfont);
 		}
 	}
@@ -275,29 +289,26 @@ void lcd_update_menu(uint8_t menu_index)
 	{
 		if (settings.usart_enabled)
 		{
-			convert_to_decimal(&text_buffer[22], usart_tx_counter, 5);
+			convert_to_decimal(&text_buffer[22], usart_tx_counter, 5, true);
 			gfx_mono_draw_string(&text_buffer[22-5], 8*6, 10, &sysfont);
-			convert_to_decimal(&text_buffer[22], usart_rx_counter, 5);
+			convert_to_decimal(&text_buffer[22], usart_rx_counter, 5, true);
 			gfx_mono_draw_string(&text_buffer[22-5], 16*6, 10, &sysfont);
 		}
 	}
 
 	if (menu_index == 8)
 	{
-		/*
-		if (settings.usart_mode == 2)
+		if (settings.goertzel_enabled)
 		{
-			convert_to_hex(&char_ascii_buf[4], usart_source[0]);
-		}
-		if ((settings.usart_mode == 1) || (settings.usart_mode == 3))
-		{
-			convert_to_hex(&char_ascii_buf[4], usart_destination[0]);
-		}
+			// display Goertzel frequencies
+			int strl = convert_to_float(&text_buffer[22], settings.goertzel_frequency_01, 6, 2, true);
+			gfx_mono_draw_string(&text_buffer[22-strl], 11*6, 10, &sysfont);
+		
+			strl = convert_to_float(&text_buffer[22], settings.goertzel_frequency_02, 6, 2, true);
+			gfx_mono_draw_string(&text_buffer[22-strl], 0*6, 20, &sysfont);
 
-		usart_error = (usart_destination[1] != usart_destination[0] + 1);
-		if (usart_error) char_ascii_buf[0] = '!'; else char_ascii_buf[0] = '0';
-		gfx_mono_draw_string(char_ascii_buf, 102, 10, &sysfont);
-		*/
+			strl = convert_to_float(&text_buffer[22], settings.goertzel_frequency_03, 6, 2, true);
+			gfx_mono_draw_string(&text_buffer[22-strl], 11*6, 20, &sysfont);
+		}
 	}
 }
-

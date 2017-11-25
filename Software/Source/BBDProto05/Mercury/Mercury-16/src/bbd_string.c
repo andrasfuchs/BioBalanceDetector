@@ -31,13 +31,17 @@ void convert_to_hex(char *buf_index, uint64_t dec_val, uint8_t digit_number)
 	}
 }
 
-void convert_to_decimal(char *buf_index, uint64_t dec_val, uint8_t digit_number)
+uint8_t convert_to_decimal(char *buf_index, uint64_t dec_val, uint8_t digit_number, bool trailing_zero)
 {
+	uint8_t result = 0;
 	uint8_t digit_count = 0;
 
-	// set the ending to 0
-	*buf_index = 0;
-	buf_index--;
+	if (trailing_zero)
+	{		
+		// set the ending to 0
+		*buf_index = 0;
+		buf_index--;
+	}
 
 	/* Loop through all digits to convert to ASCII */
 	for (digit_count = 0; digit_count < digit_number; digit_count++) 
@@ -53,7 +57,7 @@ void convert_to_decimal(char *buf_index, uint64_t dec_val, uint8_t digit_number)
 		 }
 		 else
 		 {
-			*buf_index = 32;
+			*buf_index = ' '; // space
 		 }
 
 		/* Remove extracted digit by doing divide with 10 */
@@ -64,5 +68,54 @@ void convert_to_decimal(char *buf_index, uint64_t dec_val, uint8_t digit_number)
 		 * right most digit and move backwards for extracting each digit
 		 */
 		buf_index--;
+		result++;
+		
+		if ((digit_count > 0) && (digit_count % 3 == 0))
+		{
+			*buf_index = (dec_val > 0 ? '\'' : ' ');
+			buf_index--;
+			result++;			
+		}
 	}
+	
+	return result;
+}
+
+uint8_t convert_to_float(char *buf_index, float float_val, uint8_t integer_digit_number, uint8_t franctional_digit_number, bool trailing_zero)
+{
+	uint8_t result = 0;
+	uint8_t digit_count = 0;
+
+	if (trailing_zero)
+	{		
+		// set the ending to 0
+		*buf_index = 0;
+		buf_index--;
+	}
+	
+	for (digit_count = 0; digit_count < franctional_digit_number; digit_count++)
+	{
+		float_val *= 10;
+	}
+	
+	uint64_t dec_val = float_val;
+	
+	/* Loop through all fractional digits to convert to ASCII */
+	for (digit_count = 0; digit_count < franctional_digit_number; digit_count++)
+	{
+		*buf_index = (dec_val % 10) + 48;
+
+		dec_val = (dec_val / 10);
+
+		buf_index--;
+		result++;
+	}
+
+	*buf_index = '.';
+	buf_index--;
+	result++;
+
+	result += convert_to_decimal(buf_index, dec_val, integer_digit_number, false);
+	
+	return result;
 }

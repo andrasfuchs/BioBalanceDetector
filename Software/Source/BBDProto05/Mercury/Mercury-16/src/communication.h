@@ -15,6 +15,14 @@
 #define ADC_RESULT_BUFFER_SIZE 384
 
 
+typedef struct GetSettings_struct
+{
+	// 0xF003
+	uint16_t choice;
+
+	uint16_t length;
+} GetSettings_t;
+
 typedef struct HeartBeat_struct
 {
 	// 0xF005
@@ -105,15 +113,31 @@ typedef struct CellSettings_struct
 	// USART speed in bits per second
 	uint32_t usart_speed;
 
+	// is Goertzel algorithm enabled
+	bool goertzel_enabled;
+	
+	// Goertzel frequencies
+	float goertzel_frequency_01;
+	float goertzel_frequency_02;
+	float goertzel_frequency_03;
+
 	// 8 or 12 bit resolution
 	uint8_t adc_value_bits;
 
 	// how big the bulk packets are
 	uint32_t adc_value_count_per_packet;
 
+	// should we send the ADC values to the USB
 	bool adc_value_packet_to_usb;
 	
+	// should we send the ADC values to the USART
 	bool adc_value_packet_to_usart;
+	
+	// should we send the Goertzel values to the USB
+	bool goertzel_packet_to_usb;
+	
+	// should we send the Goertzel values to the USART
+	bool goertzel_packet_to_usart;
 } CellSettings_t;
 
 typedef struct ADCResults_struct
@@ -127,6 +151,24 @@ typedef struct ADCResults_struct
 
 	uint16_t adc_values[8 * ADC_RESULT_BUFFER_SIZE];
 } ADCResults_t;
+
+typedef struct GoertzelResults_struct
+{
+	// 0xF007
+	uint16_t choice;
+
+	uint16_t length;
+
+	uint32_t device_serial;
+
+    // Goertzel frequencies
+	float goertzel_frequency_01;
+	float goertzel_frequency_02;
+	float goertzel_frequency_03;
+
+	// Goertzel values for 8 channels, grouped by the frequency first (GF01CH01, GF01CH02, GF01CH03 ... GF01CH08, GF02CH01 etc.)
+	float goertzel_values[8 * 3];
+} GoertzelResults_t;
 
 
 #endif /* COMMUNICATION_H_ */

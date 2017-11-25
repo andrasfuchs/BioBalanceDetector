@@ -26,6 +26,7 @@ static HeartBeat_t heartbeat_received;
 
 struct dac_config dac_conf;
 
+
 void adc_send_data(uint8_t* results, size_t size)
 {
 	// send data to USB
@@ -35,7 +36,7 @@ void adc_send_data(uint8_t* results, size_t size)
 	}
 
 	// send data to USART
-	if (settings.adc_value_packet_to_usart)
+	if ((settings.adc_value_packet_to_usart) && (usart_data_was_requested_by_organizer))
 	{
 		usart_serial_write_packet(USART_SERIAL, results, size);
 	}	
@@ -138,6 +139,9 @@ int main( void )
 	heartbeat.choice = 0xF005;
 	heartbeat.length = sizeof(heartbeat) - 4;
 
+	getslavesettings.choice = 0xF003;
+	getslavesettings.length = sizeof(getslavesettings) - 4;
+
 	settings_load_default();
 
 	lcd_init();
@@ -159,19 +163,19 @@ int main( void )
 
 	if (settings.usart_enabled)
 	{
-		lcd_show_message("Initializing USART...\0");
+		//lcd_show_message("Initializing USART...\0");
 
 		usart_init(settings);
-		delay_ms(200);
-
-
-		lcd_show_message("Initializing DMA...  \0");
-
-		// DMA setup for USART to RAM transfer
-		dma_enable();
-		dma_usart_out_init();
-		dma_usart_in_init();
-		delay_ms(200);
+		//delay_ms(200);
+//
+//
+		//lcd_show_message("Initializing DMA...  \0");
+//
+		//// DMA setup for USART to RAM transfer
+		//dma_enable();
+		//dma_usart_out_init();
+		//dma_usart_in_init();
+		//delay_ms(200);
 	}
 
 	if (settings.dac_enabled)
@@ -274,7 +278,6 @@ int main( void )
 			}
 		}
 
-		usart_send_receive_data_serial();
 		//usart_send_receive_data_dma();
 	}
 }

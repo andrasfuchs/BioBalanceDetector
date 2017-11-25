@@ -192,6 +192,8 @@
     </com_atmel_avrdbg_tool_atmelice>
     <avrtoolinterface>JTAG</avrtoolinterface>
     <avrtoolinterfaceclock>7500000</avrtoolinterfaceclock>
+    <ResetRule>0</ResetRule>
+    <EraseKey />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <ToolchainSettings>
@@ -606,6 +608,12 @@
     <None Include="src\ASF\xmega\drivers\wdt\wdt.h">
       <SubType>compile</SubType>
     </None>
+    <Compile Include="src\bbd_goertzel.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\bbd_goertzel.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="src\bbd_lcd.c">
       <SubType>compile</SubType>
     </Compile>

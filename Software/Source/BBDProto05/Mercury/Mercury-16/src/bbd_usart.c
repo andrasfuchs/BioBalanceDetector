@@ -67,7 +67,20 @@ ISR(USARTC0_RXC_vect)
 	{
 		usart_interrupt_counter = (usart_interrupt_counter+1) % USART_BUFFER_SIZE;
 		usart_rx_counter += 1;
+
+		// TODO: process USART data here
+		if ((usart_destination[usart_interrupt_counter-2] == 0xF0) && (usart_destination[usart_interrupt_counter-2] == 0x03))
+		{
+			// settings request from the master
+			usart_serial_write_packet(USART_SERIAL, (uint8_t*)&settings, sizeof(settings));
+		}
 	}
+}
+
+
+ISR(USARTC0_TXC_vect)
+{
+	usart_tx_counter += 1;
 }
 
 void usart_heartbeat_sent(enum dma_channel_status status)
@@ -166,7 +179,7 @@ void usart_init(CellSettings_t settings)
 	usart_options.baudrate = settings.usart_speed;
 
 	sysclk_enable_module(SYSCLK_PORT_C, PR_USART0_bm);
-	usart_serial_init(USART_SERIAL, &usart_options);
+	bool success = usart_serial_init(USART_SERIAL, &usart_options);
 
 	if (settings.usart_mode == 1)
 	{
@@ -250,5 +263,15 @@ void usart_send_receive_data_serial(void)
 
 			usart_tx_counter++;
 		}
+	}
+}
+
+void usart_get_all_slaves(void) 
+{
+	for (int i=0; i<256; i++)
+	{
+		usart_send_mpcm_data(USART_SERIAL, i, true);
+		usart_serial_write_packet(USART_SERIAL, (uint8_t*)&getslavesettings, sizeof(getslavesettings));
+		//usart_serial_read_packet(USART_SERIAL, (uint8_t*)&slaves[i], sizeof(slaves[i]));
 	}
 }
