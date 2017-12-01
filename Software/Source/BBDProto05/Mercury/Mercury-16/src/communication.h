@@ -11,10 +11,11 @@
 
 #include <compiler.h>
 
+#define MAX_CHANNELS_PER_PACKET 8
 /* Number of samples stored in memory before sending it to the organizer (note: must be dividable by the number of channels (8)) */
-//#define MAX_ADC_VALUES_BUFFER_SIZE 384
-#define MAX_ADC_VALUES_BUFFER_SIZE 128
-
+#define MAX_ADC_VALUES_PER_PACKET 128
+#define MAX_GOERTZEL_VALUES_PER_PACKET 1
+#define MAX_GOERTZEL_FREQUENCIES_PER_PACKET 3
 
 typedef struct GetSettings_struct
 {
@@ -118,9 +119,7 @@ typedef struct CellSettings_struct
 	bool goertzel_enabled;
 	
 	// Goertzel frequencies
-	float goertzel_frequency_01;
-	float goertzel_frequency_02;
-	float goertzel_frequency_03;
+	float goertzel_frequencies[MAX_GOERTZEL_FREQUENCIES_PER_PACKET];
 
 	// 8 or 12 bit resolution
 	uint8_t adc_value_bits;
@@ -157,7 +156,7 @@ typedef struct ADCResults_struct
 	// how many valid values are in the values array (per channel)
 	uint32_t adc_value_count;
 
-	uint16_t adc_values[8 * MAX_ADC_VALUES_BUFFER_SIZE];
+	uint16_t adc_values[MAX_CHANNELS_PER_PACKET * MAX_ADC_VALUES_PER_PACKET];
 } ADCResults_t;
 
 typedef struct ADCFloatResults_struct
@@ -176,7 +175,7 @@ typedef struct ADCFloatResults_struct
 	// how many valid values are in the values array (per channel)
 	uint32_t adc_value_count;
 
-	float adc_values[8 * MAX_ADC_VALUES_BUFFER_SIZE];
+	float adc_values[MAX_CHANNELS_PER_PACKET * MAX_ADC_VALUES_PER_PACKET];
 } ADCFloatResults_t;
 
 typedef struct GoertzelResults_struct
@@ -189,13 +188,17 @@ typedef struct GoertzelResults_struct
 	// unique serial for every chip
 	uint32_t device_serial;
 
+	// how many channels' values are in the packet
+	uint32_t channel_count;
+	
+	// how many valid values are in the values array (per channel)
+	uint32_t value_count;
+
     // Goertzel frequencies
-	float goertzel_frequency_01;
-	float goertzel_frequency_02;
-	float goertzel_frequency_03;
+    float goertzel_frequencies[MAX_GOERTZEL_FREQUENCIES_PER_PACKET];
 
 	// Goertzel values for 8 channels, grouped by the frequency first (GF01CH01, GF01CH02, GF01CH03 ... GF01CH08, GF02CH01 etc.)
-	float goertzel_values[8 * 3];
+	float goertzel_values[MAX_CHANNELS_PER_PACKET * MAX_GOERTZEL_FREQUENCIES_PER_PACKET * MAX_GOERTZEL_VALUES_PER_PACKET];
 } GoertzelResults_t;
 
 

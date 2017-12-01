@@ -458,6 +458,10 @@ namespace BBDDriver.Models.Source
                     BenchmarkEntries.RemoveAll(be => be.TimeStamp < DateTime.UtcNow.AddSeconds(-5));
                 }
             }
+            else if (dp.APDU.Choice == 0xF008)
+            {
+                // this is a Goertzel packet
+            }
             else if (dp.APDU.Choice != 0x0000)
             {
                 Debug.WriteLine($"{DateTime.Now.ToString()} Unknown packet received with APDU Choice '{dp.APDU}'.", "Warning");

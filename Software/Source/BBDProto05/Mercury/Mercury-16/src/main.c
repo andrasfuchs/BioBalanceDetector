@@ -51,21 +51,23 @@ void adc_compute_goertzel(uint8_t* results, size_t size)
 	goertzel_results.choice = 0xF008;
 	goertzel_results.length = sizeof(goertzel_results) - 2 - 2;  // - 2 bytes of Choice - 2 bytes of Length
 	goertzel_results.device_serial = settings.device_serial;
-	goertzel_results.goertzel_frequency_01 = settings.goertzel_frequency_01;
-	goertzel_results.goertzel_frequency_02 = settings.goertzel_frequency_02;
-	goertzel_results.goertzel_frequency_03 = settings.goertzel_frequency_03;
+	goertzel_results.goertzel_frequencies[0] = settings.goertzel_frequencies[0];
+	goertzel_results.goertzel_frequencies[1] = settings.goertzel_frequencies[1];
+	goertzel_results.goertzel_frequencies[2] = settings.goertzel_frequencies[2];
+	goertzel_results.channel_count = settings.channel_count;
+	goertzel_results.value_count = 1;
 	
 	for (int i=0; i<settings.channel_count; i++)
 	{		
-		float channel_data[MAX_ADC_VALUES_BUFFER_SIZE];
+		float channel_data[MAX_ADC_VALUES_PER_PACKET];
 		for (int j=0; j<settings.adc_value_count_per_packet; j++)
 		{
 			channel_data[j] = data->adc_values[j * 8 + i];
 		}
 		
-		goertzel_results.goertzel_values[0 * settings.channel_count + i] = goertzel_mag(settings.adc_value_count_per_packet, settings.goertzel_frequency_01, settings.sample_rate, channel_data);
-		goertzel_results.goertzel_values[1 * settings.channel_count + i] = goertzel_mag(settings.adc_value_count_per_packet, settings.goertzel_frequency_02, settings.sample_rate, channel_data);
-		goertzel_results.goertzel_values[2 * settings.channel_count + i] = goertzel_mag(settings.adc_value_count_per_packet, settings.goertzel_frequency_03, settings.sample_rate, channel_data);
+		goertzel_results.goertzel_values[0 * settings.channel_count + i] = goertzel_mag(settings.adc_value_count_per_packet, settings.goertzel_frequencies[0], settings.sample_rate, channel_data);
+		goertzel_results.goertzel_values[1 * settings.channel_count + i] = goertzel_mag(settings.adc_value_count_per_packet, settings.goertzel_frequencies[1], settings.sample_rate, channel_data);
+		goertzel_results.goertzel_values[2 * settings.channel_count + i] = goertzel_mag(settings.adc_value_count_per_packet, settings.goertzel_frequencies[2], settings.sample_rate, channel_data);
 	}
 	
 	uint8_t* packet = (uint8_t*)&goertzel_results;
