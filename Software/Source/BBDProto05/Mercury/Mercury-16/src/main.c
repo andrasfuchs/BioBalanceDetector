@@ -26,10 +26,13 @@ static HeartBeat_t heartbeat;
 static HeartBeat_t heartbeat_received;
 
 struct dac_config dac_conf;
+bool initialization_in_progress;
 
 
 void adc_send_data(uint8_t* results, size_t size)
 {
+	if (initialization_in_progress) return;
+	
 	// send data to USB
 	if ((settings.adc_value_packet_to_usb) && (send_adc_data_to_usb))
 	{
@@ -45,6 +48,8 @@ void adc_send_data(uint8_t* results, size_t size)
 
 void adc_compute_goertzel(uint8_t* results, size_t size)
 {
+	if (initialization_in_progress) return;
+	
 	ADCFloatResults_t* data = (ADCFloatResults_t*)results;
 	
 	GoertzelResults_t goertzel_results;	
@@ -150,6 +155,8 @@ void check_menu_buttons()
 
 static void counter_callback()
 {
+	if (initialization_in_progress) return;
+	
 	check_reset_button();	// if SW0 is pressed let's reset
 	check_menu_buttons();	// if the menu buttons (SW1 or SW2) were pressed, change the menu
 	lcd_update_menu(menu_index);
@@ -168,6 +175,8 @@ static void counter_init()
 
 int main( void )
 {
+	initialization_in_progress = true;
+	
 	irq_initialize_vectors();
 
 	/* Enable global interrupt */
@@ -198,9 +207,6 @@ int main( void )
 		adc_data_sent_callback = usb_adc_data_sent;
 		unknown_metadata_received_callback = usb_unknown_metadata_received;
 		udc_start();
-		
-		/* We need some time here to USB initialization */
-		delay_ms(3000);
 	}
 
 
@@ -297,6 +303,7 @@ int main( void )
 	ioport_set_pin_high(LED1_GPIO);
 	ioport_set_pin_high(LED2_GPIO);
 
+	initialization_in_progress = false;
 
 	/* Continuous Execution Loop */
 	while (true) {
