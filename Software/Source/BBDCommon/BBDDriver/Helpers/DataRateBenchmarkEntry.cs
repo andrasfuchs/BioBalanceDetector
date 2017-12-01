@@ -12,9 +12,5 @@ namespace BBDDriver
         public bool IsRead { get; set; }
         public int BytesTransferred { get; set; }
         public int SamplesTransferred { get; set; }
-
-        public ushort MaxJumpBetweenSampleValues { get; set; }
-        public int EightBitChangeOverflowCount { get; set; }
-        public int SameValueWarningCount { get; set; }
     }
 }

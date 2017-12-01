@@ -324,10 +324,7 @@ namespace BBDDriver
                         double time = (bbdInput.BenchmarkEntries.Max(be => be.TimeStamp) - bbdInput.BenchmarkEntries.Min(be => be.TimeStamp)).TotalSeconds;
                         double speed = (time <= 0 ? 0 : bbdInput.BenchmarkEntries.Sum(be => be.BytesTransferred) / time);
                         int samples = bbdInput.BenchmarkEntries.Sum(be => be.SamplesTransferred);
-                        ushort maxJump = bbdInput.BenchmarkEntries.Max(be => be.MaxJumpBetweenSampleValues);
-                        float overflowCount = (float)bbdInput.BenchmarkEntries.Sum(be => be.EightBitChangeOverflowCount) / samples / bbdInput.ChannelCount;
-                        float sameValueCount = (float)bbdInput.BenchmarkEntries.Sum(be => be.SameValueWarningCount) / samples / bbdInput.ChannelCount;
-                        consoleTitle += $" - {(speed / 1024).ToString("0.00")} kbytes/sec - {(samples / time).ToString("#,0")} Hz - maxJump: {maxJump} (of: {overflowCount.ToString("0.00%")}, sv: {sameValueCount.ToString("0.00%")})";
+                        consoleTitle += $" - {(speed / 1024).ToString("0.00")} kbytes/sec - {(samples / time).ToString("#,0")} Hz";
                     }
                 }
             }

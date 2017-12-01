@@ -10,6 +10,7 @@ using LibUsbDotNet;
 using MadWizard.WinUSBNet;
 using System.Runtime.InteropServices;
 using BBDDriver.Models.IEEE11073;
+using System.Diagnostics;
 
 namespace BBDDriver.Models.Source
 {
@@ -40,6 +41,8 @@ namespace BBDDriver.Models.Source
         public int ADCGain { get; set; } = 1;
         public int SampleRatekHz { get; set; } = 8;
         public int BufferSize { get; set; } = 32 * 1024;
+
+        private Dictionary<int, PacketStats> packetStats = new Dictionary<int, PacketStats>();
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         private struct CellSettings
@@ -142,13 +145,19 @@ namespace BBDDriver.Models.Source
             public bool GoertzelEnabled;
 
             [MarshalAs(UnmanagedType.R4)]
-            public float GoertzelFrequency;
+            public float GoertzelFrequency01;
+
+            [MarshalAs(UnmanagedType.R4)]
+            public float GoertzelFrequency02;
+
+            [MarshalAs(UnmanagedType.R4)]
+            public float GoertzelFrequency03;
 
             [MarshalAs(UnmanagedType.U1)]
             public byte ADCValueBits;
 
             [MarshalAs(UnmanagedType.U4)]
-            public UInt32 ADCValuePerPacket;
+            public UInt32 ADCValueCountPerPacket;
 
             [MarshalAs(UnmanagedType.U1)]
             public bool ADCValuePacketToUSB;
@@ -257,53 +266,53 @@ namespace BBDDriver.Models.Source
         {
             T result = default(T);
 
-            byte[] rawHeaderLE = new byte[4];
-            usbInterface.InPipe.Read(rawHeaderLE);
-            GCHandle handle = GCHandle.Alloc(rawHeaderLE, GCHandleType.Pinned);
-            APDU apdu = (APDU)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(APDU));
-            handle.Free();
-
-            if (apdu.Length > 0)
+            lock (pipe)
             {
-                byte[] rawBodyLE = new byte[apdu.Length];
-                usbInterface.InPipe.Read(rawBodyLE);
-
-                handle = GCHandle.Alloc(rawBodyLE, GCHandleType.Pinned);
-                result = (T)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(T));
+                byte[] rawHeaderLE = new byte[4];
+                usbInterface.InPipe.Read(rawHeaderLE);
+                GCHandle handle = GCHandle.Alloc(rawHeaderLE, GCHandleType.Pinned);
+                APDU apdu = (APDU)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(APDU));
                 handle.Free();
-            }
 
-            if ((choice != 0) && (apdu.Choice != choice) && (maxDiscardedPackets > 0))
-            {
-                // this is not the packet we are looking for
-                return ReadPacket<T>(pipe, choice, --maxDiscardedPackets);
+                if (apdu.Length > 0)
+                {
+                    byte[] rawBodyLE = new byte[apdu.Length];
+                    usbInterface.InPipe.Read(rawBodyLE);
+
+                    handle = GCHandle.Alloc(rawBodyLE, GCHandleType.Pinned);
+                    result = (T)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(T));
+                    handle.Free();
+                }
+
+                if ((choice != 0) && (apdu.Choice != choice) && (maxDiscardedPackets > 0))
+                {
+                    // this is not the packet we are looking for
+                    return ReadPacket<T>(pipe, choice, --maxDiscardedPackets);
+                }
             }
 
             return result;
         }
 
-        private DataPacket ReadPacketRaw(USBPipe pipe, UInt16 choice = 0, int maxDiscardedPackets = 0)
+        private DataPacket ReadPacketRaw(USBPipe pipe)
         {
             DataPacket result = new DataPacket();
 
-            byte[] rawHeaderLE = new byte[4];
-            usbInterface.InPipe.Read(rawHeaderLE);
-            GCHandle handle = GCHandle.Alloc(rawHeaderLE, GCHandleType.Pinned);
-            result.APDU = (APDU)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(APDU));
-            handle.Free();
-
-            if (result.APDU.Length > 0)
+            lock (pipe)
             {
-                byte[] rawBodyLE = new byte[result.APDU.Length];
-                usbInterface.InPipe.Read(rawBodyLE);
-                result.RawData = rawBodyLE;
-                result.Data = new DataAPDU();
-            }
+                byte[] rawHeaderLE = new byte[4];
+                usbInterface.InPipe.Read(rawHeaderLE);
+                GCHandle handle = GCHandle.Alloc(rawHeaderLE, GCHandleType.Pinned);
+                result.APDU = (APDU)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(APDU));
+                handle.Free();
 
-            if ((choice != 0) && (result.APDU.Choice != choice) && (maxDiscardedPackets > 0))
-            {
-                // this is not the packet we are looking for
-                return ReadPacketRaw(pipe, choice, --maxDiscardedPackets);
+                if (result.APDU.Length > 0)
+                {
+                    byte[] rawBodyLE = new byte[result.APDU.Length];
+                    usbInterface.InPipe.Read(rawBodyLE);
+                    result.RawData = rawBodyLE;
+                    result.Data = new DataAPDU();
+                }
             }
 
             return result;
@@ -313,22 +322,25 @@ namespace BBDDriver.Models.Source
         {
             DataPacket result = new DataPacket();
 
-            byte[] rawHeaderBE = new byte[4];
-            usbInterface.InPipe.Read(rawHeaderBE);
-
-            result.APDU = Tools.GetBigEndian<APDU>(rawHeaderBE);
-
-            
-            if (result.APDU.Length > 0)
+            lock (pipe)
             {
-                byte[] rawBodyBE = new byte[result.APDU.Length];
-                usbInterface.InPipe.Read(rawBodyBE);
-                result.RawData = rawBodyBE;
-                result.Data = new DataAPDU();
+                byte[] rawHeaderBE = new byte[4];
+                usbInterface.InPipe.Read(rawHeaderBE);
 
-                if (result.APDU.Choice == 0xE700)
+                result.APDU = Tools.GetBigEndian<APDU>(rawHeaderBE);
+
+
+                if (result.APDU.Length > 0)
                 {
-                    result.Data = Tools.GetBigEndian<DataAPDU>(rawBodyBE);
+                    byte[] rawBodyBE = new byte[result.APDU.Length];
+                    usbInterface.InPipe.Read(rawBodyBE);
+                    result.RawData = rawBodyBE;
+                    result.Data = new DataAPDU();
+
+                    if (result.APDU.Choice == 0xE700)
+                    {
+                        result.Data = Tools.GetBigEndian<DataAPDU>(rawBodyBE);
+                    }
                 }
             }
 
@@ -371,35 +383,132 @@ namespace BBDDriver.Models.Source
 
             try
             {
-                dp = ReadPacketRaw(usbInterface.InPipe, 0xF006, 10);
-                if (dp.APDU.Choice != 0xF006) return false;
+                dp = ReadPacketRaw(usbInterface.InPipe);
             }
             catch
             {
                 return false;
             }
 
-            DataRateBenchmarkEntry drbe = new DataRateBenchmarkEntry() { TimeStamp = DateTime.UtcNow, IsRead = true, BytesTransferred = dp.RawData.Length, SamplesTransferred = dp.RawData.Length / 2 / channels.Length };
-
-            // cut the 32-bit device id
-            byte[] channelData = new byte[dp.RawData.Length - 4];
-            Array.Copy(dp.RawData, 4, channelData, 0, channelData.Length);
-
-            Task processUsbDataTask = Task.Run(() =>
+            if (packetStats.ContainsKey(dp.APDU.Choice) && (packetStats[dp.APDU.Choice].LastResetTime.AddSeconds(1) < DateTime.UtcNow))
             {
-                ProcessUSBData(channelData, channelData.Length, drbe);
-            });
+                Debug.WriteLine($"The current rate of APDU choice #{dp.APDU.Choice.ToString("X")} is {(packetStats[dp.APDU.Choice].PacketCount / (DateTime.UtcNow - packetStats[dp.APDU.Choice].LastResetTime).TotalSeconds).ToString("0.00")} packets/second", "Information");
+                packetStats.Remove(dp.APDU.Choice);
+            }
 
-            lock (BenchmarkEntries)
+            if (!packetStats.ContainsKey(dp.APDU.Choice))
             {
-                BenchmarkEntries.Add(drbe);
-                BenchmarkEntries.RemoveAll(be => be.TimeStamp < DateTime.UtcNow.AddSeconds(-5));
+                packetStats.Add(dp.APDU.Choice, new PacketStats() { LastResetTime = DateTime.UtcNow });
+            }
+            packetStats[dp.APDU.Choice].PacketCount++;
+
+            if (dp.APDU.Choice == 0xF005)
+            {
+                // this is a heartbeat
+            }
+            else if ((dp.APDU.Choice == 0xF006) || (dp.APDU.Choice == 0xF007))
+            {
+                // this is an ADC data packet
+
+                DataRateBenchmarkEntry drbe = new DataRateBenchmarkEntry() { TimeStamp = DateTime.UtcNow, IsRead = true, BytesTransferred = dp.RawData.Length, SamplesTransferred = 0 };
+
+                // get the device id
+                UInt32 deviceId = System.BitConverter.ToUInt32(dp.RawData, 0);
+
+                // get the channel count
+                UInt32 channelCount = System.BitConverter.ToUInt32(dp.RawData, 4);
+
+                // get the valid value count
+                UInt32 validValueCount = System.BitConverter.ToUInt32(dp.RawData, 8);
+
+                if (dp.APDU.Choice == 0xF006)
+                {
+                    // allocate 2 bytes per value
+                    byte[] channelData = new byte[channelCount * validValueCount * 2];
+                    Array.Copy(dp.RawData, 12, channelData, 0, channelData.Length);
+
+                    // 16-bit ushort data type
+                    drbe.SamplesTransferred = channelData.Length / 2 / channels.Length;
+
+                    Task processUsbDataTask = Task.Run(() =>
+                    {
+                        float[] adcDataFloats = ConvertRawShortADCData(channelData);
+                        ProcessFloatADCData(adcDataFloats);
+                    });
+                }
+                else if (dp.APDU.Choice == 0xF007)
+                {
+                    // allocate 4 bytes per value
+                    byte[] channelData = new byte[channelCount * validValueCount * 4];
+                    Array.Copy(dp.RawData, 12, channelData, 0, channelData.Length);
+
+                    // 32-bit float data type
+                    drbe.SamplesTransferred = channelData.Length / 4 / channels.Length;
+
+                    Task processUsbDataTask = Task.Run(() =>
+                    {
+                        float[] adcDataFloats = ConvertRawFloatADCData(channelData);
+                        ProcessFloatADCData(adcDataFloats);
+                    });
+                }
+
+                lock (BenchmarkEntries)
+                {
+                    BenchmarkEntries.Add(drbe);
+                    BenchmarkEntries.RemoveAll(be => be.TimeStamp < DateTime.UtcNow.AddSeconds(-5));
+                }
+            }
+            else if (dp.APDU.Choice != 0x0000)
+            {
+                Debug.WriteLine($"{DateTime.Now.ToString()} Unknown packet received with APDU Choice '{dp.APDU}'.", "Warning");
             }
 
             return true;
         }
 
-        private void ProcessUSBData(byte[] rawDataFromUSB, int readBytes, DataRateBenchmarkEntry drbe)
+        private float[] ConvertRawShortADCData(byte[] rawADCData)
+        {
+            float[] floats = new float[rawADCData.Length / 2];
+
+            for (int i = 0; i < floats.Length; i++)
+            {
+                ushort shortValue = System.BitConverter.ToUInt16(rawADCData, i * 2);
+                floats[i] = ((shortValue / 65536.0f) - 0.5f) * (ADCReferenceV * 2);
+            }
+
+            return floats;
+        }
+
+        private float[] ConvertRawFloatADCData(byte[] rawADCData)
+        {
+            float[] floats = new float[rawADCData.Length / 4];
+
+            for (int i = 0; i < floats.Length; i++)
+            {
+                float floatValue = System.BitConverter.ToSingle(rawADCData, i * 4);
+                floats[i] = floatValue;
+            }
+
+            return floats;
+        }
+
+        private void ProcessFloatADCData(float[] floatADCData)
+        {
+            float[] floats = new float[floatADCData.Length / channels.Length];
+            for (int i = 0; i < channels.Length; i++)
+            {
+                if (channels[i] == null) continue;
+
+                for (int j = 0; j < floats.Length; j++)
+                {
+                    floats[j] = floatADCData[j * channels.Length + i];
+                }
+
+                channels[i].AppendData(floats);
+            }
+        }
+
+        private void ProcessUSBData(byte[] rawDataFromUSB, int readBytes)
         {
             if (readBytes == 0) return;
 
@@ -427,11 +536,6 @@ namespace BBDDriver.Models.Source
 
 
                     ushort valueChange = (ushort)Math.Abs(shortValue - prevShortValue);
-                    if (valueChange > drbe.MaxJumpBetweenSampleValues) drbe.MaxJumpBetweenSampleValues = valueChange;
-
-                    // 12 bit samples are shifted to left by 4 bits, so we need check if the change is higher than 256 << 4 = 4096
-                    if (valueChange >= 4096) drbe.EightBitChangeOverflowCount++;
-                    if ((j > 0) && (valueChange == 0)) drbe.SameValueWarningCount++;
 
                     prevShortValue = shortValue;
                 }
@@ -448,5 +552,11 @@ namespace BBDDriver.Models.Source
         void IDisposable.Dispose()
         {
         }
+    }
+
+    internal class PacketStats
+    {
+        public DateTime LastResetTime;
+        public int PacketCount;
     }
 }
