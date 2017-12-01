@@ -16,6 +16,8 @@ static volatile uint8_t adc_buffer_index;	// used for double buffering
 
 static ADCResults_t adc_results[2];
 
+static ADCFloatResults_t adc_float_results[2];
+
 
 void init_adc_channel(ADC_t *adc, uint8_t ch_mask, enum adcch_positive_input pos_input, uint8_t gain)
 {
@@ -34,12 +36,23 @@ void init_adc(ADC_t *adc, CellSettings_t *settings)
 	struct adc_config adc_conf;
 
 	adc_results[0].choice = 0xF006;
-	adc_results[0].length = 2 * 8 * ADC_RESULT_BUFFER_SIZE + 4;  // + 4 bytes device ID
+	adc_results[0].length = sizeof(adc_results[0]) - 2 - 2;  // - 2 bytes of Choice - 2 bytes of Length
 	adc_results[0].device_serial = settings->device_serial;
+	adc_results[0].adc_channel_count = 8;
 	adc_results[1].choice = 0xF006;
-	adc_results[1].length = 2 * 8 * ADC_RESULT_BUFFER_SIZE + 4;  // + 4 bytes device ID
+	adc_results[1].length = sizeof(adc_results[1]) - 2 - 2;  // - 2 bytes of Choice - 2 bytes of Length	
 	adc_results[1].device_serial = settings->device_serial;
+	adc_results[1].adc_channel_count = 8;
 	
+	adc_float_results[0].choice = 0xF007;
+	adc_float_results[0].length = sizeof(adc_float_results[0]) - 2 - 2;  // - 2 bytes of Choice - 2 bytes of Length
+	adc_float_results[0].device_serial = settings->device_serial;
+	adc_float_results[0].adc_channel_count = 8;
+	adc_float_results[1].choice = 0xF007;
+	adc_float_results[1].length = sizeof(adc_float_results[1]) - 2 - 2;  // - 2 bytes of Choice - 2 bytes of Length
+	adc_float_results[1].device_serial = settings->device_serial;
+	adc_float_results[1].adc_channel_count = 8;
+
 	/* Initialize configuration structures */
 	adc_read_configuration(adc, &adc_conf);
 
@@ -120,6 +133,12 @@ static void pick_a_sample_callback(void)
 		adc_results[adc_buffer_index].adc_values[offset + 5] = ADCA.CH1RES;
 		adc_results[adc_buffer_index].adc_values[offset + 6] = ADCA.CH2RES;
 		adc_results[adc_buffer_index].adc_values[offset + 7] = ADCA.CH3RES;
+		
+		float adc_reference_v = settings.adc_ref == ADC_REFSEL_INT1V_gc ? 1.0f / settings.adc_gain : 0.0f;
+		for (int i=0; i<8; i++)
+		{
+			adc_float_results[adc_buffer_index].adc_values[offset + i] = ((adc_results[adc_buffer_index].adc_values[offset + i] / 65536.0f) - 0.5f) * (adc_reference_v * 2);
+		}
 	} else
 	{
 		adc_test_counter++;
@@ -148,9 +167,15 @@ static void pick_a_sample_callback(void)
 	}
 	
 	adc_samplecount++;
-	if (adc_samplecount == ADC_RESULT_BUFFER_SIZE)
-	{
-		adc_data_ready_callback((uint8_t*)&adc_results[adc_buffer_index], sizeof(adc_results[adc_buffer_index]));
+	if (adc_samplecount == settings.adc_value_count_per_packet)
+	{	
+		// 16-bit ushort data type (DEPRECATED)
+		//adc_results[adc_buffer_index].adc_value_count = settings.adc_value_count_per_packet;
+		//adc_data_ready_callback((uint8_t*)&adc_results[adc_buffer_index], sizeof(adc_results[adc_buffer_index]));
+		
+		// 32-bit float data type
+		adc_float_results[adc_buffer_index].adc_value_count = settings.adc_value_count_per_packet;
+		adc_data_ready_callback((uint8_t*)&adc_float_results[adc_buffer_index], sizeof(adc_float_results[adc_buffer_index]));
 
 		adc_buffer_index = (adc_buffer_index + 1) % 2;
 		adc_samplecount = 0;

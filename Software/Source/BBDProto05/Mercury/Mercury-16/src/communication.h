@@ -12,7 +12,8 @@
 #include <compiler.h>
 
 /* Number of samples stored in memory before sending it to the organizer (note: must be dividable by the number of channels (8)) */
-#define ADC_RESULT_BUFFER_SIZE 384
+//#define MAX_ADC_VALUES_BUFFER_SIZE 384
+#define MAX_ADC_VALUES_BUFFER_SIZE 128
 
 
 typedef struct GetSettings_struct
@@ -147,18 +148,45 @@ typedef struct ADCResults_struct
 
 	uint16_t length;
 
+	// unique serial for every chip
 	uint32_t device_serial;
 
-	uint16_t adc_values[8 * ADC_RESULT_BUFFER_SIZE];
+	// how many channels' values are in the packet
+	uint32_t adc_channel_count;
+
+	// how many valid values are in the values array (per channel)
+	uint32_t adc_value_count;
+
+	uint16_t adc_values[8 * MAX_ADC_VALUES_BUFFER_SIZE];
 } ADCResults_t;
 
-typedef struct GoertzelResults_struct
+typedef struct ADCFloatResults_struct
 {
 	// 0xF007
 	uint16_t choice;
 
 	uint16_t length;
 
+	// unique serial for every chip
+	uint32_t device_serial;
+	
+	// how many channels' values are in the packet
+	uint32_t adc_channel_count;	
+	
+	// how many valid values are in the values array (per channel)
+	uint32_t adc_value_count;
+
+	float adc_values[8 * MAX_ADC_VALUES_BUFFER_SIZE];
+} ADCFloatResults_t;
+
+typedef struct GoertzelResults_struct
+{
+	// 0xF008
+	uint16_t choice;
+
+	uint16_t length;
+
+	// unique serial for every chip
 	uint32_t device_serial;
 
     // Goertzel frequencies

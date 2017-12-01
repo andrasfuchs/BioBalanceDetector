@@ -40,7 +40,7 @@
 	 settings.adc_bits = 12;
 	 settings.adc_ref = (uint8_t)ADC_REFSEL_INT1V_gc;
 	 //settings.adc_ref = (uint8_t)ADC_REFSEL_INTVCC_gc;
-	 settings.adc_gain = 1;
+	 settings.adc_gain = 8;
 	 settings.sample_rate = 1000;  // sample rate should be fixed to 1kSPS for now
 	 settings.sample_rate_compensation = 0;
 	 settings.channel_count = 8;
@@ -48,17 +48,17 @@
 	 //settings.usb_enabled = false;  // (!!) USB should be enabled for the organizer and disabled for the cells
 	 settings.usb_address = udd_getaddress();
 	 settings.usb_speed = (udd_is_high_speed() ? 480000000UL : 12000000UL);
-	 settings.usart_enabled = true;  // USART should be enabled for both the cells and the organizer
+	 settings.usart_enabled = false;  // USART should be enabled for both the cells and the organizer
 	 //settings.usart_mode = 3; // (!!) 1 - async, 2 - sync master (organizer), 3 - sync slave (cell)
 	 settings.usart_speed = 1200; // the minumum speed should be [adc_value_bits] * [sample rate] * [channel_count] * [cell count] * 1.2 (for the overhead)
 	 	 
-	 settings.goertzel_enabled = true;
+	 settings.goertzel_enabled = false;
 	 settings.goertzel_frequency_01 = 7.83f;
 	 settings.goertzel_frequency_02 = 40.00f;
 	 settings.goertzel_frequency_03 = 876543.21f;
 	 
 	 settings.adc_value_bits = 16;
-	 settings.adc_value_count_per_packet = ADC_RESULT_BUFFER_SIZE;
+	 settings.adc_value_count_per_packet = settings.sample_rate / 60 < MAX_ADC_VALUES_BUFFER_SIZE ?  settings.sample_rate / 60 : MAX_ADC_VALUES_BUFFER_SIZE; // we must guarantee the 60 fps refresh rate
 
      //settings.adc_value_packet_to_usb = false;  // (!!)
 	 //settings.adc_value_packet_to_usart = true;  // (!!)
@@ -74,7 +74,7 @@
 		 settings.usart_mode = 2;						// 1 - async, 2 - sync master (organizer), 3 - sync slave (cell)
 		 settings.adc_value_packet_to_usb = true;
 		 settings.adc_value_packet_to_usart = false;
-		 settings.goertzel_packet_to_usb = true;
+		 settings.goertzel_packet_to_usb = false;
 		 settings.goertzel_packet_to_usart = false;
 	 }
 

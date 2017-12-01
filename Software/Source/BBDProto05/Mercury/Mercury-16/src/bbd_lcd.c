@@ -236,7 +236,7 @@ void lcd_change_menu(uint8_t menu_index)
 
 	if (menu_index == 8)
 	{
-		if (settings.usart_enabled)
+		if (settings.goertzel_enabled)
 		{
 			gfx_mono_draw_string("Goertzel @ 100'000.00", 0, 10, &sysfont);
 			gfx_mono_draw_string("100'000.00 100'000.00", 0, 20, &sysfont);
