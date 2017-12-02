@@ -318,11 +318,10 @@ int main( void )
 		}
 		
 		heartbeat.ticks++;
-
-		if (settings.usb_enabled)
+		if ((settings.usb_enabled) && (heartbeat.ticks % 1000 == 0))
 		{
 			/* Send heartbeat packet to USB */
-			//udd_ep_run(UDI_PHDC_EP_BULK_IN, false, (uint8_t*)&heartbeat, sizeof(heartbeat), usb_data_sent);
+			udd_ep_run(UDI_PHDC_EP_BULK_IN, false, (uint8_t*)&heartbeat, sizeof(heartbeat), usb_data_sent);
 			usb_tx_counter += 1;
 		}		
 
