@@ -413,7 +413,7 @@ namespace BBDDriver.Models.Source
                 DataRateBenchmarkEntry drbe = new DataRateBenchmarkEntry() { TimeStamp = DateTime.UtcNow, IsRead = true, BytesTransferred = dp.RawData.Length, SamplesTransferred = 0 };
 
                 // get the device id
-                UInt32 deviceId = System.BitConverter.ToUInt32(dp.RawData, 0);
+                UInt32 deviceSerial = System.BitConverter.ToUInt32(dp.RawData, 0);
 
                 // get the channel count
                 UInt32 channelCount = System.BitConverter.ToUInt32(dp.RawData, 4);
@@ -447,7 +447,7 @@ namespace BBDDriver.Models.Source
 
                     Task processUsbDataTask = Task.Run(() =>
                     {
-                        float[] adcDataFloats = ConvertRawFloatADCData(channelData);
+                        float[] adcDataFloats = ConvertRawFloatToArray(channelData);
                         ProcessFloatADCData(adcDataFloats);
                     });
                 }
@@ -461,6 +461,38 @@ namespace BBDDriver.Models.Source
             else if (dp.APDU.Choice == 0xF008)
             {
                 // this is a Goertzel packet
+
+                DataRateBenchmarkEntry drbe = new DataRateBenchmarkEntry() { TimeStamp = DateTime.UtcNow, IsRead = true, BytesTransferred = dp.RawData.Length, SamplesTransferred = 0 };
+
+                // get the device id
+                UInt32 deviceSerial = System.BitConverter.ToUInt32(dp.RawData, 0);
+
+                // get the channel count
+                UInt32 channelCount = System.BitConverter.ToUInt32(dp.RawData, 4);
+
+                // get the valid value count
+                UInt32 valueCount = System.BitConverter.ToUInt32(dp.RawData, 8);
+
+                // get the valid value count
+                UInt32 goertzelCount = System.BitConverter.ToUInt32(dp.RawData, 12);
+
+                // allocate 4 bytes per Goerztel frequency
+                byte[] goertzelFrequenciesRaw = new byte[goertzelCount * 4];
+                Array.Copy(dp.RawData, 16, goertzelFrequenciesRaw, 0, goertzelFrequenciesRaw.Length);
+                float[] goertzelFrequencies = ConvertRawFloatToArray(goertzelFrequenciesRaw);
+
+                // allocate 4 bytes per Goerztel frequency
+                byte[] goertzelValuesRaw = new byte[channelCount * goertzelCount * valueCount * 4];
+                Array.Copy(dp.RawData, 16 + goertzelFrequenciesRaw.Length, goertzelValuesRaw, 0, goertzelValuesRaw.Length);
+                float[] goertzelValues = ConvertRawFloatToArray(goertzelValuesRaw);
+
+                // TODO: push Goerzel values into the pipeline
+
+                lock (BenchmarkEntries)
+                {
+                    BenchmarkEntries.Add(drbe);
+                    BenchmarkEntries.RemoveAll(be => be.TimeStamp < DateTime.UtcNow.AddSeconds(-5));
+                }
             }
             else if (dp.APDU.Choice != 0x0000)
             {
@@ -483,13 +515,13 @@ namespace BBDDriver.Models.Source
             return floats;
         }
 
-        private float[] ConvertRawFloatADCData(byte[] rawADCData)
+        private float[] ConvertRawFloatToArray(byte[] rawData)
         {
-            float[] floats = new float[rawADCData.Length / 4];
+            float[] floats = new float[rawData.Length / 4];
 
             for (int i = 0; i < floats.Length; i++)
             {
-                float floatValue = System.BitConverter.ToSingle(rawADCData, i * 4);
+                float floatValue = System.BitConverter.ToSingle(rawData, i * 4);
                 floats[i] = floatValue;
             }
 

@@ -28,6 +28,51 @@ static HeartBeat_t heartbeat_received;
 struct dac_config dac_conf;
 bool initialization_in_progress;
 
+void adc_compute_goertzel(uint8_t* results, size_t size)
+{
+	if (initialization_in_progress) return;
+	
+	ADCFloatResults_t* data = (ADCFloatResults_t*)results;
+	
+	GoertzelResults_t goertzel_results;
+	goertzel_results.choice = 0xF008;
+	goertzel_results.length = sizeof(goertzel_results) - 2 - 2;  // - 2 bytes of Choice - 2 bytes of Length
+	goertzel_results.device_serial = settings.device_serial;
+	goertzel_results.goertzel_frequencies[0] = settings.goertzel_frequencies[0];
+	goertzel_results.goertzel_frequencies[1] = settings.goertzel_frequencies[1];
+	goertzel_results.goertzel_frequencies[2] = settings.goertzel_frequencies[2];
+	goertzel_results.channel_count = settings.channel_count;
+	goertzel_results.value_count = 1;
+	goertzel_results.goertzel_count = MAX_GOERTZEL_FREQUENCIES_PER_PACKET;
+	
+	for (int i=0; i<settings.channel_count; i++)
+	{
+		float channel_data[MAX_ADC_VALUES_PER_PACKET];
+		for (int j=0; j<settings.adc_value_count_per_packet; j++)
+		{
+			channel_data[j] = data->adc_values[j * 8 + i];
+		}
+		
+		goertzel_results.goertzel_values[0 * settings.channel_count + i] = goertzel_mag(settings.adc_value_count_per_packet, settings.goertzel_frequencies[0], settings.sample_rate, channel_data);
+		goertzel_results.goertzel_values[1 * settings.channel_count + i] = goertzel_mag(settings.adc_value_count_per_packet, settings.goertzel_frequencies[1], settings.sample_rate, channel_data);
+		goertzel_results.goertzel_values[2 * settings.channel_count + i] = goertzel_mag(settings.adc_value_count_per_packet, settings.goertzel_frequencies[2], settings.sample_rate, channel_data);
+	}
+	
+	uint8_t* packet = (uint8_t*)&goertzel_results;
+	size_t packet_size = sizeof(goertzel_results);
+	
+	// send data to USB
+	if (settings.goertzel_packet_to_usb)
+	{
+		udd_ep_run(UDI_PHDC_EP_BULK_IN, false, packet, packet_size, adc_data_sent_callback);
+	}
+
+	// send data to USART
+	if ((settings.goertzel_packet_to_usart) && (usart_data_was_requested_by_organizer))
+	{
+		usart_serial_write_packet(USART_SERIAL, packet, packet_size);
+	}
+}
 
 void adc_send_data(uint8_t* results, size_t size)
 {
@@ -43,51 +88,12 @@ void adc_send_data(uint8_t* results, size_t size)
 	if ((settings.adc_value_packet_to_usart) && (usart_data_was_requested_by_organizer))
 	{
 		usart_serial_write_packet(USART_SERIAL, results, size);
-	}	
-}
-
-void adc_compute_goertzel(uint8_t* results, size_t size)
-{
-	if (initialization_in_progress) return;
-	
-	ADCFloatResults_t* data = (ADCFloatResults_t*)results;
-	
-	GoertzelResults_t goertzel_results;	
-	goertzel_results.choice = 0xF008;
-	goertzel_results.length = sizeof(goertzel_results) - 2 - 2;  // - 2 bytes of Choice - 2 bytes of Length
-	goertzel_results.device_serial = settings.device_serial;
-	goertzel_results.goertzel_frequencies[0] = settings.goertzel_frequencies[0];
-	goertzel_results.goertzel_frequencies[1] = settings.goertzel_frequencies[1];
-	goertzel_results.goertzel_frequencies[2] = settings.goertzel_frequencies[2];
-	goertzel_results.channel_count = settings.channel_count;
-	goertzel_results.value_count = 1;
-	
-	for (int i=0; i<settings.channel_count; i++)
-	{		
-		float channel_data[MAX_ADC_VALUES_PER_PACKET];
-		for (int j=0; j<settings.adc_value_count_per_packet; j++)
-		{
-			channel_data[j] = data->adc_values[j * 8 + i];
-		}
-		
-		goertzel_results.goertzel_values[0 * settings.channel_count + i] = goertzel_mag(settings.adc_value_count_per_packet, settings.goertzel_frequencies[0], settings.sample_rate, channel_data);
-		goertzel_results.goertzel_values[1 * settings.channel_count + i] = goertzel_mag(settings.adc_value_count_per_packet, settings.goertzel_frequencies[1], settings.sample_rate, channel_data);
-		goertzel_results.goertzel_values[2 * settings.channel_count + i] = goertzel_mag(settings.adc_value_count_per_packet, settings.goertzel_frequencies[2], settings.sample_rate, channel_data);
 	}
 	
-	uint8_t* packet = (uint8_t*)&goertzel_results;
-	size_t packet_size = sizeof(goertzel_results);
-	// send data to USB
-	if (settings.goertzel_packet_to_usb)
+	if (settings.goertzel_enabled)
 	{
-		udd_ep_run(UDI_PHDC_EP_BULK_IN, false, packet, packet_size, adc_data_sent_callback);
+		adc_compute_goertzel(results, size);
 	}
-
-	// send data to USART
-	if ((settings.goertzel_packet_to_usart) && (usart_data_was_requested_by_organizer))
-	{
-		usart_serial_write_packet(USART_SERIAL, packet, packet_size);
-	}		
 }
 
 void main_suspend_action(void)
@@ -255,11 +261,6 @@ int main( void )
 	{
 		adc_data_ready_callback = adc_send_data;
 		
-		if (settings.goertzel_enabled)
-		{
-			adc_data_ready_callback = adc_compute_goertzel;
-		}
-
 		init_adc(&ADCA, &settings);
 		init_adc(&ADCB, &settings);
 

@@ -194,6 +194,9 @@ typedef struct GoertzelResults_struct
 	// how many valid values are in the values array (per channel)
 	uint32_t value_count;
 
+	// how many different Goertzel frequencies are in the packet
+	uint32_t goertzel_count;
+
     // Goertzel frequencies
     float goertzel_frequencies[MAX_GOERTZEL_FREQUENCIES_PER_PACKET];
 

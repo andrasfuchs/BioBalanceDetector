@@ -72,7 +72,7 @@
 		 settings.adc_enabled = false;					// ADC should be enabled for cells and disabled for the organizer
 		 settings.usb_enabled = true;					// USB should be enabled for the organizer and disabled for the cells
 		 settings.usart_mode = 2;						// 1 - async, 2 - sync master (organizer), 3 - sync slave (cell)
-		 settings.adc_value_packet_to_usb = true;
+		 settings.adc_value_packet_to_usb = false;
 		 settings.adc_value_packet_to_usart = false;
 		 settings.goertzel_packet_to_usb = true;
 		 settings.goertzel_packet_to_usart = false;
