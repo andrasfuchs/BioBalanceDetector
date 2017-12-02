@@ -28,6 +28,21 @@ static HeartBeat_t heartbeat_received;
 struct dac_config dac_conf;
 bool initialization_in_progress;
 
+void send_data(uint8_t* data, size_t size, bool send_to_usb, bool send_to_usart, udd_callback_trans_t usb_callback)
+{
+	// send data to USB
+	if (send_to_usb)
+	{
+		udd_ep_run(UDI_PHDC_EP_BULK_IN, false, data, size, usb_callback);
+	}
+
+	// send data to USART
+	if (send_to_usart)
+	{
+		usart_serial_write_packet(USART_SERIAL, data, size);
+	}
+}
+
 void adc_compute_goertzel(uint8_t* results, size_t size)
 {
 	if (initialization_in_progress) return;
@@ -60,35 +75,14 @@ void adc_compute_goertzel(uint8_t* results, size_t size)
 	
 	uint8_t* packet = (uint8_t*)&goertzel_results;
 	size_t packet_size = sizeof(goertzel_results);
-	
-	// send data to USB
-	if (settings.goertzel_packet_to_usb)
-	{
-		udd_ep_run(UDI_PHDC_EP_BULK_IN, false, packet, packet_size, adc_data_sent_callback);
-	}
-
-	// send data to USART
-	if ((settings.goertzel_packet_to_usart) && (usart_data_was_requested_by_organizer))
-	{
-		usart_serial_write_packet(USART_SERIAL, packet, packet_size);
-	}
+	send_data(packet, packet_size, settings.goertzel_packet_to_usb, (settings.goertzel_packet_to_usart) && (usart_data_was_requested_by_organizer), adc_data_sent_callback);
 }
 
 void adc_send_data(uint8_t* results, size_t size)
 {
 	if (initialization_in_progress) return;
-	
-	// send data to USB
-	if ((settings.adc_value_packet_to_usb) && (send_adc_data_to_usb))
-	{
-		udd_ep_run(UDI_PHDC_EP_BULK_IN, false, results, size, adc_data_sent_callback);
-	}
 
-	// send data to USART
-	if ((settings.adc_value_packet_to_usart) && (usart_data_was_requested_by_organizer))
-	{
-		usart_serial_write_packet(USART_SERIAL, results, size);
-	}
+	send_data(results, size, (settings.adc_value_packet_to_usb) && (send_adc_data_to_usb), (settings.adc_value_packet_to_usart) && (usart_data_was_requested_by_organizer), adc_data_sent_callback);
 	
 	if (settings.goertzel_enabled)
 	{
@@ -318,13 +312,9 @@ int main( void )
 			}
 		}
 		
+		/* Send heartbeat packet to USB */		
 		heartbeat.ticks++;
-		if ((settings.usb_enabled) && (heartbeat.ticks % 1000 == 0))
-		{
-			/* Send heartbeat packet to USB */
-			udd_ep_run(UDI_PHDC_EP_BULK_IN, false, (uint8_t*)&heartbeat, sizeof(heartbeat), usb_data_sent);
-			usb_tx_counter += 1;
-		}		
+		send_data((uint8_t*)&heartbeat, sizeof(heartbeat), (settings.usb_enabled) && (heartbeat.ticks % 1000 == 0), false, usb_data_sent);
 
 		if (settings.test_mode == 1)
 		{

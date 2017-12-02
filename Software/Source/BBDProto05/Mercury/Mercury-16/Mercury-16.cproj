@@ -608,6 +608,9 @@
     <None Include="src\ASF\xmega\drivers\wdt\wdt.h">
       <SubType>compile</SubType>
     </None>
+    <Compile Include="src\bbd_communication.c">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="src\bbd_goertzel.c">
       <SubType>compile</SubType>
     </Compile>
@@ -638,7 +641,7 @@
     <Compile Include="src\bbd_usb.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="src\communication.h">
+    <Compile Include="src\bbd_communication.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\config\conf_dac.h">

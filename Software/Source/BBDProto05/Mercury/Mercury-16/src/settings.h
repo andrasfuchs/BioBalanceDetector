@@ -9,7 +9,7 @@
 #ifndef SETTINGS_H_
 #define SETTINGS_H_
 
-#include "communication.h"
+#include <bbd_communication.h>
 
 
 CellSettings_t settings;

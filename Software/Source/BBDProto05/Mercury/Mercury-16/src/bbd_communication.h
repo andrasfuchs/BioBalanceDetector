@@ -2,12 +2,12 @@
  * communication.h
  *
  * Created: 2017-03-07 16:20:49
- *  Author: Andras
+ *  Author: Andras Fuchs
  */ 
 
 
-#ifndef COMMUNICATION_H_
-#define COMMUNICATION_H_
+#ifndef BBD_COMMUNICATION_H_
+#define BBD_COMMUNICATION_H_
 
 #include <compiler.h>
 
@@ -16,6 +16,7 @@
 #define MAX_ADC_VALUES_PER_PACKET 128
 #define MAX_GOERTZEL_VALUES_PER_PACKET 1
 #define MAX_GOERTZEL_FREQUENCIES_PER_PACKET 3
+
 
 typedef struct GetSettings_struct
 {
@@ -205,4 +206,4 @@ typedef struct GoertzelResults_struct
 } GoertzelResults_t;
 
 
-#endif /* COMMUNICATION_H_ */
+#endif /* BBD_COMMUNICATION_H_ */

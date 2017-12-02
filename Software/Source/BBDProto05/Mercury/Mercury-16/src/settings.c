@@ -2,7 +2,7 @@
  * settings.c
  *
  * Created: 2017-03-07 16:16:18
- *  Author: Andras
+ *  Author: Andras Fuchs
  */ 
 
 #include "settings.h"

@@ -2,7 +2,7 @@
 #define BBD_ADC_H
 
 #include <adc.h>
-#include <communication.h>
+#include <bbd_communication.h>
 #include "asf.h"
 
 
