@@ -41,7 +41,7 @@
 	 settings.adc_ref = (uint8_t)ADC_REFSEL_INT1V_gc;
 	 //settings.adc_ref = (uint8_t)ADC_REFSEL_INTVCC_gc;
 	 settings.adc_gain = 8;
-	 settings.sample_rate = 1000;  // sample rate should be fixed to 1kSPS for now
+	 settings.sample_rate = 4000;  // sample rate should be fixed to 1kSPS for now
 	 settings.sample_rate_compensation = 0;
 	 settings.channel_count = 8;
 	 settings.dac_enabled = false;
@@ -52,7 +52,7 @@
 	 //settings.usart_mode = 3; // (!!) 1 - async, 2 - sync master (organizer), 3 - sync slave (cell)
 	 settings.usart_speed = 1200; // the minumum speed should be [adc_value_bits] * [sample rate] * [channel_count] * [cell count] * 1.2 (for the overhead)
 	 	 
-	 settings.goertzel_enabled = true;
+	 settings.goertzel_enabled = false;
 	 settings.goertzel_frequencies[0] = 7.83f;
 	 settings.goertzel_frequencies[1] = 40.00f;
 	 settings.goertzel_frequencies[2] = 876543.21f;
@@ -72,7 +72,7 @@
 		 settings.adc_enabled = false;					// ADC should be enabled for cells and disabled for the organizer
 		 settings.usb_enabled = true;					// USB should be enabled for the organizer and disabled for the cells
 		 settings.usart_mode = 2;						// 1 - async, 2 - sync master (organizer), 3 - sync slave (cell)
-		 settings.adc_value_packet_to_usb = false;
+		 settings.adc_value_packet_to_usb = true;
 		 settings.adc_value_packet_to_usart = false;
 		 settings.goertzel_packet_to_usb = true;
 		 settings.goertzel_packet_to_usart = false;
