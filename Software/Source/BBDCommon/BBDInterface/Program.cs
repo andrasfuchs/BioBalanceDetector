@@ -13,7 +13,7 @@ namespace BBDInterface
         static void Main(string[] args)
         {
             ConsoleKeyInfo cki = new ConsoleKeyInfo();
-            currentMode = BBDDriver.Program.DataDisplayModes.NormalizedWaveform;
+            currentMode = BBDDriver.Program.DataDisplayModes.GoertzelValues;
 
             while ((cki.Key != ConsoleKey.Q) && (cki.Key != ConsoleKey.Escape))
             {
@@ -40,6 +40,11 @@ namespace BBDInterface
                 if (cki.Key == ConsoleKey.D3)
                 {
                     currentMode = BBDDriver.Program.DataDisplayModes.DominanceMatrix;
+                }
+
+                if (cki.Key == ConsoleKey.D4)
+                {
+                    currentMode = BBDDriver.Program.DataDisplayModes.GoertzelValues;
                 }
             }
         }

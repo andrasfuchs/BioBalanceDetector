@@ -7,9 +7,18 @@ using MadWizard.WinUSBNet;
 using System.Runtime.InteropServices;
 using BBDDriver.Models.IEEE11073;
 using System.Diagnostics;
+using BBDDriver.Models.Filter;
 
 namespace BBDDriver.Models.Source
 {
+    public class Mercury16GoertzelFilterSettings : ChannelFilterSettings
+    {
+        public int FFTSampleCount { get; set; }
+        public int Timeout { get; set; }
+        public bool IsRealTime { get; set; }
+        public FFTOutputFormat OutputFormat { get; set; }
+    }
+
     internal class BBDMercury16Input : MultiChannelInput<IDataChannel>, IDisposable
     {
         // warning: interface guid changes when the driver is regenerated (by zadig)
@@ -37,6 +46,11 @@ namespace BBDDriver.Models.Source
         public int ADCGain { get; set; } = 1;
         public int SampleRatekHz { get; set; } = 8;
         public int BufferSize { get; set; } = 32 * 1024;
+
+        public List<float>[] GoertzelOutputs;
+        public float GoertzelFrequency01;
+        public float GoertzelFrequency02;
+        public float GoertzelFrequency03;
 
         private Dictionary<int, PacketStats> packetStats = new Dictionary<int, PacketStats>();
 
@@ -235,9 +249,8 @@ namespace BBDDriver.Models.Source
             }
 
             // set the modified cell settings
-            cellSettings.SampleRate /= 4;
-
-            WritePacket<CellSettings>(usbInterface.OutPipe, 0xF009, cellSettings);
+            //cellSettings.SampleRate /= 4;
+            //WritePacket<CellSettings>(usbInterface.OutPipe, 0xF009, cellSettings);
 
             // start streaming data
             usbInterface.OutPipe.Write(new byte[] { 0xF0, 0x02, 0x00, 0x00 });
@@ -255,6 +268,10 @@ namespace BBDDriver.Models.Source
             }
 
             this.BufferSize = Math.Max(this.BufferSize, this.SamplesPerSecond * this.ChannelCount * 2 / targetFPS);
+            this.GoertzelOutputs = new List<float>[this.ChannelCount];
+            this.GoertzelFrequency01 = cellSettings.GoertzelFrequency01;
+            this.GoertzelFrequency02 = cellSettings.GoertzelFrequency02;
+            this.GoertzelFrequency03 = cellSettings.GoertzelFrequency03;
 
             Task usbPollTask = Task.Run(() =>
             {
@@ -513,11 +530,26 @@ namespace BBDDriver.Models.Source
                 float[] goertzelFrequencies = ConvertRawFloatToArray(goertzelFrequenciesRaw);
 
                 // allocate 4 bytes per Goerztel frequency
-                byte[] goertzelValuesRaw = new byte[channelCount * goertzelCount * valueCount * 4];
+                byte[] goertzelValuesRaw = new byte[channelCount * valueCount * goertzelCount * 4];
                 Array.Copy(dp.RawData, 16 + goertzelFrequenciesRaw.Length, goertzelValuesRaw, 0, goertzelValuesRaw.Length);
                 float[] goertzelValues = ConvertRawFloatToArray(goertzelValuesRaw);
 
-                // TODO: push Goerzel values into the pipeline
+                // push Goerzel values into the pipeline
+                for (int c = 0; c < channelCount; c++)
+                {
+                    float[] channelGoertzelValues = new float[valueCount * goertzelCount];
+                    Array.Copy(goertzelValues, c * valueCount * goertzelCount, channelGoertzelValues, 0, valueCount * goertzelCount);
+
+                    if (GoertzelOutputs[c] == null)
+                    {
+                        GoertzelOutputs[c] = new List<float>();
+                    }
+
+                    lock (GoertzelOutputs[c])
+                    {
+                        GoertzelOutputs[c].AddRange(channelGoertzelValues);
+                    }
+                }
 
                 lock (BenchmarkEntries)
                 {

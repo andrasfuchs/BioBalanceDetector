@@ -205,7 +205,7 @@ typedef struct GoertzelResults_struct
 	float goertzel_frequency_02;
 	float goertzel_frequency_03;
 
-	// Goertzel values for 8 channels, grouped by the frequency first (GF01CH01, GF01CH02, GF01CH03 ... GF01CH08, GF02CH01 etc.)
+	// Goertzel values for 8 channels, grouped by the channel first, value index second and the frequency third (CH01IX01GF1, CH01IX01GF2, CH01IX01GF3, CH01IX02GF01 values ... CH01IX02GF03, CH02IX01GF01 etc.)
 	float goertzel_values[MAX_CHANNELS_PER_PACKET * GOERTZEL_FREQUENCIES_PER_PACKET * MAX_GOERTZEL_VALUES_PER_PACKET];
 } GoertzelResults_t;
 

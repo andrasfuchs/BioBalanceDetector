@@ -9,7 +9,7 @@ using System.IO;
 
 namespace BBDDriver.Models.Output
 {
-    public enum VisualOutputMode { None, Waveform, Matrix, Spectrum, DominanceMatrix };
+    public enum VisualOutputMode { None, Waveform, Matrix, Spectrum, DominanceMatrix, GoertzelTable };
 
     public struct FrequencyValue
     {

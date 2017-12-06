@@ -10,7 +10,6 @@ using System.Web.Http;
 using System.Web.Http.Cors;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Threading;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.IO;
@@ -50,6 +49,7 @@ namespace BBDDriver
         private static int consoleRefreshAtY;
 
         private static VisualOutput vo = null;
+        private static DateTime lastRefreshVisualOutput = DateTime.UtcNow;
 
         private static int waveDataOverflowWarningCount = 0;
         private static long waveFileBytesWritten = 0;
@@ -58,7 +58,7 @@ namespace BBDDriver
 
         private static string sessionId;
 
-        public enum DataDisplayModes { None, NormalizedWaveform, FilteredSpectogram, DominanceMatrix }
+        public enum DataDisplayModes { None, NormalizedWaveform, FilteredSpectogram, DominanceMatrix, GoertzelValues }
 
         public static string SessionId
         {
@@ -120,7 +120,7 @@ namespace BBDDriver
             MultiChannelInput<IDataChannel> normalizedSource = FilterManager.ApplyFilters(waveSource, new NormalizeFilter() { Settings = new NormalizeFilterSettings() { Enabled = true, SampleCount = waveSource.SamplesPerSecond * 3, Gain = 40.0f } });
             //MultiChannelInput<IDataChannel> filteredSource = FilterManager.ApplyFilters(waveSource, new ByPassFilter() { Settings = new ByPassFilterSettings() { Enabled = true } });
             //MultiChannelInput<IDataChannel> filteredSource = FilterManager.ApplyFilters(waveSource, new FillFilter() { Settings = new FillFilterSettings() { Enabled = true, ValueToFillWith = 0.75f } });
-            
+
             //MultiChannelInput<IDataChannel> averagedSource = FilterManager.ApplyFilters(thresholdedSource, new MovingAverageFilter() { Settings = new MovingAverageFilterSettings() { Enabled = true, InputDataDimensions = 2, MovingAverageLength = 10 } });
 
             wfo = new WaveFileOutput(normalizedSource, $"{workingDirectory}{SessionId}.wav");
@@ -148,9 +148,12 @@ namespace BBDDriver
                     MultiChannelInput<IDataChannel> thresholdedSource = FilterManager.ApplyFilters(filteredSource, new ThresholdFilter() { Settings = new ThresholdFilterSettings() { Enabled = true, MinValue = 0.002f, MaxValue = Single.MaxValue } });
                     vo = new VisualOutput(thresholdedSource, 25, VisualOutputMode.DominanceMatrix);
                     break;
+                case DataDisplayModes.GoertzelValues:
+                    vo = new VisualOutput(waveSource, 25, VisualOutputMode.GoertzelTable);
+                    break;
             }
-            
-            
+
+
             //VisualOutput vo = new VisualOutput(waveSource, 25, VisualOutputMode.None);
             //vo = new VisualOutput(normalizedSource, 25, VisualOutputMode.Waveform);
             //VisualOutput vo = new VisualOutput(waveSource, 25, VisualOutputMode.Waveform);
@@ -167,8 +170,13 @@ namespace BBDDriver
 
             Console.OutputEncoding = System.Text.Encoding.Unicode;
             Console.SetBufferSize(200, 500);
-            Console.SetWindowSize(200, 63);            
+            Console.SetWindowSize(200, 63);
             consoleRefreshAtY = Console.CursorTop;
+        }
+
+        private static void Timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         public static void StopSession()
@@ -205,7 +213,10 @@ namespace BBDDriver
 
         private static void Vo_RefreshVisualOutput(object sender, RefreshVisualOutputEventArgs e)
         {
-            if (!e.ChangedSinceLastRefresh) return;
+            if ((!e.ChangedSinceLastRefresh) && (e.Mode != VisualOutputMode.GoertzelTable)) return;
+
+            if (lastRefreshVisualOutput.AddMilliseconds(20) > DateTime.UtcNow) return;
+            lastRefreshVisualOutput = DateTime.UtcNow;
 
             lock (SessionId)
             {
@@ -229,7 +240,11 @@ namespace BBDDriver
                     else if (e.Mode == VisualOutputMode.DominanceMatrix)
                     {
                         consoleOutput = GenerateDominanceMatrixOutput(e, 1, false);
-                    }                    
+                    }
+                    else if (e.Mode == VisualOutputMode.GoertzelTable)
+                    {
+                        consoleOutput = GenerateGoertzelTableOutput(e);
+                    }
 
                     Console.Title = GenerateConsoleTitle();
                     Console.SetCursorPosition(0, consoleRefreshAtY);
@@ -575,6 +590,36 @@ namespace BBDDriver
                         PrintDominanceMatrixUnit(consoleSB, "------------------------+", false, colorDisplay);
                     }
                     PrintDominanceMatrixUnit(consoleSB, null, true, colorDisplay);
+                }
+            }
+
+            return consoleSB.ToString();
+        }
+
+        private static string GenerateGoertzelTableOutput(RefreshVisualOutputEventArgs e)
+        {
+            BBDMercury16Input bbdMercury16Input = waveSource as BBDMercury16Input;
+
+            // Console Content
+            consoleSB.Clear();
+
+            if (bbdMercury16Input != null)
+            {
+                for (int c = 0; c < bbdMercury16Input.GoertzelOutputs.Length; c++)
+                {
+                    if ((bbdMercury16Input.GoertzelOutputs[c] == null) || (bbdMercury16Input.GoertzelOutputs[c].Count % 3 != 0)) continue;
+
+                    lock (bbdMercury16Input.GoertzelOutputs[c])
+                    {
+                        consoleSB.AppendLine($"---- channel {c+1}");
+                        float[] relevantValues = bbdMercury16Input.GoertzelOutputs[c].Where((x, i) => (i % 3 == 0) && (i > bbdMercury16Input.GoertzelOutputs[c].Count - 28)).ToArray();
+                        consoleSB.AppendLine($"- freq: {String.Format("{0, 10:##0.00}", bbdMercury16Input.GoertzelFrequency01)} Hz    values: {String.Join(" |", relevantValues.Select(v => String.Format("{0, 8:##0.00}", Math.Max(Math.Min(v, 9999.99), -9999.99))))}          ");
+                        relevantValues = bbdMercury16Input.GoertzelOutputs[c].Where((x, i) => (i % 3 == 1) && (i > bbdMercury16Input.GoertzelOutputs[c].Count - 28)).ToArray();
+                        consoleSB.AppendLine($"- freq: {String.Format("{0, 10:##0.00}", bbdMercury16Input.GoertzelFrequency02)} Hz    values: {String.Join(" |", relevantValues.Select(v => String.Format("{0, 8:##0.00}", Math.Max(Math.Min(v, 9999.99), -9999.99))))}          ");
+                        relevantValues = bbdMercury16Input.GoertzelOutputs[c].Where((x, i) => (i % 3 == 2) && (i > bbdMercury16Input.GoertzelOutputs[c].Count - 28)).ToArray();
+                        consoleSB.AppendLine($"- freq: {String.Format("{0, 10:##0.00}", bbdMercury16Input.GoertzelFrequency03)} Hz    values: {String.Join(" |", relevantValues.Select(v => String.Format("{0, 8:##0.00}", Math.Max(Math.Min(v, 9999.99), -9999.99))))}          ");
+                        consoleSB.AppendLine();
+                    }
                 }
             }
 
