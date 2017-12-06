@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO.Ports;
-using System.Linq;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using libusbK;
 using LibUsbDotNet;
@@ -238,6 +234,11 @@ namespace BBDDriver.Models.Source
                 cellSettings = ReadPacket<CellSettings>(usbInterface.InPipe, 0xF004, 10);
             }
 
+            // set the modified cell settings
+            cellSettings.SampleRate /= 4;
+
+            WritePacket<CellSettings>(usbInterface.OutPipe, 0xF009, cellSettings);
+
             // start streaming data
             usbInterface.OutPipe.Write(new byte[] { 0xF0, 0x02, 0x00, 0x00 });
 
@@ -291,6 +292,37 @@ namespace BBDDriver.Models.Source
             }
 
             return result;
+        }
+
+        private void WritePacket<T>(USBPipe pipe, UInt16 choice, T dataToSend)
+        {
+            List<byte> rawData = new List<byte>();
+            rawData.AddRange(ObjectToBinaryData<T>(dataToSend));
+            
+
+            // APDU must be converted to little endian so we need some trickery here
+            APDU apdu = new APDU() { Choice = choice, Length = (ushort)rawData.Count };
+            byte[] apduBE = ObjectToBinaryData<APDU>(apdu);
+
+            rawData.InsertRange(0, new byte[] { apduBE[1], apduBE[0], apduBE[3], apduBE[2] });
+
+            lock (pipe)
+            {
+                usbInterface.OutPipe.Write(rawData.ToArray());
+            }
+        }
+
+        private byte[] ObjectToBinaryData<T>(T dataToSend)
+        {
+            byte[] rawData = new byte[Marshal.SizeOf(dataToSend)];
+
+            IntPtr unmanagedAddr = Marshal.AllocHGlobal(Marshal.SizeOf(dataToSend));
+
+            Marshal.StructureToPtr(dataToSend, unmanagedAddr, true);
+
+            Marshal.Copy(unmanagedAddr, rawData, 0, rawData.Length);
+
+            return rawData;
         }
 
         private DataPacket ReadPacketRaw(USBPipe pipe)

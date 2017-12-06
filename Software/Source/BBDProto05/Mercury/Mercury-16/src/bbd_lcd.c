@@ -301,13 +301,13 @@ void lcd_update_menu(uint8_t menu_index)
 		if (settings.goertzel_enabled)
 		{
 			// display Goertzel frequencies
-			int strl = convert_to_float(&text_buffer[22], settings.goertzel_frequencies[0], 6, 2, true);
+			int strl = convert_to_float(&text_buffer[22], settings.goertzel_frequency_01, 6, 2, true);
 			gfx_mono_draw_string(&text_buffer[22-strl], 11*6, 10, &sysfont);
 		
-			strl = convert_to_float(&text_buffer[22], settings.goertzel_frequencies[1], 6, 2, true);
+			strl = convert_to_float(&text_buffer[22], settings.goertzel_frequency_02, 6, 2, true);
 			gfx_mono_draw_string(&text_buffer[22-strl], 0*6, 20, &sysfont);
 
-			strl = convert_to_float(&text_buffer[22], settings.goertzel_frequencies[2], 6, 2, true);
+			strl = convert_to_float(&text_buffer[22], settings.goertzel_frequency_03, 6, 2, true);
 			gfx_mono_draw_string(&text_buffer[22-strl], 11*6, 20, &sysfont);
 		}
 	}
