@@ -1,0 +1,36 @@
+A jelgenerátor mindig 5Vpp-os szinus jelet ad le.
+
+Murata Power Solutions Inc 330UH 780MA 215 MOhm - nem volt sikeres a meres, lehet, hogy a befogo kabel miatt
+100 Hz -> %
+1 kHz -> %
+10 kHz -> %
+100 kHz -> %
+
+
+Murata Power Solutions Inc 330UH 2.8A 150 MOhm
+100 Hz -> < 0.5%
+1 kHz -> 3%
+10 kHz -> 25%
+100 kHz -> 200%
+
+
+Bourns Inc. 330UH 540MA 850 MOhm
+0cm-ről x% megy át a csúcsoknál (fordított polaritással) és oldalt (azonos polaritással)
+100 Hz -> < 0.5%
+1 kHz -> 2%
+10 kHz -> 20%
+100 kHz -> 170%, kb. 5mm-es kartonlappal 80%. karton+0.11M ferrit lap 40%
+
+Bourns Inc. 470UH 140MA 6.5 Ohm TH
+100 Hz -> < 0.5%
+1 kHz -> 2%
+10 kHz -> 15%
+100 kHz -> 100%
+
+
+Sumida America Components 680UH 650MA 1.1 Ohm TH
+0cm-ről x% megy át a csúcsoknál (azonos polaritással) és oldalt (fordított polaritással)
+100 Hz -> 1%
+1 kHz -> 6%
+10 kHz -> 60%
+100 kHz -> 250%
