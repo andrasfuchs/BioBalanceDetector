@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO.Ports;
-using System.Linq;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using libusbK;
 using LibUsbDotNet;
@@ -11,15 +7,24 @@ using MadWizard.WinUSBNet;
 using System.Runtime.InteropServices;
 using BBDDriver.Models.IEEE11073;
 using System.Diagnostics;
+using BBDDriver.Models.Filter;
 
 namespace BBDDriver.Models.Source
 {
+    public class Mercury16GoertzelFilterSettings : ChannelFilterSettings
+    {
+        public int FFTSampleCount { get; set; }
+        public int Timeout { get; set; }
+        public bool IsRealTime { get; set; }
+        public FFTOutputFormat OutputFormat { get; set; }
+    }
+
     internal class BBDMercury16Input : MultiChannelInput<IDataChannel>, IDisposable
     {
         // warning: interface guid changes when the driver is regenerated (by zadig)
         // the new DeviceGUID can be found in the .inf file in the 'C:\Users\{username}\usb_driver' folder.
-        //private const string DEVICE_INTERFACE_GUID = "{ABA7BA71-CA9E-428F-813C-0B97D8205E31}"; // Sheldon
-        private const string DEVICE_INTERFACE_GUID = "{1E04662A-6FF7-4864-B7B7-8BBA6658585F}"; // Mr. Pepper
+        private const string DEVICE_INTERFACE_GUID = "{515CBB1B-8BCD-40F1-9B7D-6853970F6630}"; // Sheldon
+        //private const string DEVICE_INTERFACE_GUID = "{1E04662A-6FF7-4864-B7B7-8BBA6658585F}"; // Mr. Pepper
         private const int DEVICE_VID = 0x03EB;
         private const int DEVICE_PID = 0x2405;
         private const string DEVICE_DESC = "Mercury-16";
@@ -41,6 +46,11 @@ namespace BBDDriver.Models.Source
         public int ADCGain { get; set; } = 1;
         public int SampleRatekHz { get; set; } = 8;
         public int BufferSize { get; set; } = 32 * 1024;
+
+        public List<float>[] GoertzelOutputs;
+        public float GoertzelFrequency01;
+        public float GoertzelFrequency02;
+        public float GoertzelFrequency03;
 
         private Dictionary<int, PacketStats> packetStats = new Dictionary<int, PacketStats>();
 
@@ -225,7 +235,6 @@ namespace BBDDriver.Models.Source
             usbDevice = new USBDevice(selectedDevice);
             usbInterface = usbDevice.Interfaces.Find(USBBaseClass.PersonalHealthcare);
 
-
             var phdPacket = ReadIEEE11073Pakcet(usbInterface.InPipe);
 
             // stop streaming data
@@ -238,6 +247,10 @@ namespace BBDDriver.Models.Source
                 usbInterface.OutPipe.Write(new byte[] { 0xF0, 0x03, 0x00, 0x00 });
                 cellSettings = ReadPacket<CellSettings>(usbInterface.InPipe, 0xF004, 10);
             }
+
+            // set the modified cell settings
+            //cellSettings.SampleRate /= 4;
+            //WritePacket<CellSettings>(usbInterface.OutPipe, 0xF009, cellSettings);
 
             // start streaming data
             usbInterface.OutPipe.Write(new byte[] { 0xF0, 0x02, 0x00, 0x00 });
@@ -255,6 +268,10 @@ namespace BBDDriver.Models.Source
             }
 
             this.BufferSize = Math.Max(this.BufferSize, this.SamplesPerSecond * this.ChannelCount * 2 / targetFPS);
+            this.GoertzelOutputs = new List<float>[this.ChannelCount];
+            this.GoertzelFrequency01 = cellSettings.GoertzelFrequency01;
+            this.GoertzelFrequency02 = cellSettings.GoertzelFrequency02;
+            this.GoertzelFrequency03 = cellSettings.GoertzelFrequency03;
 
             Task usbPollTask = Task.Run(() =>
             {
@@ -292,6 +309,37 @@ namespace BBDDriver.Models.Source
             }
 
             return result;
+        }
+
+        private void WritePacket<T>(USBPipe pipe, UInt16 choice, T dataToSend)
+        {
+            List<byte> rawData = new List<byte>();
+            rawData.AddRange(ObjectToBinaryData<T>(dataToSend));
+            
+
+            // APDU must be converted to little endian so we need some trickery here
+            APDU apdu = new APDU() { Choice = choice, Length = (ushort)rawData.Count };
+            byte[] apduBE = ObjectToBinaryData<APDU>(apdu);
+
+            rawData.InsertRange(0, new byte[] { apduBE[1], apduBE[0], apduBE[3], apduBE[2] });
+
+            lock (pipe)
+            {
+                usbInterface.OutPipe.Write(rawData.ToArray());
+            }
+        }
+
+        private byte[] ObjectToBinaryData<T>(T dataToSend)
+        {
+            byte[] rawData = new byte[Marshal.SizeOf(dataToSend)];
+
+            IntPtr unmanagedAddr = Marshal.AllocHGlobal(Marshal.SizeOf(dataToSend));
+
+            Marshal.StructureToPtr(dataToSend, unmanagedAddr, true);
+
+            Marshal.Copy(unmanagedAddr, rawData, 0, rawData.Length);
+
+            return rawData;
         }
 
         private DataPacket ReadPacketRaw(USBPipe pipe)
@@ -482,11 +530,26 @@ namespace BBDDriver.Models.Source
                 float[] goertzelFrequencies = ConvertRawFloatToArray(goertzelFrequenciesRaw);
 
                 // allocate 4 bytes per Goerztel frequency
-                byte[] goertzelValuesRaw = new byte[channelCount * goertzelCount * valueCount * 4];
+                byte[] goertzelValuesRaw = new byte[channelCount * valueCount * goertzelCount * 4];
                 Array.Copy(dp.RawData, 16 + goertzelFrequenciesRaw.Length, goertzelValuesRaw, 0, goertzelValuesRaw.Length);
                 float[] goertzelValues = ConvertRawFloatToArray(goertzelValuesRaw);
 
-                // TODO: push Goerzel values into the pipeline
+                // push Goerzel values into the pipeline
+                for (int c = 0; c < channelCount; c++)
+                {
+                    float[] channelGoertzelValues = new float[valueCount * goertzelCount];
+                    Array.Copy(goertzelValues, c * valueCount * goertzelCount, channelGoertzelValues, 0, valueCount * goertzelCount);
+
+                    if (GoertzelOutputs[c] == null)
+                    {
+                        GoertzelOutputs[c] = new List<float>();
+                    }
+
+                    lock (GoertzelOutputs[c])
+                    {
+                        GoertzelOutputs[c].AddRange(channelGoertzelValues);
+                    }
+                }
 
                 lock (BenchmarkEntries)
                 {
@@ -587,6 +650,7 @@ namespace BBDDriver.Models.Source
 
         void IDisposable.Dispose()
         {
+            usbDevice.Dispose();
         }
     }
 

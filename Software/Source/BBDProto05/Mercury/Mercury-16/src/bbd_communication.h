@@ -15,7 +15,7 @@
 /* Number of samples stored in memory before sending it to the organizer (note: must be dividable by the number of channels (8)) */
 #define MAX_ADC_VALUES_PER_PACKET 128
 #define MAX_GOERTZEL_VALUES_PER_PACKET 1
-#define MAX_GOERTZEL_FREQUENCIES_PER_PACKET 3
+#define GOERTZEL_FREQUENCIES_PER_PACKET 3
 
 
 typedef struct GetSettings_struct
@@ -120,7 +120,9 @@ typedef struct CellSettings_struct
 	bool goertzel_enabled;
 	
 	// Goertzel frequencies
-	float goertzel_frequencies[MAX_GOERTZEL_FREQUENCIES_PER_PACKET];
+	float goertzel_frequency_01;
+	float goertzel_frequency_02;
+	float goertzel_frequency_03;
 
 	// 8 or 12 bit resolution
 	uint8_t adc_value_bits;
@@ -199,11 +201,23 @@ typedef struct GoertzelResults_struct
 	uint32_t goertzel_count;
 
     // Goertzel frequencies
-    float goertzel_frequencies[MAX_GOERTZEL_FREQUENCIES_PER_PACKET];
+    float goertzel_frequency_01;
+	float goertzel_frequency_02;
+	float goertzel_frequency_03;
 
-	// Goertzel values for 8 channels, grouped by the frequency first (GF01CH01, GF01CH02, GF01CH03 ... GF01CH08, GF02CH01 etc.)
-	float goertzel_values[MAX_CHANNELS_PER_PACKET * MAX_GOERTZEL_FREQUENCIES_PER_PACKET * MAX_GOERTZEL_VALUES_PER_PACKET];
+	// Goertzel values for 8 channels, grouped by the channel first, value index second and the frequency third (CH01IX01GF1, CH01IX01GF2, CH01IX01GF3, CH01IX02GF01 values ... CH01IX02GF03, CH02IX01GF01 etc.)
+	float goertzel_values[MAX_CHANNELS_PER_PACKET * GOERTZEL_FREQUENCIES_PER_PACKET * MAX_GOERTZEL_VALUES_PER_PACKET];
 } GoertzelResults_t;
+
+typedef struct SetSettings_struct
+{
+	// 0xF009
+	uint16_t choice;
+
+	uint16_t length;
+	
+	CellSettings_t new_settings;
+} SetSettings_t;
 
 
 #endif /* BBD_COMMUNICATION_H_ */
