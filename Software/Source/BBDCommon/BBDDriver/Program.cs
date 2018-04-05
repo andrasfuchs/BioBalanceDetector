@@ -117,11 +117,11 @@ namespace BBDDriver
             int fftSize = 1024 * 16;
             frequencyStep = (float)waveSource.SamplesPerSecond / fftSize;
 
-            MultiChannelInput<IDataChannel> normalizedSource = FilterManager.ApplyFilters(waveSource, new NormalizeFilter() { Settings = new NormalizeFilterSettings() { Enabled = true, SampleCount = waveSource.SamplesPerSecond * 3, Gain = 40.0f } });
+            MultiChannelInput<IDataChannel> normalizedSource = FilterManager.ApplyFilters(waveSource, new NormalizeFilter() { Settings = new NormalizeFilterSettings() { Enabled = true, SampleCount = waveSource.SamplesPerSecond * 3, Gain = 10.0f } });
             //MultiChannelInput<IDataChannel> filteredSource = FilterManager.ApplyFilters(waveSource, new ByPassFilter() { Settings = new ByPassFilterSettings() { Enabled = true } });
             //MultiChannelInput<IDataChannel> filteredSource = FilterManager.ApplyFilters(waveSource, new FillFilter() { Settings = new FillFilterSettings() { Enabled = true, ValueToFillWith = 0.75f } });
 
-            //MultiChannelInput<IDataChannel> averagedSource = FilterManager.ApplyFilters(thresholdedSource, new MovingAverageFilter() { Settings = new MovingAverageFilterSettings() { Enabled = true, InputDataDimensions = 2, MovingAverageLength = 10 } });
+            //MultiChannelInput<IDataChannel> averagedSource = FilterManager.ApplyFilters(normalizedSource, new MovingAverageFilter() { Settings = new MovingAverageFilterSettings() { Enabled = true, InputDataDimensions = 2, MovingAverageLength = 10 } });
 
             wfo = new WaveFileOutput(normalizedSource, $"{workingDirectory}{SessionId}.wav");
             wfo.DataWritten += Wfo_DataWritten;
@@ -152,14 +152,6 @@ namespace BBDDriver
                     vo = new VisualOutput(waveSource, 25, VisualOutputMode.GoertzelTable);
                     break;
             }
-
-
-            //VisualOutput vo = new VisualOutput(waveSource, 25, VisualOutputMode.None);
-            //vo = new VisualOutput(normalizedSource, 25, VisualOutputMode.Waveform);
-            //VisualOutput vo = new VisualOutput(waveSource, 25, VisualOutputMode.Waveform);
-            //VisualOutput vo = new VisualOutput(filteredSource, 25, VisualOutputMode.Spectrum);
-            //VisualOutput vo = new VisualOutput(thresholdedSource, 25, VisualOutputMode.DominanceMatrix);
-
 
             if (vo != null)
             {
@@ -231,7 +223,8 @@ namespace BBDDriver
                     }
                     else if (e.Mode == VisualOutputMode.Waveform)
                     {
-                        consoleOutput = GenerateWaveformOutput(e, minimumAverageSamples, 4, 13);
+                        //consoleOutput = GenerateWaveformOutput(e, minimumAverageSamples, 4, 13);
+                        consoleOutput = GenerateWaveformOutput(e, minimumAverageSamples, 8, 6);
                     }
                     else if (e.Mode == VisualOutputMode.Spectrum)
                     {
@@ -342,7 +335,7 @@ namespace BBDDriver
                     columnAvgs[x] /= avgSampleCount;
                 }
 
-                consoleSB.AppendLine($"=== channel {chIndex}");
+                consoleSB.AppendLine($"=== channel {chIndex} (min: {columnMins.Min().ToString("+0.0000;-0.0000; 0.0000")}, max: {columnMaxs.Max().ToString("+0.0000;-0.0000; 0.0000")}, peak-to-peak: {(columnMaxs.Max() - columnMins.Min()).ToString("0.0000")})       ");
                 for (int y = height - 1; y >= 0; y--)
                 {
                     float maxValue = ((2.0f / height) * (y + 1)) - 1.0f;
