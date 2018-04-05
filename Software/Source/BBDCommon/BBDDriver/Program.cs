@@ -137,7 +137,8 @@ namespace BBDDriver
             switch (mode)
             {
                 case DataDisplayModes.NormalizedWaveform:
-                    vo = new VisualOutput(normalizedSource, 25, VisualOutputMode.Waveform);
+                    peakToPeakValues = null;
+                    vo = new VisualOutput(normalizedSource, 25, VisualOutputMode.Waveform);                    
                     break;
                 case DataDisplayModes.FilteredSpectogram:
                     filteredSource = FilterManager.ApplyFilters(normalizedSource, new FFTWFilter() { Settings = new FFTWFilterSettings() { Enabled = true, FFTSampleCount = fftSize, IsBackward = false, PlanningRigor = FFTPlanningRigor.Estimate, IsRealTime = true, Timeout = 300, OutputFormat = FFTOutputFormat.Magnitude, BufferSize = fftSize * 16 } });
@@ -312,8 +313,18 @@ namespace BBDDriver
 
         }
 
+
+        private static int peakToPeakValueCounter;
+        private static float[][] peakToPeakValues;
+
         private static string GenerateWaveformOutput(RefreshVisualOutputEventArgs e, int avgSampleCount, int maxChannelCount, int height)
         {
+            if (peakToPeakValues == null)
+            {
+                peakToPeakValues = new float[e.Dimensions[0]][];
+            }
+            peakToPeakValueCounter = (peakToPeakValueCounter + 1) % (25 * 3);
+
             consoleSB.Clear();
             for (int chIndex = 0; chIndex < Math.Min(maxChannelCount, e.Dimensions[0]); chIndex++)
             {
@@ -335,7 +346,14 @@ namespace BBDDriver
                     columnAvgs[x] /= avgSampleCount;
                 }
 
-                consoleSB.AppendLine($"=== channel {chIndex} (min: {columnMins.Min().ToString("+0.0000;-0.0000; 0.0000")}, max: {columnMaxs.Max().ToString("+0.0000;-0.0000; 0.0000")}, peak-to-peak: {(columnMaxs.Max() - columnMins.Min()).ToString("0.0000")})       ");
+                float peakToPeakValue = (columnMaxs.Max() - columnMins.Min());
+                if (peakToPeakValues[chIndex] == null)
+                {
+                    peakToPeakValues[chIndex] = new float[25 * 3];
+                }
+                peakToPeakValues[chIndex][peakToPeakValueCounter] = peakToPeakValue;
+
+                consoleSB.AppendLine($"=== channel {chIndex} (min: {columnMins.Min().ToString("+0.0000;-0.0000; 0.0000")}, max: {columnMaxs.Max().ToString("+0.0000;-0.0000; 0.0000")}, peak-to-peak: {peakToPeakValue.ToString("0.0000")} [avg: {peakToPeakValues[chIndex].Average().ToString("0.0000")}, {peakToPeakValues[chIndex].Min().ToString("0.0000")} - {peakToPeakValues[chIndex].Max().ToString("0.0000")}])       ");
                 for (int y = height - 1; y >= 0; y--)
                 {
                     float maxValue = ((2.0f / height) * (y + 1)) - 1.0f;
