@@ -4,7 +4,7 @@ EELAYER 26 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 3 3
+Sheet 3 5
 Title "Raspberry Pi GOIP Header"
 Date "2018-04-27"
 Rev "A"
@@ -93,4 +93,12 @@ Wire Wire Line
 	2400 1700 2700 1700
 Wire Wire Line
 	2400 1300 2700 1300
+Text HLabel 2700 1100 2    50   Output ~ 0
+DC_POWER_5V0
+Text HLabel 2700 1200 2    50   Output ~ 0
+DC_POWER_5V0
+Wire Wire Line
+	2400 1100 2700 1100
+Wire Wire Line
+	2400 1200 2700 1200
 $EndSCHEMATC

@@ -1,11 +1,11 @@
 EESchema Schematic File Version 4
-LIBS:CellSlave-cache
+LIBS:Venus-256-cache
 EELAYER 26 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 1 1
-Title "Venus-256 / Cell Slave"
+Sheet 5 5
+Title "Cell Slave"
 Date "2018-04-26"
 Rev "A"
 Comp "Bio Balance Detector"
@@ -14,37 +14,590 @@ Comment2 ""
 Comment3 ""
 Comment4 ""
 $EndDescr
+Wire Wire Line
+	4100 2300 4400 2300
+$Comp
+L Device:C_Small C?
+U 1 1 5AE9F047
+P 4400 1700
+F 0 "C?" H 4492 1746 50  0000 L CNN
+F 1 "10uF,X5R" H 4492 1655 50  0000 L CNN
+F 2 "" H 4400 1700 50  0001 C CNN
+F 3 "~" H 4400 1700 50  0001 C CNN
+	1    4400 1700
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4100 1800 4200 1800
+Wire Wire Line
+	4200 1800 4200 1500
+Wire Wire Line
+	4200 1500 4400 1500
+Wire Wire Line
+	4400 1500 4400 1600
+Wire Wire Line
+	4100 1900 4400 1900
+Text HLabel 4400 2800 2    50   UnSpc ~ 0
+DGND
+Text HLabel 4400 2900 2    50   UnSpc ~ 0
+DGND
+Wire Wire Line
+	4100 2800 4400 2800
+Wire Wire Line
+	4100 2900 4400 2900
+Text HLabel 4400 5800 2    50   Output ~ 0
+BUSY
+Text HLabel 4400 5200 2    50   Input ~ 0
+~CS
+Text HLabel 4400 3100 2    50   Input ~ 0
+VDRIVE_3V3
+Wire Wire Line
+	4100 3100 4400 3100
+Wire Wire Line
+	4100 3700 4400 3700
+Text HLabel 4400 4300 2    50   Input ~ 0
+SDI
+Text HLabel 4400 4500 2    50   Output ~ 0
+SDOA
+Wire Wire Line
+	4100 4300 4400 4300
+Wire Wire Line
+	4100 4400 4400 4400
+Wire Wire Line
+	4100 4500 4400 4500
+Wire Wire Line
+	4100 5200 4400 5200
+Wire Wire Line
+	4100 5800 4400 5800
+Text HLabel 4400 5100 2    50   Input ~ 0
+SCLK
+Wire Wire Line
+	4100 5100 4400 5100
+Text HLabel 2900 7000 3    50   UnSpc ~ 0
+AGND
+Wire Wire Line
+	2600 6700 2600 6800
+Wire Wire Line
+	2600 6800 2700 6800
+Wire Wire Line
+	2900 6800 2900 7000
+Wire Wire Line
+	2900 6700 2900 6800
+Connection ~ 2900 6800
+Wire Wire Line
+	2800 6700 2800 6800
+Connection ~ 2800 6800
+Wire Wire Line
+	2800 6800 2900 6800
+Wire Wire Line
+	2700 6700 2700 6800
+Connection ~ 2700 6800
+Wire Wire Line
+	2700 6800 2800 6800
+Text HLabel 3200 7000 3    50   UnSpc ~ 0
+DGND
+Wire Wire Line
+	3200 6700 3200 7000
+Text HLabel 3100 1200 1    50   Input ~ 0
+VDRIVE_3V3
+Wire Wire Line
+	3100 1500 3100 1200
+Text HLabel 2900 1200 1    50   Input ~ 0
+VCC_5V0
+Wire Wire Line
+	2900 1500 2900 1400
+Wire Wire Line
+	2600 1500 2600 1400
+Wire Wire Line
+	2600 1400 2700 1400
+Connection ~ 2900 1400
+Wire Wire Line
+	2900 1400 2900 1200
+Wire Wire Line
+	2700 1500 2700 1400
+Connection ~ 2700 1400
+Wire Wire Line
+	2700 1400 2800 1400
+Wire Wire Line
+	2800 1500 2800 1400
+Connection ~ 2800 1400
+Wire Wire Line
+	2800 1400 2900 1400
+$Comp
+L Connector_Generic:Conn_01x01 J?
+U 1 1 5AEA60FF
+P 1400 1800
+F 0 "J?" H 1320 1575 50  0000 C CNN
+F 1 "S01" H 1320 1666 50  0000 C CNN
+F 2 "" H 1400 1800 50  0001 C CNN
+F 3 "~" H 1400 1800 50  0001 C CNN
+	1    1400 1800
+	-1   0    0    1   
+$EndComp
+$Comp
+L Connector_Generic:Conn_01x01 J?
+U 1 1 5AEA6172
+P 1400 2100
+F 0 "J?" H 1320 1875 50  0000 C CNN
+F 1 "S02" H 1320 1966 50  0000 C CNN
+F 2 "" H 1400 2100 50  0001 C CNN
+F 3 "~" H 1400 2100 50  0001 C CNN
+	1    1400 2100
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	1600 1800 1900 1800
+Wire Wire Line
+	1600 2100 1900 2100
+Text HLabel 1800 7000 3    50   Input ~ 0
+SGND
+Wire Wire Line
+	1800 7000 1800 6400
+Wire Wire Line
+	1800 6400 1900 6400
+Wire Wire Line
+	1800 6400 1800 6100
+Wire Wire Line
+	1800 6100 1900 6100
+Connection ~ 1800 6400
+Wire Wire Line
+	1800 6100 1800 5800
+Wire Wire Line
+	1800 5800 1900 5800
+Connection ~ 1800 6100
+Wire Wire Line
+	1800 5800 1800 5500
+Wire Wire Line
+	1800 5500 1900 5500
+Connection ~ 1800 5800
+Wire Wire Line
+	1800 5500 1800 5200
+Wire Wire Line
+	1800 5200 1900 5200
+Connection ~ 1800 5500
+Wire Wire Line
+	1800 5200 1800 4900
+Wire Wire Line
+	1800 4900 1900 4900
+Connection ~ 1800 5200
+Wire Wire Line
+	1800 4900 1800 4600
+Wire Wire Line
+	1800 4600 1900 4600
+Connection ~ 1800 4900
+Wire Wire Line
+	1800 4600 1800 4300
+Wire Wire Line
+	1800 4300 1900 4300
+Connection ~ 1800 4600
+Wire Wire Line
+	1800 4300 1800 4000
+Wire Wire Line
+	1800 4000 1900 4000
+Connection ~ 1800 4300
+Wire Wire Line
+	1800 4000 1800 3700
+Wire Wire Line
+	1800 3700 1900 3700
+Connection ~ 1800 4000
+Wire Wire Line
+	1800 3700 1800 3400
+Wire Wire Line
+	1800 3400 1900 3400
+Connection ~ 1800 3700
+Wire Wire Line
+	1800 3400 1800 3100
+Wire Wire Line
+	1800 3100 1900 3100
+Connection ~ 1800 3400
+Wire Wire Line
+	1800 3100 1800 2800
+Wire Wire Line
+	1800 2800 1900 2800
+Connection ~ 1800 3100
+Wire Wire Line
+	1800 2800 1800 2500
+Wire Wire Line
+	1800 2500 1900 2500
+Connection ~ 1800 2800
+Wire Wire Line
+	1800 2500 1800 2200
+Wire Wire Line
+	1800 2200 1900 2200
+Connection ~ 1800 2500
+Wire Wire Line
+	1800 2200 1800 1900
+Wire Wire Line
+	1800 1900 1900 1900
+Connection ~ 1800 2200
+Text HLabel 4400 4600 2    50   UnSpc ~ 0
+DGND
+Text HLabel 4400 4700 2    50   UnSpc ~ 0
+DGND
+Text HLabel 4400 4800 2    50   UnSpc ~ 0
+DGND
+Wire Wire Line
+	4100 4600 4400 4600
+Wire Wire Line
+	4100 4700 4400 4700
+Wire Wire Line
+	4100 4800 4400 4800
+Text HLabel 4400 5000 2    50   UnSpc ~ 0
+DGND
+Wire Wire Line
+	4100 5000 4400 5000
+Text HLabel 4400 5400 2    50   UnSpc ~ 0
+DGND
+Text HLabel 4400 5500 2    50   UnSpc ~ 0
+DGND
+Text HLabel 4400 5600 2    50   UnSpc ~ 0
+DGND
 $Comp
 L Analog_ADC:AD7616 U?
 U 1 1 5AE20D71
-P 4300 4300
-F 0 "U?" H 4300 7078 50  0000 C CNN
-F 1 "AD7616" H 4300 6987 50  0000 C CNN
-F 2 "Package_QFP:LQFP-80_14x14mm_P0.65mm" H 4300 4300 50  0001 C CIN
-F 3 "http://www.analog.com/media/en/technical-documentation/data-sheets/AD7616.pdf" H 4400 1300 50  0001 C CNN
-	1    4300 4300
+P 3000 4100
+F 0 "U?" H 2200 6600 50  0000 C CNN
+F 1 "AD7616" H 2300 1600 50  0000 C CNN
+F 2 "Package_QFP:LQFP-80_14x14mm_P0.65mm" H 3000 4100 50  0001 C CIN
+F 3 "http://www.analog.com/media/en/technical-documentation/data-sheets/AD7616.pdf" H 3100 1100 50  0001 C CNN
+	1    3000 4100
 	1    0    0    -1  
 $EndComp
+Wire Wire Line
+	4100 5400 4400 5400
+Wire Wire Line
+	4100 5500 4400 5500
+Wire Wire Line
+	4100 5600 4400 5600
+Text HLabel 4400 2300 2    50   Input ~ 0
+VDRIVE_3V3
+Text HLabel 5600 1800 2    50   Output ~ 0
+ADC_REF_OUT
+Text HLabel 4700 1900 2    50   UnSpc ~ 0
+AGND
+Wire Wire Line
+	4400 1900 4700 1900
+Connection ~ 4400 1900
+Wire Wire Line
+	4400 1800 4400 1900
+Text HLabel 4400 2600 2    50   UnSpc ~ 0
+DGND
+Wire Wire Line
+	4100 2600 4400 2600
+Text HLabel 4400 2500 2    50   Input ~ 0
+~RESET
+Wire Wire Line
+	4100 2500 4400 2500
+Text HLabel 4400 3300 2    50   UnSpc ~ 0
+DGND
+Text HLabel 4400 3400 2    50   UnSpc ~ 0
+DGND
+Text HLabel 4400 3500 2    50   UnSpc ~ 0
+DGND
+Text HLabel 4400 3600 2    50   UnSpc ~ 0
+DGND
+Wire Wire Line
+	4100 3300 4400 3300
+Wire Wire Line
+	4100 3400 4400 3400
+Wire Wire Line
+	4100 3500 4400 3500
+Wire Wire Line
+	4100 3600 4400 3600
+Text HLabel 4400 3700 2    50   UnSpc ~ 0
+DGND
+Text HLabel 4400 3800 2    50   UnSpc ~ 0
+DGND
+Wire Wire Line
+	4100 3800 4400 3800
+Text HLabel 4400 3900 2    50   UnSpc ~ 0
+DGND
+Text HLabel 4400 4000 2    50   UnSpc ~ 0
+DGND
+Wire Wire Line
+	4100 3900 4400 3900
+Wire Wire Line
+	4100 4000 4400 4000
+Text HLabel 4400 4100 2    50   UnSpc ~ 0
+DGND
+Text HLabel 4400 4200 2    50   UnSpc ~ 0
+DGND
+Wire Wire Line
+	4100 4100 4400 4100
+Wire Wire Line
+	4100 4200 4400 4200
+NoConn ~ 4400 4400
+Text HLabel 4400 5900 2    50   Input ~ 0
+CONVST
+Wire Wire Line
+	4100 5900 4400 5900
+Text HLabel 4700 6300 2    50   UnSpc ~ 0
+AGND
+Wire Wire Line
+	4100 6300 4400 6300
 $Comp
-L Connector_Generic:Conn_01x01 J100
-U 1 1 5AE20EA6
-P 2700 2000
-F 0 "J100" H 2620 1775 50  0000 C CNN
-F 1 "CH00" H 2620 1866 50  0000 C CNN
-F 2 "" H 2700 2000 50  0001 C CNN
-F 3 "~" H 2700 2000 50  0001 C CNN
-	1    2700 2000
+L Device:C_Small C?
+U 1 1 5AF0F415
+P 4400 6600
+F 0 "C?" H 4492 6646 50  0000 L CNN
+F 1 "10uF" H 4492 6555 50  0000 L CNN
+F 2 "" H 4400 6600 50  0001 C CNN
+F 3 "~" H 4400 6600 50  0001 C CNN
+	1    4400 6600
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4400 6300 4400 6500
+Connection ~ 4400 6300
+Wire Wire Line
+	4400 6300 4700 6300
+Wire Wire Line
+	4100 6400 4200 6400
+Wire Wire Line
+	4200 6400 4200 6800
+Wire Wire Line
+	4200 6800 4400 6800
+Wire Wire Line
+	4400 6800 4400 6700
+Text HLabel 5700 6100 2    50   UnSpc ~ 0
+DGND
+$Comp
+L Device:C_Small C?
+U 1 1 5AF1A3C9
+P 5400 6400
+F 0 "C?" H 5492 6446 50  0000 L CNN
+F 1 "10uF" H 5492 6355 50  0000 L CNN
+F 2 "" H 5400 6400 50  0001 C CNN
+F 3 "~" H 5400 6400 50  0001 C CNN
+	1    5400 6400
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5400 6100 5400 6300
+Connection ~ 5400 6100
+Wire Wire Line
+	5400 6100 5700 6100
+Wire Wire Line
+	5200 6200 5200 6600
+Wire Wire Line
+	5200 6600 5400 6600
+Wire Wire Line
+	5400 6600 5400 6500
+Wire Wire Line
+	4100 6100 5400 6100
+Wire Wire Line
+	4100 6200 5200 6200
+$Comp
+L Connector_Generic:Conn_01x01 J?
+U 1 1 5AF23C74
+P 1400 2400
+F 0 "J?" H 1320 2175 50  0000 C CNN
+F 1 "S03" H 1320 2266 50  0000 C CNN
+F 2 "" H 1400 2400 50  0001 C CNN
+F 3 "~" H 1400 2400 50  0001 C CNN
+	1    1400 2400
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	1600 2400 1900 2400
+$Comp
+L Connector_Generic:Conn_01x01 J?
+U 1 1 5AF2A3B4
+P 1400 2700
+F 0 "J?" H 1320 2475 50  0000 C CNN
+F 1 "S04" H 1320 2566 50  0000 C CNN
+F 2 "" H 1400 2700 50  0001 C CNN
+F 3 "~" H 1400 2700 50  0001 C CNN
+	1    1400 2700
 	-1   0    0    1   
 $EndComp
 $Comp
-L Connector_Generic:Conn_01x01 J101
-U 1 1 5AE21024
-P 2400 2100
-F 0 "J101" H 2320 1875 50  0000 C CNN
-F 1 "CH01" H 2320 1966 50  0000 C CNN
-F 2 "" H 2400 2100 50  0001 C CNN
-F 3 "~" H 2400 2100 50  0001 C CNN
-	1    2400 2100
+L Connector_Generic:Conn_01x01 J?
+U 1 1 5AF2A3D6
+P 1400 3000
+F 0 "J?" H 1320 2775 50  0000 C CNN
+F 1 "S05" H 1320 2866 50  0000 C CNN
+F 2 "" H 1400 3000 50  0001 C CNN
+F 3 "~" H 1400 3000 50  0001 C CNN
+	1    1400 3000
 	-1   0    0    1   
 $EndComp
+$Comp
+L Connector_Generic:Conn_01x01 J?
+U 1 1 5AF2A3FA
+P 1400 3300
+F 0 "J?" H 1320 3075 50  0000 C CNN
+F 1 "S06" H 1320 3166 50  0000 C CNN
+F 2 "" H 1400 3300 50  0001 C CNN
+F 3 "~" H 1400 3300 50  0001 C CNN
+	1    1400 3300
+	-1   0    0    1   
+$EndComp
+$Comp
+L Connector_Generic:Conn_01x01 J?
+U 1 1 5AF2A420
+P 1400 3600
+F 0 "J?" H 1320 3375 50  0000 C CNN
+F 1 "S07" H 1320 3466 50  0000 C CNN
+F 2 "" H 1400 3600 50  0001 C CNN
+F 3 "~" H 1400 3600 50  0001 C CNN
+	1    1400 3600
+	-1   0    0    1   
+$EndComp
+$Comp
+L Connector_Generic:Conn_01x01 J?
+U 1 1 5AF2A483
+P 1400 3900
+F 0 "J?" H 1320 3675 50  0000 C CNN
+F 1 "S08" H 1320 3766 50  0000 C CNN
+F 2 "" H 1400 3900 50  0001 C CNN
+F 3 "~" H 1400 3900 50  0001 C CNN
+	1    1400 3900
+	-1   0    0    1   
+$EndComp
+$Comp
+L Connector_Generic:Conn_01x01 J?
+U 1 1 5AF2A4AD
+P 1400 4200
+F 0 "J?" H 1320 3975 50  0000 C CNN
+F 1 "S09" H 1320 4066 50  0000 C CNN
+F 2 "" H 1400 4200 50  0001 C CNN
+F 3 "~" H 1400 4200 50  0001 C CNN
+	1    1400 4200
+	-1   0    0    1   
+$EndComp
+$Comp
+L Connector_Generic:Conn_01x01 J?
+U 1 1 5AF2A4D9
+P 1400 4500
+F 0 "J?" H 1320 4275 50  0000 C CNN
+F 1 "S10" H 1320 4366 50  0000 C CNN
+F 2 "" H 1400 4500 50  0001 C CNN
+F 3 "~" H 1400 4500 50  0001 C CNN
+	1    1400 4500
+	-1   0    0    1   
+$EndComp
+$Comp
+L Connector_Generic:Conn_01x01 J?
+U 1 1 5AF2A507
+P 1400 4800
+F 0 "J?" H 1320 4575 50  0000 C CNN
+F 1 "S11" H 1320 4666 50  0000 C CNN
+F 2 "" H 1400 4800 50  0001 C CNN
+F 3 "~" H 1400 4800 50  0001 C CNN
+	1    1400 4800
+	-1   0    0    1   
+$EndComp
+$Comp
+L Connector_Generic:Conn_01x01 J?
+U 1 1 5AF2A537
+P 1400 5100
+F 0 "J?" H 1320 4875 50  0000 C CNN
+F 1 "S12" H 1320 4966 50  0000 C CNN
+F 2 "" H 1400 5100 50  0001 C CNN
+F 3 "~" H 1400 5100 50  0001 C CNN
+	1    1400 5100
+	-1   0    0    1   
+$EndComp
+$Comp
+L Connector_Generic:Conn_01x01 J?
+U 1 1 5AF2A569
+P 1400 5400
+F 0 "J?" H 1320 5175 50  0000 C CNN
+F 1 "S13" H 1320 5266 50  0000 C CNN
+F 2 "" H 1400 5400 50  0001 C CNN
+F 3 "~" H 1400 5400 50  0001 C CNN
+	1    1400 5400
+	-1   0    0    1   
+$EndComp
+$Comp
+L Connector_Generic:Conn_01x01 J?
+U 1 1 5AF2A59D
+P 1400 5700
+F 0 "J?" H 1320 5475 50  0000 C CNN
+F 1 "S14" H 1320 5566 50  0000 C CNN
+F 2 "" H 1400 5700 50  0001 C CNN
+F 3 "~" H 1400 5700 50  0001 C CNN
+	1    1400 5700
+	-1   0    0    1   
+$EndComp
+$Comp
+L Connector_Generic:Conn_01x01 J?
+U 1 1 5AF2A5D3
+P 1400 6000
+F 0 "J?" H 1320 5775 50  0000 C CNN
+F 1 "S15" H 1320 5866 50  0000 C CNN
+F 2 "" H 1400 6000 50  0001 C CNN
+F 3 "~" H 1400 6000 50  0001 C CNN
+	1    1400 6000
+	-1   0    0    1   
+$EndComp
+$Comp
+L Connector_Generic:Conn_01x01 J?
+U 1 1 5AF2A6A3
+P 1400 6300
+F 0 "J?" H 1320 6075 50  0000 C CNN
+F 1 "S16" H 1320 6166 50  0000 C CNN
+F 2 "" H 1400 6300 50  0001 C CNN
+F 3 "~" H 1400 6300 50  0001 C CNN
+	1    1400 6300
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	1600 2700 1900 2700
+Wire Wire Line
+	1900 3000 1600 3000
+Wire Wire Line
+	1600 3300 1900 3300
+Wire Wire Line
+	1600 3600 1900 3600
+Wire Wire Line
+	1900 3900 1600 3900
+Wire Wire Line
+	1600 4200 1900 4200
+Wire Wire Line
+	1900 4500 1600 4500
+Wire Wire Line
+	1600 4800 1900 4800
+Wire Wire Line
+	1900 5100 1600 5100
+Wire Wire Line
+	1600 5400 1900 5400
+Wire Wire Line
+	1900 5700 1600 5700
+Wire Wire Line
+	1600 6000 1900 6000
+Wire Wire Line
+	1900 6300 1600 6300
+$Comp
+L Device:C_Small C?
+U 1 1 5AF62C30
+P 5300 2000
+F 0 "C?" H 5392 2046 50  0000 L CNN
+F 1 "0.1uF,X8R" H 5392 1955 50  0000 L CNN
+F 2 "" H 5300 2000 50  0001 C CNN
+F 3 "~" H 5300 2000 50  0001 C CNN
+	1    5300 2000
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5100 2100 5100 1800
+Wire Wire Line
+	5100 1800 5300 1800
+Wire Wire Line
+	5300 1800 5300 1900
+Text HLabel 5600 2200 2    50   UnSpc ~ 0
+AGND
+Wire Wire Line
+	5300 2200 5600 2200
+Connection ~ 5300 2200
+Wire Wire Line
+	5300 2100 5300 2200
+Wire Wire Line
+	4100 2200 5300 2200
+Wire Wire Line
+	4100 2100 5100 2100
+Wire Wire Line
+	5300 1800 5600 1800
+Connection ~ 5300 1800
 $EndSCHEMATC
