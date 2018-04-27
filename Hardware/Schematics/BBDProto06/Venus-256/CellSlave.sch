@@ -4,7 +4,7 @@ EELAYER 26 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 5 5
+Sheet 4 8
 Title "Cell Slave"
 Date "2018-04-26"
 Rev "A"
@@ -229,8 +229,6 @@ Wire Wire Line
 	4400 5800 4700 5800
 Text HLabel 4700 2500 2    50   Input ~ 0
 VDRIVE_3V3
-Text HLabel 5900 2000 2    50   Output ~ 0
-ADC_REF_OUT
 Text HLabel 5000 2100 2    50   UnSpc ~ 0
 AGND
 Wire Wire Line
@@ -892,4 +890,15 @@ Wire Wire Line
 	2300 1600 2800 1600
 Wire Wire Line
 	2800 1600 2800 1700
+$Comp
+L Connector_Generic:Conn_01x01 J?
+U 1 1 5AE85F26
+P 6100 2000
+F 0 "J?" H 6179 2042 50  0000 L CNN
+F 1 "ADC_REF_OUT" H 6179 1951 50  0000 L CNN
+F 2 "" H 6100 2000 50  0001 C CNN
+F 3 "~" H 6100 2000 50  0001 C CNN
+	1    6100 2000
+	1    0    0    -1  
+$EndComp
 $EndSCHEMATC

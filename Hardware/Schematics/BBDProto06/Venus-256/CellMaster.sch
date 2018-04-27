@@ -4,7 +4,7 @@ EELAYER 26 0
 EELAYER END
 $Descr A3 16535 11693
 encoding utf-8
-Sheet 2 5
+Sheet 5 8
 Title "Venus-256 / Cell Master"
 Date "2018-04-06"
 Rev "A"
@@ -547,14 +547,6 @@ Wire Wire Line
 	5700 7500 6000 7500
 Wire Wire Line
 	5700 7600 6000 7600
-Text HLabel 5700 8900 0    50   Output ~ 0
-USBD+
-Text HLabel 5700 9000 0    50   Output ~ 0
-USBD-
-Wire Wire Line
-	5700 8900 6000 8900
-Wire Wire Line
-	5700 9000 6000 9000
 Text HLabel 5700 9300 0    50   Input ~ 0
 TARGET_RESET
 Wire Wire Line
@@ -619,12 +611,6 @@ Text HLabel 8900 6300 2    50   Output ~ 0
 SPI1_MOSI
 Text HLabel 8900 6000 2    50   Output ~ 0
 SPI1_SPCK
-Text HLabel 5700 5700 0    50   Input ~ 0
-AFE0_AD1
-Text HLabel 8900 9900 2    50   Input ~ 0
-AFE0_AD0
-Text HLabel 8900 6900 2    50   Output ~ 0
-DAC1
 Wire Wire Line
 	5700 5700 6000 5700
 Wire Wire Line
@@ -650,8 +636,6 @@ Wire Wire Line
 Wire Wire Line
 	8600 6600 8900 6600
 Wire Wire Line
-	8600 6900 8900 6900
-Wire Wire Line
 	6000 7000 5000 7000
 Wire Wire Line
 	5000 7000 5000 8000
@@ -660,4 +644,62 @@ Wire Wire Line
 Wire Wire Line
 	4800 8000 5000 8000
 Connection ~ 5000 8000
+$Comp
+L Connector_Generic:Conn_01x01 J?
+U 1 1 5AE3AAE9
+P 9100 9900
+F 0 "J?" H 9180 9942 50  0000 L CNN
+F 1 "AFE0_AD0" H 9180 9851 50  0000 L CNN
+F 2 "" H 9100 9900 50  0001 C CNN
+F 3 "~" H 9100 9900 50  0001 C CNN
+	1    9100 9900
+	1    0    0    -1  
+$EndComp
+$Comp
+L Connector_Generic:Conn_01x01 J?
+U 1 1 5AE3AD89
+P 5500 5700
+F 0 "J?" H 5420 5475 50  0000 C CNN
+F 1 "AFE0_AD1" H 5420 5566 50  0000 C CNN
+F 2 "" H 5500 5700 50  0001 C CNN
+F 3 "~" H 5500 5700 50  0001 C CNN
+	1    5500 5700
+	-1   0    0    1   
+$EndComp
+Text HLabel 5700 8200 0    50   Output ~ 0
+ADC_CONVST0
+Wire Wire Line
+	5700 8200 6000 8200
+Text HLabel 5700 5900 0    50   Input ~ 0
+ADC_BUSY0
+Text HLabel 5700 6000 0    50   Input ~ 0
+ADC_BUSY1
+Text HLabel 5700 6100 0    50   Input ~ 0
+ADC_BUSY2
+Text HLabel 5700 6200 0    50   Input ~ 0
+ADC_BUSY3
+Wire Wire Line
+	5700 5900 6000 5900
+Wire Wire Line
+	5700 6000 6000 6000
+Wire Wire Line
+	5700 6100 6000 6100
+Wire Wire Line
+	5700 6200 6000 6200
+Text HLabel 5700 8300 0    50   Output ~ 0
+ADC_CONVST1
+Text HLabel 5700 8400 0    50   Output ~ 0
+ADC_CONVST2
+Text HLabel 5700 8500 0    50   Output ~ 0
+ADC_CONVST3
+Wire Wire Line
+	5700 8300 6000 8300
+Wire Wire Line
+	5700 8400 6000 8400
+Wire Wire Line
+	5700 8500 6000 8500
+Text HLabel 5700 6300 0    50   Input ~ 0
+ADC_RESET
+Wire Wire Line
+	5700 6300 6000 6300
 $EndSCHEMATC
