@@ -611,12 +611,14 @@ namespace BBDDriver
 
                     lock (bbdMercury16Input.GoertzelOutputs[c])
                     {
+                        float[] relevantValues = null;
+
                         consoleSB.AppendLine($"---- channel {c+1}");
-                        float[] relevantValues = bbdMercury16Input.GoertzelOutputs[c].Where((x, i) => (i % 3 == 0) && (i > bbdMercury16Input.GoertzelOutputs[c].Count - 28)).ToArray();
+                        relevantValues = bbdMercury16Input.GoertzelOutputs[c].Where((x, i) => (i % 3 == 0) && (i > bbdMercury16Input.GoertzelOutputs[c].Count - 43)).ToArray();
                         consoleSB.AppendLine($"- freq: {String.Format("{0, 10:##0.00}", bbdMercury16Input.GoertzelFrequency01)} Hz    values: {String.Join(" |", relevantValues.Select(v => String.Format("{0, 8:##0.00}", Math.Max(Math.Min(v, 9999.99), -9999.99))))}          ");
-                        relevantValues = bbdMercury16Input.GoertzelOutputs[c].Where((x, i) => (i % 3 == 1) && (i > bbdMercury16Input.GoertzelOutputs[c].Count - 28)).ToArray();
+                        relevantValues = bbdMercury16Input.GoertzelOutputs[c].Where((x, i) => (i % 3 == 1) && (i > bbdMercury16Input.GoertzelOutputs[c].Count - 43)).ToArray();
                         consoleSB.AppendLine($"- freq: {String.Format("{0, 10:##0.00}", bbdMercury16Input.GoertzelFrequency02)} Hz    values: {String.Join(" |", relevantValues.Select(v => String.Format("{0, 8:##0.00}", Math.Max(Math.Min(v, 9999.99), -9999.99))))}          ");
-                        relevantValues = bbdMercury16Input.GoertzelOutputs[c].Where((x, i) => (i % 3 == 2) && (i > bbdMercury16Input.GoertzelOutputs[c].Count - 28)).ToArray();
+                        relevantValues = bbdMercury16Input.GoertzelOutputs[c].Where((x, i) => (i % 3 == 2) && (i > bbdMercury16Input.GoertzelOutputs[c].Count - 43)).ToArray();
                         consoleSB.AppendLine($"- freq: {String.Format("{0, 10:##0.00}", bbdMercury16Input.GoertzelFrequency03)} Hz    values: {String.Join(" |", relevantValues.Select(v => String.Format("{0, 8:##0.00}", Math.Max(Math.Min(v, 9999.99), -9999.99))))}          ");
                         consoleSB.AppendLine();
                     }
