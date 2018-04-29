@@ -24,19 +24,28 @@ namespace BBDDriver.Models.Filter
             float[] newData = e.Channel.GetData(e.DataCount);
 
             if (newData.Length % settings.InputDataDimensions != 0) throw new ArgumentException("The received data count must be a multiple of the dimension.", "DataCount");
-            float[] result = new float[newData.Length];
 
-            for (int i = 0; i < newData.Length; i++)
+            float[] result;
+
+            if (this.Settings.Enabled)
             {
-                if (i % settings.InputDataDimensions != 0) continue;
+                result = new float[newData.Length];
 
-                for (int j = 0; j < settings.InputDataDimensions; j++)
+                for (int i = 0; i < newData.Length; i++)
                 {
-                    valuesToAverage[j][position] = newData[i + j];
-                    result[i + j] = valuesToAverage[j].Average();
-                }
+                    if (i % settings.InputDataDimensions != 0) continue;
 
-                position = (position + 1) % settings.MovingAverageLength;
+                    for (int j = 0; j < settings.InputDataDimensions; j++)
+                    {
+                        valuesToAverage[j][position] = newData[i + j];
+                        result[i + j] = valuesToAverage[j].Average();
+                    }
+
+                    position = (position + 1) % settings.MovingAverageLength;
+                }
+            } else
+            {
+                result = newData;
             }
 
             this.Output.AppendData(result);

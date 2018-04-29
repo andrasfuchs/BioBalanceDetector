@@ -41,9 +41,13 @@
           <Shortcut Command="EditorContextMenus.CodeWindow.GotoImplementation" Scope="Text Editor">Ctrl+F12</Shortcut>
           <RemoveShortcut Command="Debug.StopDebugging" Scope="Global">Ctrl+Shift+F5</RemoveShortcut>
           <Shortcut Command="Debug.StopDebugging" Scope="Global">Shift+F5</Shortcut>
-          <Shortcut Command="Edit.FindAllReferences" Scope="Global">Ctrl+K, R</Shortcut>
-          <Shortcut Command="Edit.FindAllReferences" Scope="Global">Ctrl+K, Ctrl+R</Shortcut>
           <Shortcut Command="Edit.FindAllReferences" Scope="Global">Shift+F12</Shortcut>
+          <Shortcut Command="VisualAssist.FindReferences" Scope="Global">Ctrl+K, Ctrl+R</Shortcut>
+          <Shortcut Command="VisualAssist.FindReferences" Scope="Global">Ctrl+K, R</Shortcut>
+          <RemoveShortcut Command="VisualAssist.FindReferences" Scope="Text Editor">Shift+Alt+F</RemoveShortcut>
+          <RemoveShortcut Command="VisualAssist.RefactorRename" Scope="Text Editor">Shift+Alt+R</RemoveShortcut>
+          <Shortcut Command="VisualAssist.RefactorRename" Scope="Global">Ctrl+R, R</Shortcut>
+          <RemoveShortcut Command="File.ImportProjectTemplate" Scope="Global">Ctrl+T</RemoveShortcut>
         </UserShortcuts>
       </KeyboardShortcuts>
     </Category>
