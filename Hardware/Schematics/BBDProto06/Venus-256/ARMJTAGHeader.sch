@@ -4,9 +4,9 @@ EELAYER 26 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 4 9
-Title "ARM JTAG"
-Date "2018-04-27"
+Sheet 3 10
+Title "Venus-256: ARM JTAG"
+Date "2018-05-02"
 Rev "A"
 Comp "Bio Balance Detector"
 Comment1 ""

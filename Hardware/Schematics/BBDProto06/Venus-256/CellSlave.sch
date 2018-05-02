@@ -4,9 +4,9 @@ EELAYER 26 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 6 9
-Title "Cell Slave"
-Date "2018-04-26"
+Sheet 10 10
+Title "Venus-256: Cell Slave"
+Date "2018-05-02"
 Rev "A"
 Comp "Bio Balance Detector"
 Comment1 ""
@@ -17,14 +17,15 @@ $EndDescr
 Wire Wire Line
 	4400 2500 4700 2500
 $Comp
-L Device:C_Small C11
+L Device:C_Small C1011
 U 1 1 5AE9F047
 P 4700 1900
-AR Path="/5AE9ECEB/5AE9F047" Ref="C11"  Part="1" 
-AR Path="/5AE958E5/5AE9F047" Ref="C43"  Part="1" 
-AR Path="/5AE96312/5AE9F047" Ref="C59"  Part="1" 
-AR Path="/5AE96ED4/5AE9F047" Ref="C75"  Part="1" 
-F 0 "C11" H 4792 1946 50  0000 L CNN
+AR Path="/5AFE7089/5AE9F047" Ref="C1011"  Part="1" 
+AR Path="/5AE9ECEB/5AE9F047" Ref="C411"  Part="1" 
+AR Path="/5AE958E5/5AE9F047" Ref="C611"  Part="1" 
+AR Path="/5AE96312/5AE9F047" Ref="C711"  Part="1" 
+AR Path="/5AE96ED4/5AE9F047" Ref="C811"  Part="1" 
+F 0 "C1011" H 4792 1946 50  0000 L CNN
 F 1 "10uF,X5R" H 4792 1855 50  0000 L CNN
 F 2 "Capacitor_SMD:C_0603_1608Metric_Pad0.84x1.00mm_HandSolder" H 4700 1900 50  0001 C CNN
 F 3 "~" H 4700 1900 50  0001 C CNN
@@ -85,40 +86,10 @@ Text HLabel 3100 7700 0    50   Input ~ 0
 VDRIVE_3V3
 Text HLabel 1900 600  0    50   Input ~ 0
 VCC_5V0
-$Comp
-L Connector_Generic:Conn_01x01 J3
-U 1 1 5AEA60FF
-P 1700 2000
-AR Path="/5AE9ECEB/5AEA60FF" Ref="J3"  Part="1" 
-AR Path="/5AE958E5/5AEA60FF" Ref="J23"  Part="1" 
-AR Path="/5AE96312/5AEA60FF" Ref="J40"  Part="1" 
-AR Path="/5AE96ED4/5AEA60FF" Ref="J57"  Part="1" 
-F 0 "J3" H 1620 1775 50  0000 C CNN
-F 1 "S01" H 1620 1866 50  0000 C CNN
-F 2 "Connector_Wire:SolderWirePad_single_0-8mmDrill" H 1700 2000 50  0001 C CNN
-F 3 "~" H 1700 2000 50  0001 C CNN
-	1    1700 2000
-	-1   0    0    1   
-$EndComp
-$Comp
-L Connector_Generic:Conn_01x01 J4
-U 1 1 5AEA6172
-P 1700 2300
-AR Path="/5AE9ECEB/5AEA6172" Ref="J4"  Part="1" 
-AR Path="/5AE958E5/5AEA6172" Ref="J24"  Part="1" 
-AR Path="/5AE96312/5AEA6172" Ref="J41"  Part="1" 
-AR Path="/5AE96ED4/5AEA6172" Ref="J58"  Part="1" 
-F 0 "J4" H 1620 2075 50  0000 C CNN
-F 1 "S02" H 1620 2166 50  0000 C CNN
-F 2 "Connector_Wire:SolderWirePad_single_0-8mmDrill" H 1700 2300 50  0001 C CNN
-F 3 "~" H 1700 2300 50  0001 C CNN
-	1    1700 2300
-	-1   0    0    1   
-$EndComp
 Wire Wire Line
-	1900 2000 2200 2000
+	1600 2000 2200 2000
 Wire Wire Line
-	1900 2300 2200 2300
+	1600 2300 2200 2300
 Text HLabel 2100 7200 3    50   Input ~ 0
 SGND
 Wire Wire Line
@@ -223,15 +194,16 @@ DGND
 Text HLabel 4700 5800 2    50   UnSpc ~ 0
 DGND
 $Comp
-L Analog_ADC:AD7616 U2
+L Analog_ADC:AD7616 U1001
 U 1 1 5AE20D71
 P 3300 4300
-AR Path="/5AE9ECEB/5AE20D71" Ref="U2"  Part="1" 
-AR Path="/5AE958E5/5AE20D71" Ref="U4"  Part="1" 
-AR Path="/5AE96312/5AE20D71" Ref="U5"  Part="1" 
-AR Path="/5AE96ED4/5AE20D71" Ref="U6"  Part="1" 
-F 0 "U2" H 2500 6800 50  0000 C CNN
-F 1 "AD7616" H 2600 1800 50  0000 C CNN
+AR Path="/5AFE7089/5AE20D71" Ref="U1001"  Part="1" 
+AR Path="/5AE9ECEB/5AE20D71" Ref="U401"  Part="1" 
+AR Path="/5AE958E5/5AE20D71" Ref="U601"  Part="1" 
+AR Path="/5AE96312/5AE20D71" Ref="U701"  Part="1" 
+AR Path="/5AE96ED4/5AE20D71" Ref="U801"  Part="1" 
+F 0 "U1001" H 2450 6750 50  0000 C CNN
+F 1 "AD7616" H 4050 6750 50  0000 C CNN
 F 2 "Package_QFP:LQFP-80_14x14mm_P0.65mm" H 3300 4300 50  0001 C CIN
 F 3 "http://www.analog.com/media/en/technical-documentation/data-sheets/AD7616.pdf" H 3400 1300 50  0001 C CNN
 	1    3300 4300
@@ -308,14 +280,15 @@ AGND
 Wire Wire Line
 	4400 6500 4700 6500
 $Comp
-L Device:C_Small C12
+L Device:C_Small C1012
 U 1 1 5AF0F415
 P 4700 6700
-AR Path="/5AE9ECEB/5AF0F415" Ref="C12"  Part="1" 
-AR Path="/5AE958E5/5AF0F415" Ref="C44"  Part="1" 
-AR Path="/5AE96312/5AF0F415" Ref="C60"  Part="1" 
-AR Path="/5AE96ED4/5AF0F415" Ref="C76"  Part="1" 
-F 0 "C12" H 4792 6746 50  0000 L CNN
+AR Path="/5AFE7089/5AF0F415" Ref="C1012"  Part="1" 
+AR Path="/5AE9ECEB/5AF0F415" Ref="C412"  Part="1" 
+AR Path="/5AE958E5/5AF0F415" Ref="C612"  Part="1" 
+AR Path="/5AE96312/5AF0F415" Ref="C712"  Part="1" 
+AR Path="/5AE96ED4/5AF0F415" Ref="C812"  Part="1" 
+F 0 "C1012" H 4792 6746 50  0000 L CNN
 F 1 "0.1uF" H 4792 6655 50  0000 L CNN
 F 2 "Capacitor_SMD:C_0603_1608Metric_Pad0.84x1.00mm_HandSolder" H 4700 6700 50  0001 C CNN
 F 3 "~" H 4700 6700 50  0001 C CNN
@@ -338,14 +311,15 @@ Wire Wire Line
 Text HLabel 6700 6300 2    50   UnSpc ~ 0
 DGND
 $Comp
-L Device:C_Small C16
+L Device:C_Small C1016
 U 1 1 5AF1A3C9
 P 6400 6500
-AR Path="/5AE9ECEB/5AF1A3C9" Ref="C16"  Part="1" 
-AR Path="/5AE958E5/5AF1A3C9" Ref="C48"  Part="1" 
-AR Path="/5AE96312/5AF1A3C9" Ref="C64"  Part="1" 
-AR Path="/5AE96ED4/5AF1A3C9" Ref="C80"  Part="1" 
-F 0 "C16" H 6492 6546 50  0000 L CNN
+AR Path="/5AFE7089/5AF1A3C9" Ref="C1016"  Part="1" 
+AR Path="/5AE9ECEB/5AF1A3C9" Ref="C416"  Part="1" 
+AR Path="/5AE958E5/5AF1A3C9" Ref="C616"  Part="1" 
+AR Path="/5AE96312/5AF1A3C9" Ref="C716"  Part="1" 
+AR Path="/5AE96ED4/5AF1A3C9" Ref="C816"  Part="1" 
+F 0 "C1016" H 6492 6546 50  0000 L CNN
 F 1 "10uF" H 6492 6455 50  0000 L CNN
 F 2 "Capacitor_SMD:C_0603_1608Metric_Pad0.84x1.00mm_HandSolder" H 6400 6500 50  0001 C CNN
 F 3 "~" H 6400 6500 50  0001 C CNN
@@ -367,253 +341,44 @@ Wire Wire Line
 	4400 6300 6000 6300
 Wire Wire Line
 	4400 6400 5800 6400
-$Comp
-L Connector_Generic:Conn_01x01 J5
-U 1 1 5AF23C74
-P 1700 2600
-AR Path="/5AE9ECEB/5AF23C74" Ref="J5"  Part="1" 
-AR Path="/5AE958E5/5AF23C74" Ref="J25"  Part="1" 
-AR Path="/5AE96312/5AF23C74" Ref="J42"  Part="1" 
-AR Path="/5AE96ED4/5AF23C74" Ref="J59"  Part="1" 
-F 0 "J5" H 1620 2375 50  0000 C CNN
-F 1 "S03" H 1620 2466 50  0000 C CNN
-F 2 "Connector_Wire:SolderWirePad_single_0-8mmDrill" H 1700 2600 50  0001 C CNN
-F 3 "~" H 1700 2600 50  0001 C CNN
-	1    1700 2600
-	-1   0    0    1   
-$EndComp
 Wire Wire Line
-	1900 2600 2200 2600
-$Comp
-L Connector_Generic:Conn_01x01 J6
-U 1 1 5AF2A3B4
-P 1700 2900
-AR Path="/5AE9ECEB/5AF2A3B4" Ref="J6"  Part="1" 
-AR Path="/5AE958E5/5AF2A3B4" Ref="J26"  Part="1" 
-AR Path="/5AE96312/5AF2A3B4" Ref="J43"  Part="1" 
-AR Path="/5AE96ED4/5AF2A3B4" Ref="J60"  Part="1" 
-F 0 "J6" H 1620 2675 50  0000 C CNN
-F 1 "S04" H 1620 2766 50  0000 C CNN
-F 2 "Connector_Wire:SolderWirePad_single_0-8mmDrill" H 1700 2900 50  0001 C CNN
-F 3 "~" H 1700 2900 50  0001 C CNN
-	1    1700 2900
-	-1   0    0    1   
-$EndComp
-$Comp
-L Connector_Generic:Conn_01x01 J7
-U 1 1 5AF2A3D6
-P 1700 3200
-AR Path="/5AE9ECEB/5AF2A3D6" Ref="J7"  Part="1" 
-AR Path="/5AE958E5/5AF2A3D6" Ref="J27"  Part="1" 
-AR Path="/5AE96312/5AF2A3D6" Ref="J44"  Part="1" 
-AR Path="/5AE96ED4/5AF2A3D6" Ref="J61"  Part="1" 
-F 0 "J7" H 1620 2975 50  0000 C CNN
-F 1 "S05" H 1620 3066 50  0000 C CNN
-F 2 "Connector_Wire:SolderWirePad_single_0-8mmDrill" H 1700 3200 50  0001 C CNN
-F 3 "~" H 1700 3200 50  0001 C CNN
-	1    1700 3200
-	-1   0    0    1   
-$EndComp
-$Comp
-L Connector_Generic:Conn_01x01 J8
-U 1 1 5AF2A3FA
-P 1700 3500
-AR Path="/5AE9ECEB/5AF2A3FA" Ref="J8"  Part="1" 
-AR Path="/5AE958E5/5AF2A3FA" Ref="J28"  Part="1" 
-AR Path="/5AE96312/5AF2A3FA" Ref="J45"  Part="1" 
-AR Path="/5AE96ED4/5AF2A3FA" Ref="J62"  Part="1" 
-F 0 "J8" H 1620 3275 50  0000 C CNN
-F 1 "S06" H 1620 3366 50  0000 C CNN
-F 2 "Connector_Wire:SolderWirePad_single_0-8mmDrill" H 1700 3500 50  0001 C CNN
-F 3 "~" H 1700 3500 50  0001 C CNN
-	1    1700 3500
-	-1   0    0    1   
-$EndComp
-$Comp
-L Connector_Generic:Conn_01x01 J9
-U 1 1 5AF2A420
-P 1700 3800
-AR Path="/5AE9ECEB/5AF2A420" Ref="J9"  Part="1" 
-AR Path="/5AE958E5/5AF2A420" Ref="J29"  Part="1" 
-AR Path="/5AE96312/5AF2A420" Ref="J46"  Part="1" 
-AR Path="/5AE96ED4/5AF2A420" Ref="J63"  Part="1" 
-F 0 "J9" H 1620 3575 50  0000 C CNN
-F 1 "S07" H 1620 3666 50  0000 C CNN
-F 2 "Connector_Wire:SolderWirePad_single_0-8mmDrill" H 1700 3800 50  0001 C CNN
-F 3 "~" H 1700 3800 50  0001 C CNN
-	1    1700 3800
-	-1   0    0    1   
-$EndComp
-$Comp
-L Connector_Generic:Conn_01x01 J10
-U 1 1 5AF2A483
-P 1700 4100
-AR Path="/5AE9ECEB/5AF2A483" Ref="J10"  Part="1" 
-AR Path="/5AE958E5/5AF2A483" Ref="J30"  Part="1" 
-AR Path="/5AE96312/5AF2A483" Ref="J47"  Part="1" 
-AR Path="/5AE96ED4/5AF2A483" Ref="J64"  Part="1" 
-F 0 "J10" H 1620 3875 50  0000 C CNN
-F 1 "S08" H 1620 3966 50  0000 C CNN
-F 2 "Connector_Wire:SolderWirePad_single_0-8mmDrill" H 1700 4100 50  0001 C CNN
-F 3 "~" H 1700 4100 50  0001 C CNN
-	1    1700 4100
-	-1   0    0    1   
-$EndComp
-$Comp
-L Connector_Generic:Conn_01x01 J11
-U 1 1 5AF2A4AD
-P 1700 4400
-AR Path="/5AE9ECEB/5AF2A4AD" Ref="J11"  Part="1" 
-AR Path="/5AE958E5/5AF2A4AD" Ref="J31"  Part="1" 
-AR Path="/5AE96312/5AF2A4AD" Ref="J48"  Part="1" 
-AR Path="/5AE96ED4/5AF2A4AD" Ref="J65"  Part="1" 
-F 0 "J11" H 1620 4175 50  0000 C CNN
-F 1 "S09" H 1620 4266 50  0000 C CNN
-F 2 "Connector_Wire:SolderWirePad_single_0-8mmDrill" H 1700 4400 50  0001 C CNN
-F 3 "~" H 1700 4400 50  0001 C CNN
-	1    1700 4400
-	-1   0    0    1   
-$EndComp
-$Comp
-L Connector_Generic:Conn_01x01 J12
-U 1 1 5AF2A4D9
-P 1700 4700
-AR Path="/5AE9ECEB/5AF2A4D9" Ref="J12"  Part="1" 
-AR Path="/5AE958E5/5AF2A4D9" Ref="J32"  Part="1" 
-AR Path="/5AE96312/5AF2A4D9" Ref="J49"  Part="1" 
-AR Path="/5AE96ED4/5AF2A4D9" Ref="J66"  Part="1" 
-F 0 "J12" H 1620 4475 50  0000 C CNN
-F 1 "S10" H 1620 4566 50  0000 C CNN
-F 2 "Connector_Wire:SolderWirePad_single_0-8mmDrill" H 1700 4700 50  0001 C CNN
-F 3 "~" H 1700 4700 50  0001 C CNN
-	1    1700 4700
-	-1   0    0    1   
-$EndComp
-$Comp
-L Connector_Generic:Conn_01x01 J13
-U 1 1 5AF2A507
-P 1700 5000
-AR Path="/5AE9ECEB/5AF2A507" Ref="J13"  Part="1" 
-AR Path="/5AE958E5/5AF2A507" Ref="J33"  Part="1" 
-AR Path="/5AE96312/5AF2A507" Ref="J50"  Part="1" 
-AR Path="/5AE96ED4/5AF2A507" Ref="J67"  Part="1" 
-F 0 "J13" H 1620 4775 50  0000 C CNN
-F 1 "S11" H 1620 4866 50  0000 C CNN
-F 2 "Connector_Wire:SolderWirePad_single_0-8mmDrill" H 1700 5000 50  0001 C CNN
-F 3 "~" H 1700 5000 50  0001 C CNN
-	1    1700 5000
-	-1   0    0    1   
-$EndComp
-$Comp
-L Connector_Generic:Conn_01x01 J14
-U 1 1 5AF2A537
-P 1700 5300
-AR Path="/5AE9ECEB/5AF2A537" Ref="J14"  Part="1" 
-AR Path="/5AE958E5/5AF2A537" Ref="J34"  Part="1" 
-AR Path="/5AE96312/5AF2A537" Ref="J51"  Part="1" 
-AR Path="/5AE96ED4/5AF2A537" Ref="J68"  Part="1" 
-F 0 "J14" H 1620 5075 50  0000 C CNN
-F 1 "S12" H 1620 5166 50  0000 C CNN
-F 2 "Connector_Wire:SolderWirePad_single_0-8mmDrill" H 1700 5300 50  0001 C CNN
-F 3 "~" H 1700 5300 50  0001 C CNN
-	1    1700 5300
-	-1   0    0    1   
-$EndComp
-$Comp
-L Connector_Generic:Conn_01x01 J15
-U 1 1 5AF2A569
-P 1700 5600
-AR Path="/5AE9ECEB/5AF2A569" Ref="J15"  Part="1" 
-AR Path="/5AE958E5/5AF2A569" Ref="J35"  Part="1" 
-AR Path="/5AE96312/5AF2A569" Ref="J52"  Part="1" 
-AR Path="/5AE96ED4/5AF2A569" Ref="J69"  Part="1" 
-F 0 "J15" H 1620 5375 50  0000 C CNN
-F 1 "S13" H 1620 5466 50  0000 C CNN
-F 2 "Connector_Wire:SolderWirePad_single_0-8mmDrill" H 1700 5600 50  0001 C CNN
-F 3 "~" H 1700 5600 50  0001 C CNN
-	1    1700 5600
-	-1   0    0    1   
-$EndComp
-$Comp
-L Connector_Generic:Conn_01x01 J16
-U 1 1 5AF2A59D
-P 1700 5900
-AR Path="/5AE9ECEB/5AF2A59D" Ref="J16"  Part="1" 
-AR Path="/5AE958E5/5AF2A59D" Ref="J36"  Part="1" 
-AR Path="/5AE96312/5AF2A59D" Ref="J53"  Part="1" 
-AR Path="/5AE96ED4/5AF2A59D" Ref="J70"  Part="1" 
-F 0 "J16" H 1620 5675 50  0000 C CNN
-F 1 "S14" H 1620 5766 50  0000 C CNN
-F 2 "Connector_Wire:SolderWirePad_single_0-8mmDrill" H 1700 5900 50  0001 C CNN
-F 3 "~" H 1700 5900 50  0001 C CNN
-	1    1700 5900
-	-1   0    0    1   
-$EndComp
-$Comp
-L Connector_Generic:Conn_01x01 J17
-U 1 1 5AF2A5D3
-P 1700 6200
-AR Path="/5AE9ECEB/5AF2A5D3" Ref="J17"  Part="1" 
-AR Path="/5AE958E5/5AF2A5D3" Ref="J37"  Part="1" 
-AR Path="/5AE96312/5AF2A5D3" Ref="J54"  Part="1" 
-AR Path="/5AE96ED4/5AF2A5D3" Ref="J71"  Part="1" 
-F 0 "J17" H 1620 5975 50  0000 C CNN
-F 1 "S15" H 1620 6066 50  0000 C CNN
-F 2 "Connector_Wire:SolderWirePad_single_0-8mmDrill" H 1700 6200 50  0001 C CNN
-F 3 "~" H 1700 6200 50  0001 C CNN
-	1    1700 6200
-	-1   0    0    1   
-$EndComp
-$Comp
-L Connector_Generic:Conn_01x01 J18
-U 1 1 5AF2A6A3
-P 1700 6500
-AR Path="/5AE9ECEB/5AF2A6A3" Ref="J18"  Part="1" 
-AR Path="/5AE958E5/5AF2A6A3" Ref="J38"  Part="1" 
-AR Path="/5AE96312/5AF2A6A3" Ref="J55"  Part="1" 
-AR Path="/5AE96ED4/5AF2A6A3" Ref="J72"  Part="1" 
-F 0 "J18" H 1620 6275 50  0000 C CNN
-F 1 "S16" H 1620 6366 50  0000 C CNN
-F 2 "Connector_Wire:SolderWirePad_single_0-8mmDrill" H 1700 6500 50  0001 C CNN
-F 3 "~" H 1700 6500 50  0001 C CNN
-	1    1700 6500
-	-1   0    0    1   
-$EndComp
+	1600 2600 2200 2600
 Wire Wire Line
-	1900 2900 2200 2900
+	1600 2900 2200 2900
 Wire Wire Line
-	2200 3200 1900 3200
+	2200 3200 1600 3200
 Wire Wire Line
-	1900 3500 2200 3500
+	1600 3500 2200 3500
 Wire Wire Line
-	1900 3800 2200 3800
+	1600 3800 2200 3800
 Wire Wire Line
-	2200 4100 1900 4100
+	2200 4100 1600 4100
 Wire Wire Line
-	1900 4400 2200 4400
+	1600 4400 2200 4400
 Wire Wire Line
-	2200 4700 1900 4700
+	2200 4700 1600 4700
 Wire Wire Line
-	1900 5000 2200 5000
+	1600 5000 2200 5000
 Wire Wire Line
-	2200 5300 1900 5300
+	2200 5300 1600 5300
 Wire Wire Line
-	1900 5600 2200 5600
+	1600 5600 2200 5600
 Wire Wire Line
-	2200 5900 1900 5900
+	2200 5900 1600 5900
 Wire Wire Line
-	1900 6200 2200 6200
+	1600 6200 2200 6200
 Wire Wire Line
-	2200 6500 1900 6500
+	2200 6500 1600 6500
 $Comp
-L Device:C_Small C14
+L Device:C_Small C1014
 U 1 1 5AF62C30
 P 5600 2200
-AR Path="/5AE9ECEB/5AF62C30" Ref="C14"  Part="1" 
-AR Path="/5AE958E5/5AF62C30" Ref="C46"  Part="1" 
-AR Path="/5AE96312/5AF62C30" Ref="C62"  Part="1" 
-AR Path="/5AE96ED4/5AF62C30" Ref="C78"  Part="1" 
-F 0 "C14" H 5692 2246 50  0000 L CNN
+AR Path="/5AFE7089/5AF62C30" Ref="C1014"  Part="1" 
+AR Path="/5AE9ECEB/5AF62C30" Ref="C414"  Part="1" 
+AR Path="/5AE958E5/5AF62C30" Ref="C614"  Part="1" 
+AR Path="/5AE96312/5AF62C30" Ref="C714"  Part="1" 
+AR Path="/5AE96ED4/5AF62C30" Ref="C814"  Part="1" 
+F 0 "C1014" H 5692 2246 50  0000 L CNN
 F 1 "0.1uF,X8R" H 5692 2155 50  0000 L CNN
 F 2 "Capacitor_SMD:C_0603_1608Metric_Pad0.84x1.00mm_HandSolder" H 5600 2200 50  0001 C CNN
 F 3 "~" H 5600 2200 50  0001 C CNN
@@ -645,14 +410,15 @@ Wire Wire Line
 Wire Wire Line
 	3500 7000 3600 7000
 $Comp
-L Device:C_Small C5
+L Device:C_Small C1005
 U 1 1 5AE39B5F
 P 3400 7200
-AR Path="/5AE9ECEB/5AE39B5F" Ref="C5"  Part="1" 
-AR Path="/5AE958E5/5AE39B5F" Ref="C37"  Part="1" 
-AR Path="/5AE96312/5AE39B5F" Ref="C53"  Part="1" 
-AR Path="/5AE96ED4/5AE39B5F" Ref="C69"  Part="1" 
-F 0 "C5" V 3300 7200 50  0000 C CNN
+AR Path="/5AFE7089/5AE39B5F" Ref="C1005"  Part="1" 
+AR Path="/5AE9ECEB/5AE39B5F" Ref="C405"  Part="1" 
+AR Path="/5AE958E5/5AE39B5F" Ref="C605"  Part="1" 
+AR Path="/5AE96312/5AE39B5F" Ref="C705"  Part="1" 
+AR Path="/5AE96ED4/5AE39B5F" Ref="C805"  Part="1" 
+F 0 "C1005" V 3300 7200 50  0000 C CNN
 F 1 "0.1uF" V 3500 7200 50  0000 C CNN
 F 2 "Capacitor_SMD:C_0603_1608Metric_Pad0.84x1.00mm_HandSolder" H 3400 7200 50  0001 C CNN
 F 3 "~" H 3400 7200 50  0001 C CNN
@@ -660,14 +426,15 @@ F 3 "~" H 3400 7200 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L Device:C_Small C6
+L Device:C_Small C1006
 U 1 1 5AE424D3
 P 3400 7500
-AR Path="/5AE9ECEB/5AE424D3" Ref="C6"  Part="1" 
-AR Path="/5AE958E5/5AE424D3" Ref="C38"  Part="1" 
-AR Path="/5AE96312/5AE424D3" Ref="C54"  Part="1" 
-AR Path="/5AE96ED4/5AE424D3" Ref="C70"  Part="1" 
-F 0 "C6" V 3300 7500 50  0000 C CNN
+AR Path="/5AFE7089/5AE424D3" Ref="C1006"  Part="1" 
+AR Path="/5AE9ECEB/5AE424D3" Ref="C406"  Part="1" 
+AR Path="/5AE958E5/5AE424D3" Ref="C606"  Part="1" 
+AR Path="/5AE96312/5AE424D3" Ref="C706"  Part="1" 
+AR Path="/5AE96ED4/5AE424D3" Ref="C806"  Part="1" 
+F 0 "C1006" V 3300 7500 50  0000 C CNN
 F 1 "10uF" V 3500 7500 50  0000 C CNN
 F 2 "Capacitor_SMD:C_0603_1608Metric_Pad0.84x1.00mm_HandSolder" H 3400 7500 50  0001 C CNN
 F 3 "~" H 3400 7500 50  0001 C CNN
@@ -707,14 +474,15 @@ Connection ~ 3600 7500
 Wire Wire Line
 	3600 7500 3600 7700
 $Comp
-L Device:C_Small C1
+L Device:C_Small C1001
 U 1 1 5AE748DC
 P 2500 900
-AR Path="/5AE9ECEB/5AE748DC" Ref="C1"  Part="1" 
-AR Path="/5AE958E5/5AE748DC" Ref="C33"  Part="1" 
-AR Path="/5AE96312/5AE748DC" Ref="C49"  Part="1" 
-AR Path="/5AE96ED4/5AE748DC" Ref="C65"  Part="1" 
-F 0 "C1" V 2400 900 50  0000 C CNN
+AR Path="/5AFE7089/5AE748DC" Ref="C1001"  Part="1" 
+AR Path="/5AE9ECEB/5AE748DC" Ref="C401"  Part="1" 
+AR Path="/5AE958E5/5AE748DC" Ref="C601"  Part="1" 
+AR Path="/5AE96312/5AE748DC" Ref="C701"  Part="1" 
+AR Path="/5AE96ED4/5AE748DC" Ref="C801"  Part="1" 
+F 0 "C1001" V 2400 900 50  0000 C CNN
 F 1 "10uF" V 2600 900 50  0000 C CNN
 F 2 "Capacitor_SMD:C_0603_1608Metric_Pad0.84x1.00mm_HandSolder" H 2500 900 50  0001 C CNN
 F 3 "~" H 2500 900 50  0001 C CNN
@@ -722,14 +490,15 @@ F 3 "~" H 2500 900 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L Device:C_Small C2
+L Device:C_Small C1002
 U 1 1 5AE748E2
 P 2500 1200
-AR Path="/5AE9ECEB/5AE748E2" Ref="C2"  Part="1" 
-AR Path="/5AE958E5/5AE748E2" Ref="C34"  Part="1" 
-AR Path="/5AE96312/5AE748E2" Ref="C50"  Part="1" 
-AR Path="/5AE96ED4/5AE748E2" Ref="C66"  Part="1" 
-F 0 "C2" V 2400 1200 50  0000 C CNN
+AR Path="/5AFE7089/5AE748E2" Ref="C1002"  Part="1" 
+AR Path="/5AE9ECEB/5AE748E2" Ref="C402"  Part="1" 
+AR Path="/5AE958E5/5AE748E2" Ref="C602"  Part="1" 
+AR Path="/5AE96312/5AE748E2" Ref="C702"  Part="1" 
+AR Path="/5AE96ED4/5AE748E2" Ref="C802"  Part="1" 
+F 0 "C1002" V 2400 1200 50  0000 C CNN
 F 1 "0.1uF" V 2600 1200 50  0000 C CNN
 F 2 "Capacitor_SMD:C_0603_1608Metric_Pad0.84x1.00mm_HandSolder" H 2500 1200 50  0001 C CNN
 F 3 "~" H 2500 1200 50  0001 C CNN
@@ -759,14 +528,15 @@ Connection ~ 2700 1200
 Wire Wire Line
 	2300 600  2300 900 
 $Comp
-L Device:C_Small C3
+L Device:C_Small C1003
 U 1 1 5AE9D928
 P 3000 900
-AR Path="/5AE9ECEB/5AE9D928" Ref="C3"  Part="1" 
-AR Path="/5AE958E5/5AE9D928" Ref="C35"  Part="1" 
-AR Path="/5AE96312/5AE9D928" Ref="C51"  Part="1" 
-AR Path="/5AE96ED4/5AE9D928" Ref="C67"  Part="1" 
-F 0 "C3" V 2900 900 50  0000 C CNN
+AR Path="/5AFE7089/5AE9D928" Ref="C1003"  Part="1" 
+AR Path="/5AE9ECEB/5AE9D928" Ref="C403"  Part="1" 
+AR Path="/5AE958E5/5AE9D928" Ref="C603"  Part="1" 
+AR Path="/5AE96312/5AE9D928" Ref="C703"  Part="1" 
+AR Path="/5AE96ED4/5AE9D928" Ref="C803"  Part="1" 
+F 0 "C1003" V 2900 900 50  0000 C CNN
 F 1 "10uF" V 3100 900 50  0000 C CNN
 F 2 "Capacitor_SMD:C_0603_1608Metric_Pad0.84x1.00mm_HandSolder" H 3000 900 50  0001 C CNN
 F 3 "~" H 3000 900 50  0001 C CNN
@@ -774,14 +544,15 @@ F 3 "~" H 3000 900 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L Device:C_Small C4
+L Device:C_Small C1004
 U 1 1 5AE9D92E
 P 3000 1200
-AR Path="/5AE9ECEB/5AE9D92E" Ref="C4"  Part="1" 
-AR Path="/5AE958E5/5AE9D92E" Ref="C36"  Part="1" 
-AR Path="/5AE96312/5AE9D92E" Ref="C52"  Part="1" 
-AR Path="/5AE96ED4/5AE9D92E" Ref="C68"  Part="1" 
-F 0 "C4" V 2900 1200 50  0000 C CNN
+AR Path="/5AFE7089/5AE9D92E" Ref="C1004"  Part="1" 
+AR Path="/5AE9ECEB/5AE9D92E" Ref="C404"  Part="1" 
+AR Path="/5AE958E5/5AE9D92E" Ref="C604"  Part="1" 
+AR Path="/5AE96312/5AE9D92E" Ref="C704"  Part="1" 
+AR Path="/5AE96ED4/5AE9D92E" Ref="C804"  Part="1" 
+F 0 "C1004" V 2900 1200 50  0000 C CNN
 F 1 "0.1uF" V 3100 1200 50  0000 C CNN
 F 2 "Capacitor_SMD:C_0603_1608Metric_Pad0.84x1.00mm_HandSolder" H 3000 1200 50  0001 C CNN
 F 3 "~" H 3000 1200 50  0001 C CNN
@@ -809,14 +580,15 @@ Connection ~ 3200 1200
 Wire Wire Line
 	2800 600  2800 900 
 $Comp
-L Device:C_Small C7
+L Device:C_Small C1007
 U 1 1 5AEA3FF2
 P 3600 900
-AR Path="/5AE9ECEB/5AEA3FF2" Ref="C7"  Part="1" 
-AR Path="/5AE958E5/5AEA3FF2" Ref="C39"  Part="1" 
-AR Path="/5AE96312/5AEA3FF2" Ref="C55"  Part="1" 
-AR Path="/5AE96ED4/5AEA3FF2" Ref="C71"  Part="1" 
-F 0 "C7" V 3500 900 50  0000 C CNN
+AR Path="/5AFE7089/5AEA3FF2" Ref="C1007"  Part="1" 
+AR Path="/5AE9ECEB/5AEA3FF2" Ref="C407"  Part="1" 
+AR Path="/5AE958E5/5AEA3FF2" Ref="C607"  Part="1" 
+AR Path="/5AE96312/5AEA3FF2" Ref="C707"  Part="1" 
+AR Path="/5AE96ED4/5AEA3FF2" Ref="C807"  Part="1" 
+F 0 "C1007" V 3500 900 50  0000 C CNN
 F 1 "10uF" V 3700 900 50  0000 C CNN
 F 2 "Capacitor_SMD:C_0603_1608Metric_Pad0.84x1.00mm_HandSolder" H 3600 900 50  0001 C CNN
 F 3 "~" H 3600 900 50  0001 C CNN
@@ -824,14 +596,15 @@ F 3 "~" H 3600 900 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L Device:C_Small C8
+L Device:C_Small C1008
 U 1 1 5AEA3FF8
 P 3600 1200
-AR Path="/5AE9ECEB/5AEA3FF8" Ref="C8"  Part="1" 
-AR Path="/5AE958E5/5AEA3FF8" Ref="C40"  Part="1" 
-AR Path="/5AE96312/5AEA3FF8" Ref="C56"  Part="1" 
-AR Path="/5AE96ED4/5AEA3FF8" Ref="C72"  Part="1" 
-F 0 "C8" V 3500 1200 50  0000 C CNN
+AR Path="/5AFE7089/5AEA3FF8" Ref="C1008"  Part="1" 
+AR Path="/5AE9ECEB/5AEA3FF8" Ref="C408"  Part="1" 
+AR Path="/5AE958E5/5AEA3FF8" Ref="C608"  Part="1" 
+AR Path="/5AE96312/5AEA3FF8" Ref="C708"  Part="1" 
+AR Path="/5AE96ED4/5AEA3FF8" Ref="C808"  Part="1" 
+F 0 "C1008" V 3500 1200 50  0000 C CNN
 F 1 "0.1uF" V 3700 1200 50  0000 C CNN
 F 2 "Capacitor_SMD:C_0603_1608Metric_Pad0.84x1.00mm_HandSolder" H 3600 1200 50  0001 C CNN
 F 3 "~" H 3600 1200 50  0001 C CNN
@@ -861,14 +634,15 @@ Wire Wire Line
 Wire Wire Line
 	3400 600  3400 900 
 $Comp
-L Device:C_Small C9
+L Device:C_Small C1009
 U 1 1 5AEB23BE
 P 4100 900
-AR Path="/5AE9ECEB/5AEB23BE" Ref="C9"  Part="1" 
-AR Path="/5AE958E5/5AEB23BE" Ref="C41"  Part="1" 
-AR Path="/5AE96312/5AEB23BE" Ref="C57"  Part="1" 
-AR Path="/5AE96ED4/5AEB23BE" Ref="C73"  Part="1" 
-F 0 "C9" V 4000 900 50  0000 C CNN
+AR Path="/5AFE7089/5AEB23BE" Ref="C1009"  Part="1" 
+AR Path="/5AE9ECEB/5AEB23BE" Ref="C409"  Part="1" 
+AR Path="/5AE958E5/5AEB23BE" Ref="C609"  Part="1" 
+AR Path="/5AE96312/5AEB23BE" Ref="C709"  Part="1" 
+AR Path="/5AE96ED4/5AEB23BE" Ref="C809"  Part="1" 
+F 0 "C1009" V 4000 900 50  0000 C CNN
 F 1 "10uF" V 4200 900 50  0000 C CNN
 F 2 "Capacitor_SMD:C_0603_1608Metric_Pad0.84x1.00mm_HandSolder" H 4100 900 50  0001 C CNN
 F 3 "~" H 4100 900 50  0001 C CNN
@@ -876,14 +650,15 @@ F 3 "~" H 4100 900 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L Device:C_Small C10
+L Device:C_Small C1010
 U 1 1 5AEB23C4
 P 4100 1200
-AR Path="/5AE9ECEB/5AEB23C4" Ref="C10"  Part="1" 
-AR Path="/5AE958E5/5AEB23C4" Ref="C42"  Part="1" 
-AR Path="/5AE96312/5AEB23C4" Ref="C58"  Part="1" 
-AR Path="/5AE96ED4/5AEB23C4" Ref="C74"  Part="1" 
-F 0 "C10" V 4000 1200 50  0000 C CNN
+AR Path="/5AFE7089/5AEB23C4" Ref="C1010"  Part="1" 
+AR Path="/5AE9ECEB/5AEB23C4" Ref="C410"  Part="1" 
+AR Path="/5AE958E5/5AEB23C4" Ref="C610"  Part="1" 
+AR Path="/5AE96312/5AEB23C4" Ref="C710"  Part="1" 
+AR Path="/5AE96ED4/5AEB23C4" Ref="C810"  Part="1" 
+F 0 "C1010" V 4000 1200 50  0000 C CNN
 F 1 "0.1uF" V 4200 1200 50  0000 C CNN
 F 2 "Capacitor_SMD:C_0603_1608Metric_Pad0.84x1.00mm_HandSolder" H 4100 1200 50  0001 C CNN
 F 3 "~" H 4100 1200 50  0001 C CNN
@@ -935,14 +710,15 @@ Wire Wire Line
 Wire Wire Line
 	4300 1400 4000 1400
 $Comp
-L Device:C_Small C13
+L Device:C_Small C1013
 U 1 1 5AF66660
 P 5100 6700
-AR Path="/5AE9ECEB/5AF66660" Ref="C13"  Part="1" 
-AR Path="/5AE958E5/5AF66660" Ref="C45"  Part="1" 
-AR Path="/5AE96312/5AF66660" Ref="C61"  Part="1" 
-AR Path="/5AE96ED4/5AF66660" Ref="C77"  Part="1" 
-F 0 "C13" H 5192 6746 50  0000 L CNN
+AR Path="/5AFE7089/5AF66660" Ref="C1013"  Part="1" 
+AR Path="/5AE9ECEB/5AF66660" Ref="C413"  Part="1" 
+AR Path="/5AE958E5/5AF66660" Ref="C613"  Part="1" 
+AR Path="/5AE96312/5AF66660" Ref="C713"  Part="1" 
+AR Path="/5AE96ED4/5AF66660" Ref="C813"  Part="1" 
+F 0 "C1013" H 5192 6746 50  0000 L CNN
 F 1 "10uF" H 5192 6655 50  0000 L CNN
 F 2 "Capacitor_SMD:C_0603_1608Metric_Pad0.84x1.00mm_HandSolder" H 5100 6700 50  0001 C CNN
 F 3 "~" H 5100 6700 50  0001 C CNN
@@ -960,14 +736,15 @@ Connection ~ 5100 6500
 Wire Wire Line
 	5100 6500 5400 6500
 $Comp
-L Device:C_Small C15
+L Device:C_Small C1015
 U 1 1 5AFC3D5B
 P 6000 6500
-AR Path="/5AE9ECEB/5AFC3D5B" Ref="C15"  Part="1" 
-AR Path="/5AE958E5/5AFC3D5B" Ref="C47"  Part="1" 
-AR Path="/5AE96312/5AFC3D5B" Ref="C63"  Part="1" 
-AR Path="/5AE96ED4/5AFC3D5B" Ref="C79"  Part="1" 
-F 0 "C15" H 6092 6546 50  0000 L CNN
+AR Path="/5AFE7089/5AFC3D5B" Ref="C1015"  Part="1" 
+AR Path="/5AE9ECEB/5AFC3D5B" Ref="C415"  Part="1" 
+AR Path="/5AE958E5/5AFC3D5B" Ref="C615"  Part="1" 
+AR Path="/5AE96312/5AFC3D5B" Ref="C715"  Part="1" 
+AR Path="/5AE96ED4/5AFC3D5B" Ref="C815"  Part="1" 
+F 0 "C1015" H 6092 6546 50  0000 L CNN
 F 1 "0.1uF" H 6092 6455 50  0000 L CNN
 F 2 "Capacitor_SMD:C_0603_1608Metric_Pad0.84x1.00mm_HandSolder" H 6000 6500 50  0001 C CNN
 F 3 "~" H 6000 6500 50  0001 C CNN
@@ -1023,18 +800,275 @@ Wire Wire Line
 Wire Wire Line
 	2800 1600 2800 1700
 $Comp
-L Connector_Specialized:Test_Point TP1
+L Connector_Specialized:Test_Point TP1017
 U 1 1 5AE6BFCE
 P 5900 2000
-AR Path="/5AE9ECEB/5AE6BFCE" Ref="TP1"  Part="1" 
-AR Path="/5AE958E5/5AE6BFCE" Ref="TP5"  Part="1" 
-AR Path="/5AE96312/5AE6BFCE" Ref="TP6"  Part="1" 
-AR Path="/5AE96ED4/5AE6BFCE" Ref="TP7"  Part="1" 
-F 0 "TP1" V 5854 2187 50  0000 L CNN
+AR Path="/5AFE7089/5AE6BFCE" Ref="TP1017"  Part="1" 
+AR Path="/5AE9ECEB/5AE6BFCE" Ref="TP417"  Part="1" 
+AR Path="/5AE958E5/5AE6BFCE" Ref="TP617"  Part="1" 
+AR Path="/5AE96312/5AE6BFCE" Ref="TP717"  Part="1" 
+AR Path="/5AE96ED4/5AE6BFCE" Ref="TP817"  Part="1" 
+F 0 "TP1017" V 5854 2187 50  0000 L CNN
 F 1 "ADC_REF_OUT" V 5945 2187 50  0000 L CNN
 F 2 "TestPoint:TestPoint_Pad_1.5x1.5mm" H 6100 2000 50  0001 C CNN
 F 3 "~" H 6100 2000 50  0001 C CNN
 	1    5900 2000
 	0    1    1    0   
+$EndComp
+$Comp
+L Connector_Specialized:Test_Point_Flag TP1001
+U 1 1 5AECD270
+P 1600 2000
+AR Path="/5AFE7089/5AECD270" Ref="TP1001"  Part="1" 
+AR Path="/5AE9ECEB/5AECD270" Ref="TP401"  Part="1" 
+AR Path="/5AE958E5/5AECD270" Ref="TP601"  Part="1" 
+AR Path="/5AE96312/5AECD270" Ref="TP701"  Part="1" 
+AR Path="/5AE96ED4/5AECD270" Ref="TP801"  Part="1" 
+F 0 "TP1001" H 1600 2100 50  0000 R CNN
+F 1 "S01" H 1800 2075 50  0000 R CNN
+F 2 "TestPoint:TestPoint_Pad_1.5x1.5mm" H 1800 2000 50  0001 C CNN
+F 3 "~" H 1800 2000 50  0001 C CNN
+	1    1600 2000
+	-1   0    0    -1  
+$EndComp
+$Comp
+L Connector_Specialized:Test_Point_Flag TP1002
+U 1 1 5AECE3AF
+P 1600 2300
+AR Path="/5AFE7089/5AECE3AF" Ref="TP1002"  Part="1" 
+AR Path="/5AE9ECEB/5AECE3AF" Ref="TP402"  Part="1" 
+AR Path="/5AE958E5/5AECE3AF" Ref="TP602"  Part="1" 
+AR Path="/5AE96312/5AECE3AF" Ref="TP702"  Part="1" 
+AR Path="/5AE96ED4/5AECE3AF" Ref="TP802"  Part="1" 
+F 0 "TP1002" H 1600 2400 50  0000 R CNN
+F 1 "S02" H 1800 2375 50  0000 R CNN
+F 2 "TestPoint:TestPoint_Pad_1.5x1.5mm" H 1800 2300 50  0001 C CNN
+F 3 "~" H 1800 2300 50  0001 C CNN
+	1    1600 2300
+	-1   0    0    -1  
+$EndComp
+$Comp
+L Connector_Specialized:Test_Point_Flag TP1003
+U 1 1 5AECE3FB
+P 1600 2600
+AR Path="/5AFE7089/5AECE3FB" Ref="TP1003"  Part="1" 
+AR Path="/5AE9ECEB/5AECE3FB" Ref="TP403"  Part="1" 
+AR Path="/5AE958E5/5AECE3FB" Ref="TP603"  Part="1" 
+AR Path="/5AE96312/5AECE3FB" Ref="TP703"  Part="1" 
+AR Path="/5AE96ED4/5AECE3FB" Ref="TP803"  Part="1" 
+F 0 "TP1003" H 1600 2700 50  0000 R CNN
+F 1 "S03" H 1800 2675 50  0000 R CNN
+F 2 "TestPoint:TestPoint_Pad_1.5x1.5mm" H 1800 2600 50  0001 C CNN
+F 3 "~" H 1800 2600 50  0001 C CNN
+	1    1600 2600
+	-1   0    0    -1  
+$EndComp
+$Comp
+L Connector_Specialized:Test_Point_Flag TP1004
+U 1 1 5AECE449
+P 1600 2900
+AR Path="/5AFE7089/5AECE449" Ref="TP1004"  Part="1" 
+AR Path="/5AE9ECEB/5AECE449" Ref="TP404"  Part="1" 
+AR Path="/5AE958E5/5AECE449" Ref="TP604"  Part="1" 
+AR Path="/5AE96312/5AECE449" Ref="TP704"  Part="1" 
+AR Path="/5AE96ED4/5AECE449" Ref="TP804"  Part="1" 
+F 0 "TP1004" H 1600 3000 50  0000 R CNN
+F 1 "S04" H 1800 2975 50  0000 R CNN
+F 2 "TestPoint:TestPoint_Pad_1.5x1.5mm" H 1800 2900 50  0001 C CNN
+F 3 "~" H 1800 2900 50  0001 C CNN
+	1    1600 2900
+	-1   0    0    -1  
+$EndComp
+$Comp
+L Connector_Specialized:Test_Point_Flag TP1005
+U 1 1 5AECE499
+P 1600 3200
+AR Path="/5AFE7089/5AECE499" Ref="TP1005"  Part="1" 
+AR Path="/5AE9ECEB/5AECE499" Ref="TP405"  Part="1" 
+AR Path="/5AE958E5/5AECE499" Ref="TP605"  Part="1" 
+AR Path="/5AE96312/5AECE499" Ref="TP705"  Part="1" 
+AR Path="/5AE96ED4/5AECE499" Ref="TP805"  Part="1" 
+F 0 "TP1005" H 1600 3300 50  0000 R CNN
+F 1 "S05" H 1800 3275 50  0000 R CNN
+F 2 "TestPoint:TestPoint_Pad_1.5x1.5mm" H 1800 3200 50  0001 C CNN
+F 3 "~" H 1800 3200 50  0001 C CNN
+	1    1600 3200
+	-1   0    0    -1  
+$EndComp
+$Comp
+L Connector_Specialized:Test_Point_Flag TP1006
+U 1 1 5AECE4E7
+P 1600 3500
+AR Path="/5AFE7089/5AECE4E7" Ref="TP1006"  Part="1" 
+AR Path="/5AE9ECEB/5AECE4E7" Ref="TP406"  Part="1" 
+AR Path="/5AE958E5/5AECE4E7" Ref="TP606"  Part="1" 
+AR Path="/5AE96312/5AECE4E7" Ref="TP706"  Part="1" 
+AR Path="/5AE96ED4/5AECE4E7" Ref="TP806"  Part="1" 
+F 0 "TP1006" H 1600 3600 50  0000 R CNN
+F 1 "S06" H 1800 3575 50  0000 R CNN
+F 2 "TestPoint:TestPoint_Pad_1.5x1.5mm" H 1800 3500 50  0001 C CNN
+F 3 "~" H 1800 3500 50  0001 C CNN
+	1    1600 3500
+	-1   0    0    -1  
+$EndComp
+$Comp
+L Connector_Specialized:Test_Point_Flag TP1007
+U 1 1 5AECE53B
+P 1600 3800
+AR Path="/5AFE7089/5AECE53B" Ref="TP1007"  Part="1" 
+AR Path="/5AE9ECEB/5AECE53B" Ref="TP407"  Part="1" 
+AR Path="/5AE958E5/5AECE53B" Ref="TP607"  Part="1" 
+AR Path="/5AE96312/5AECE53B" Ref="TP707"  Part="1" 
+AR Path="/5AE96ED4/5AECE53B" Ref="TP807"  Part="1" 
+F 0 "TP1007" H 1600 3900 50  0000 R CNN
+F 1 "S07" H 1800 3875 50  0000 R CNN
+F 2 "TestPoint:TestPoint_Pad_1.5x1.5mm" H 1800 3800 50  0001 C CNN
+F 3 "~" H 1800 3800 50  0001 C CNN
+	1    1600 3800
+	-1   0    0    -1  
+$EndComp
+$Comp
+L Connector_Specialized:Test_Point_Flag TP1008
+U 1 1 5AECE591
+P 1600 4100
+AR Path="/5AFE7089/5AECE591" Ref="TP1008"  Part="1" 
+AR Path="/5AE9ECEB/5AECE591" Ref="TP408"  Part="1" 
+AR Path="/5AE958E5/5AECE591" Ref="TP608"  Part="1" 
+AR Path="/5AE96312/5AECE591" Ref="TP708"  Part="1" 
+AR Path="/5AE96ED4/5AECE591" Ref="TP808"  Part="1" 
+F 0 "TP1008" H 1600 4200 50  0000 R CNN
+F 1 "S08" H 1800 4175 50  0000 R CNN
+F 2 "TestPoint:TestPoint_Pad_1.5x1.5mm" H 1800 4100 50  0001 C CNN
+F 3 "~" H 1800 4100 50  0001 C CNN
+	1    1600 4100
+	-1   0    0    -1  
+$EndComp
+$Comp
+L Connector_Specialized:Test_Point_Flag TP1009
+U 1 1 5AECE5E5
+P 1600 4400
+AR Path="/5AFE7089/5AECE5E5" Ref="TP1009"  Part="1" 
+AR Path="/5AE9ECEB/5AECE5E5" Ref="TP409"  Part="1" 
+AR Path="/5AE958E5/5AECE5E5" Ref="TP609"  Part="1" 
+AR Path="/5AE96312/5AECE5E5" Ref="TP709"  Part="1" 
+AR Path="/5AE96ED4/5AECE5E5" Ref="TP809"  Part="1" 
+F 0 "TP1009" H 1600 4500 50  0000 R CNN
+F 1 "S09" H 1800 4475 50  0000 R CNN
+F 2 "TestPoint:TestPoint_Pad_1.5x1.5mm" H 1800 4400 50  0001 C CNN
+F 3 "~" H 1800 4400 50  0001 C CNN
+	1    1600 4400
+	-1   0    0    -1  
+$EndComp
+$Comp
+L Connector_Specialized:Test_Point_Flag TP1010
+U 1 1 5AECEE9D
+P 1600 4700
+AR Path="/5AFE7089/5AECEE9D" Ref="TP1010"  Part="1" 
+AR Path="/5AE9ECEB/5AECEE9D" Ref="TP410"  Part="1" 
+AR Path="/5AE958E5/5AECEE9D" Ref="TP610"  Part="1" 
+AR Path="/5AE96312/5AECEE9D" Ref="TP710"  Part="1" 
+AR Path="/5AE96ED4/5AECEE9D" Ref="TP810"  Part="1" 
+F 0 "TP1010" H 1600 4800 50  0000 R CNN
+F 1 "S10" H 1800 4775 50  0000 R CNN
+F 2 "TestPoint:TestPoint_Pad_1.5x1.5mm" H 1800 4700 50  0001 C CNN
+F 3 "~" H 1800 4700 50  0001 C CNN
+	1    1600 4700
+	-1   0    0    -1  
+$EndComp
+$Comp
+L Connector_Specialized:Test_Point_Flag TP1011
+U 1 1 5AECEEE7
+P 1600 5000
+AR Path="/5AFE7089/5AECEEE7" Ref="TP1011"  Part="1" 
+AR Path="/5AE9ECEB/5AECEEE7" Ref="TP411"  Part="1" 
+AR Path="/5AE958E5/5AECEEE7" Ref="TP611"  Part="1" 
+AR Path="/5AE96312/5AECEEE7" Ref="TP711"  Part="1" 
+AR Path="/5AE96ED4/5AECEEE7" Ref="TP811"  Part="1" 
+F 0 "TP1011" H 1600 5100 50  0000 R CNN
+F 1 "S11" H 1800 5075 50  0000 R CNN
+F 2 "TestPoint:TestPoint_Pad_1.5x1.5mm" H 1800 5000 50  0001 C CNN
+F 3 "~" H 1800 5000 50  0001 C CNN
+	1    1600 5000
+	-1   0    0    -1  
+$EndComp
+$Comp
+L Connector_Specialized:Test_Point_Flag TP1012
+U 1 1 5AECEF33
+P 1600 5300
+AR Path="/5AFE7089/5AECEF33" Ref="TP1012"  Part="1" 
+AR Path="/5AE9ECEB/5AECEF33" Ref="TP412"  Part="1" 
+AR Path="/5AE958E5/5AECEF33" Ref="TP612"  Part="1" 
+AR Path="/5AE96312/5AECEF33" Ref="TP712"  Part="1" 
+AR Path="/5AE96ED4/5AECEF33" Ref="TP812"  Part="1" 
+F 0 "TP1012" H 1600 5400 50  0000 R CNN
+F 1 "S12" H 1800 5375 50  0000 R CNN
+F 2 "TestPoint:TestPoint_Pad_1.5x1.5mm" H 1800 5300 50  0001 C CNN
+F 3 "~" H 1800 5300 50  0001 C CNN
+	1    1600 5300
+	-1   0    0    -1  
+$EndComp
+$Comp
+L Connector_Specialized:Test_Point_Flag TP1013
+U 1 1 5AECEF81
+P 1600 5600
+AR Path="/5AFE7089/5AECEF81" Ref="TP1013"  Part="1" 
+AR Path="/5AE9ECEB/5AECEF81" Ref="TP413"  Part="1" 
+AR Path="/5AE958E5/5AECEF81" Ref="TP613"  Part="1" 
+AR Path="/5AE96312/5AECEF81" Ref="TP713"  Part="1" 
+AR Path="/5AE96ED4/5AECEF81" Ref="TP813"  Part="1" 
+F 0 "TP1013" H 1600 5700 50  0000 R CNN
+F 1 "S13" H 1800 5675 50  0000 R CNN
+F 2 "TestPoint:TestPoint_Pad_1.5x1.5mm" H 1800 5600 50  0001 C CNN
+F 3 "~" H 1800 5600 50  0001 C CNN
+	1    1600 5600
+	-1   0    0    -1  
+$EndComp
+$Comp
+L Connector_Specialized:Test_Point_Flag TP1014
+U 1 1 5AECEFD1
+P 1600 5900
+AR Path="/5AFE7089/5AECEFD1" Ref="TP1014"  Part="1" 
+AR Path="/5AE9ECEB/5AECEFD1" Ref="TP414"  Part="1" 
+AR Path="/5AE958E5/5AECEFD1" Ref="TP614"  Part="1" 
+AR Path="/5AE96312/5AECEFD1" Ref="TP714"  Part="1" 
+AR Path="/5AE96ED4/5AECEFD1" Ref="TP814"  Part="1" 
+F 0 "TP1014" H 1600 6000 50  0000 R CNN
+F 1 "S14" H 1800 5975 50  0000 R CNN
+F 2 "TestPoint:TestPoint_Pad_1.5x1.5mm" H 1800 5900 50  0001 C CNN
+F 3 "~" H 1800 5900 50  0001 C CNN
+	1    1600 5900
+	-1   0    0    -1  
+$EndComp
+$Comp
+L Connector_Specialized:Test_Point_Flag TP1015
+U 1 1 5AECF023
+P 1600 6200
+AR Path="/5AFE7089/5AECF023" Ref="TP1015"  Part="1" 
+AR Path="/5AE9ECEB/5AECF023" Ref="TP415"  Part="1" 
+AR Path="/5AE958E5/5AECF023" Ref="TP615"  Part="1" 
+AR Path="/5AE96312/5AECF023" Ref="TP715"  Part="1" 
+AR Path="/5AE96ED4/5AECF023" Ref="TP815"  Part="1" 
+F 0 "TP1015" H 1600 6300 50  0000 R CNN
+F 1 "S15" H 1800 6275 50  0000 R CNN
+F 2 "TestPoint:TestPoint_Pad_1.5x1.5mm" H 1800 6200 50  0001 C CNN
+F 3 "~" H 1800 6200 50  0001 C CNN
+	1    1600 6200
+	-1   0    0    -1  
+$EndComp
+$Comp
+L Connector_Specialized:Test_Point_Flag TP1016
+U 1 1 5AECF077
+P 1600 6500
+AR Path="/5AFE7089/5AECF077" Ref="TP1016"  Part="1" 
+AR Path="/5AE9ECEB/5AECF077" Ref="TP416"  Part="1" 
+AR Path="/5AE958E5/5AECF077" Ref="TP616"  Part="1" 
+AR Path="/5AE96312/5AECF077" Ref="TP716"  Part="1" 
+AR Path="/5AE96ED4/5AECF077" Ref="TP816"  Part="1" 
+F 0 "TP1016" H 1600 6600 50  0000 R CNN
+F 1 "S16" H 1800 6575 50  0000 R CNN
+F 2 "TestPoint:TestPoint_Pad_1.5x1.5mm" H 1800 6500 50  0001 C CNN
+F 3 "~" H 1800 6500 50  0001 C CNN
+	1    1600 6500
+	-1   0    0    -1  
 $EndComp
 $EndSCHEMATC

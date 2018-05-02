@@ -4,9 +4,9 @@ EELAYER 26 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 3 9
-Title "Raspberry Pi GOIP Header"
-Date "2018-04-27"
+Sheet 2 10
+Title "Venus-256: Raspberry Pi GOIP Header"
+Date "2018-05-02"
 Rev "A"
 Comp "Bio Balance Deterctor"
 Comment1 ""
