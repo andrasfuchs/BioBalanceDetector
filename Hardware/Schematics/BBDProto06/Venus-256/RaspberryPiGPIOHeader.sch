@@ -15,12 +15,12 @@ Comment3 ""
 Comment4 ""
 $EndDescr
 $Comp
-L Connector_Generic:Conn_02x20_Odd_Even J1
+L Connector_Generic:Conn_02x20_Odd_Even J201
 U 1 1 5AE76166
 P 2100 2000
-F 0 "J1" H 2150 3000 50  0000 C CNN
+F 0 "J201" H 2150 3000 50  0000 C CNN
 F 1 "RaspberryPi header" H 2150 900 50  0000 C CNN
-F 2 "Connector_PinHeader_2.54mm:PinHeader_2x20_P2.54mm_Vertical" H 2100 2000 50  0001 C CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_2x20_P2.54mm_Horizontal" H 2100 2000 50  0001 C CNN
 F 3 "~" H 2100 2000 50  0001 C CNN
 	1    2100 2000
 	1    0    0    -1  

@@ -4,7 +4,7 @@ EELAYER 26 0
 EELAYER END
 $Descr A3 16535 11693
 encoding utf-8
-Sheet 9 10
+Sheet 5 10
 Title "Venus-256: Cell Master"
 Date "2018-05-02"
 Rev "A"
@@ -482,7 +482,7 @@ Connection ~ 7300 900
 Wire Wire Line
 	7300 900  7000 900 
 $Comp
-L MCU_Microchip_SAME:ATSAME70Q21A-AN U501
+L Venus-256-rescue:ATSAME70Q21A-AN-MCU_Microchip_SAME U501
 U 1 1 5ACBEA02
 P 7300 6800
 AR Path="/5AE473C8/5ACBEA02" Ref="U501"  Part="1" 
@@ -708,7 +708,7 @@ ADC_RESET
 Wire Wire Line
 	5700 6300 6000 6300
 $Comp
-L Connector_Specialized:Test_Point TP502
+L Venus-256-rescue:Test_Point-Connector_Specialized TP502
 U 1 1 5AE7EA0D
 P 3100 9700
 AR Path="/5AE473C8/5AE7EA0D" Ref="TP502"  Part="1" 
@@ -721,7 +721,7 @@ F 3 "~" H 3300 9700 50  0001 C CNN
 	0    -1   -1   0   
 $EndComp
 $Comp
-L Connector_Specialized:Test_Point TP501
+L Venus-256-rescue:Test_Point-Connector_Specialized TP501
 U 1 1 5AE7EBD0
 P 3100 9300
 AR Path="/5AE473C8/5AE7EBD0" Ref="TP501"  Part="1" 
@@ -734,7 +734,7 @@ F 3 "~" H 3300 9300 50  0001 C CNN
 	0    -1   -1   0   
 $EndComp
 $Comp
-L Connector_Specialized:Test_Point TP503
+L Venus-256-rescue:Test_Point-Connector_Specialized TP503
 U 1 1 5AE7F482
 P 3100 10100
 AR Path="/5AE473C8/5AE7F482" Ref="TP503"  Part="1" 

@@ -15,12 +15,12 @@ Comment3 ""
 Comment4 ""
 $EndDescr
 $Comp
-L Connector_Generic:Conn_02x10_Odd_Even J2
+L Connector_Generic:Conn_02x10_Odd_Even J301
 U 1 1 5AE9A682
 P 2300 1400
-F 0 "J2" H 2350 1900 50  0000 C CNN
+F 0 "J301" H 2350 1900 50  0000 C CNN
 F 1 "ARM JTAG" H 2350 800 50  0000 C CNN
-F 2 "Connector_PinHeader_2.54mm:PinHeader_2x10_P2.54mm_Vertical" H 2300 1400 50  0001 C CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_2x10_P2.54mm_Horizontal" H 2300 1400 50  0001 C CNN
 F 3 "~" H 2300 1400 50  0001 C CNN
 	1    2300 1400
 	1    0    0    -1  
@@ -88,10 +88,10 @@ Wire Wire Line
 	2700 800  2900 800 
 Connection ~ 2700 800 
 $Comp
-L Device:R_Small R3
+L Device:R_Small R303
 U 1 1 5AE9A6B6
 P 1800 1300
-F 0 "R3" H 1741 1254 50  0000 R CNN
+F 0 "R303" H 1741 1254 50  0000 R CNN
 F 1 "0R" H 1741 1345 50  0000 R CNN
 F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.84x1.00mm_HandSolder" H 1800 1300 50  0001 C CNN
 F 3 "~" H 1800 1300 50  0001 C CNN
@@ -99,10 +99,10 @@ F 3 "~" H 1800 1300 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L Device:R_Small R1
+L Device:R_Small R301
 U 1 1 5AE9A6BD
 P 1600 1400
-F 0 "R1" H 1541 1354 50  0000 R CNN
+F 0 "R301" H 1541 1354 50  0000 R CNN
 F 1 "0R" H 1541 1445 50  0000 R CNN
 F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.84x1.00mm_HandSolder" H 1600 1400 50  0001 C CNN
 F 3 "~" H 1600 1400 50  0001 C CNN
@@ -110,10 +110,10 @@ F 3 "~" H 1600 1400 50  0001 C CNN
 	0    -1   -1   0   
 $EndComp
 $Comp
-L Device:R_Small R4
+L Device:R_Small R304
 U 1 1 5AE9A6C4
 P 1800 1600
-F 0 "R4" H 1741 1554 50  0000 R CNN
+F 0 "R304" H 1741 1554 50  0000 R CNN
 F 1 "0R" H 1741 1645 50  0000 R CNN
 F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.84x1.00mm_HandSolder" H 1800 1600 50  0001 C CNN
 F 3 "~" H 1800 1600 50  0001 C CNN
@@ -121,10 +121,10 @@ F 3 "~" H 1800 1600 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L Device:R_Small R2
+L Device:R_Small R302
 U 1 1 5AE9A6CB
 P 1600 1700
-F 0 "R2" H 1541 1654 50  0000 R CNN
+F 0 "R302" H 1541 1654 50  0000 R CNN
 F 1 "0R" H 1541 1745 50  0000 R CNN
 F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.84x1.00mm_HandSolder" H 1600 1700 50  0001 C CNN
 F 3 "~" H 1600 1700 50  0001 C CNN
