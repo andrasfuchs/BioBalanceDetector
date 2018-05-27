@@ -145,7 +145,7 @@ Wire Wire Line
 Wire Wire Line
 	800  2200 1100 2200
 Wire Wire Line
-	1100 2300 700  2300
+	1100 2300 900  2300
 Wire Wire Line
 	700  2300 700  600 
 Wire Wire Line
@@ -590,12 +590,12 @@ Wire Wire Line
 $Comp
 L power:GND #PWR0104
 U 1 1 5AE36CCF
-P 1700 6250
-F 0 "#PWR0104" H 1700 6000 50  0001 C CNN
-F 1 "GND" H 1705 6077 50  0000 C CNN
-F 2 "" H 1700 6250 50  0001 C CNN
-F 3 "" H 1700 6250 50  0001 C CNN
-	1    1700 6250
+P 1500 6300
+F 0 "#PWR0104" H 1500 6050 50  0001 C CNN
+F 1 "GND" H 1505 6127 50  0000 C CNN
+F 2 "" H 1500 6300 50  0001 C CNN
+F 3 "" H 1500 6300 50  0001 C CNN
+	1    1500 6300
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
@@ -603,7 +603,7 @@ Wire Wire Line
 Wire Wire Line
 	4100 1100 4100 1000
 Wire Wire Line
-	3000 1000 3000 4400
+	3000 1000 3000 4800
 Wire Wire Line
 	3000 1000 4100 1000
 Wire Wire Line
@@ -613,22 +613,9 @@ Wire Wire Line
 	800  2200 800  3800
 Connection ~ 800  2200
 Wire Wire Line
-	1700 5900 1700 6250
-$Comp
-L power:GND #PWR0105
-U 1 1 5AE90B6E
-P 1900 6250
-F 0 "#PWR0105" H 1900 6000 50  0001 C CNN
-F 1 "GND" H 1905 6077 50  0000 C CNN
-F 2 "" H 1900 6250 50  0001 C CNN
-F 3 "" H 1900 6250 50  0001 C CNN
-	1    1900 6250
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
 	1100 2500 600  2500
 Wire Wire Line
-	600  2500 600  5400
+	600  2500 600  5300
 Wire Wire Line
 	1100 2600 700  2600
 $Comp
@@ -642,8 +629,6 @@ F 3 "" H 700 6250 50  0001 C CNN
 	1    700  6250
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	1800 3800 1800 4100
 $Sheet
 S 4200 6500 1300 2300
 U 5AF0307C
@@ -748,7 +733,7 @@ Connection ~ 3200 1600
 Wire Wire Line
 	3200 1600 4200 1600
 Wire Wire Line
-	3000 4500 3000 6600
+	3000 4900 3000 6600
 Wire Wire Line
 	3000 6600 4100 6600
 Connection ~ 4100 6600
@@ -838,32 +823,13 @@ Wire Wire Line
 	9800 6700 10100 6700
 Wire Wire Line
 	9800 6900 10300 6900
-$Comp
-L Analog_Switch:ADG715 U101
-U 1 1 5AE36C1A
-P 1800 5100
-F 0 "U101" H 1150 6050 50  0000 C CNN
-F 1 "ADG715" H 2350 6050 50  0000 C CNN
-F 2 "Package_SO:TSSOP-24_4.4x7.8mm_P0.65mm" H 2800 4600 50  0001 C CIN
-F 3 "http://www.analog.com/media/en/technical-documentation/data-sheets/ADG714_715.pdf" H 1800 4900 50  0001 C CNN
-	1    1800 5100
-	1    0    0    -1  
-$EndComp
 Wire Wire Line
-	1900 5900 1900 6250
+	800  3800 1400 3800
 Wire Wire Line
-	800  3800 1800 3800
-Wire Wire Line
-	800  3800 800  4400
-Wire Wire Line
-	800  5300 1000 5300
+	800  3800 800  4300
 Connection ~ 800  3800
 Wire Wire Line
-	1000 5500 700  5500
-Wire Wire Line
-	700  2600 700  5500
-Wire Wire Line
-	600  5400 1000 5400
+	700  2600 700  5400
 Wire Wire Line
 	700  5600 700  5700
 Wire Wire Line
@@ -873,10 +839,6 @@ Wire Wire Line
 Connection ~ 700  5700
 Wire Wire Line
 	700  5700 700  6250
-Wire Wire Line
-	3000 4500 2600 4500
-Wire Wire Line
-	2600 4400 3000 4400
 Wire Wire Line
 	800  4400 1000 4400
 Connection ~ 800  4400
@@ -890,13 +852,6 @@ Wire Wire Line
 Wire Wire Line
 	800  4600 1000 4600
 Connection ~ 800  4600
-Wire Wire Line
-	800  4600 800  4700
-Wire Wire Line
-	800  4700 1000 4700
-Connection ~ 800  4700
-Wire Wire Line
-	800  4700 800  4800
 Wire Wire Line
 	800  4800 1000 4800
 Connection ~ 800  4800
@@ -914,15 +869,6 @@ Wire Wire Line
 	800  5000 800  5100
 Wire Wire Line
 	800  5100 1000 5100
-Connection ~ 800  5100
-Wire Wire Line
-	800  5100 800  5300
-NoConn ~ 2600 4600
-NoConn ~ 2600 4700
-NoConn ~ 2600 4800
-NoConn ~ 2600 4900
-NoConn ~ 2600 5000
-NoConn ~ 2600 5100
 NoConn ~ 2500 2600
 NoConn ~ 2500 2700
 Wire Wire Line
@@ -956,4 +902,82 @@ Wire Wire Line
 	5500 8200 5600 8200
 Wire Wire Line
 	5500 8300 5600 8300
+$Comp
+L Power_Management:TPS22993 U101
+U 1 1 5B0BC0D7
+P 1500 5000
+F 0 "U101" H 1150 5850 50  0000 C CNN
+F 1 "TPS22993" H 1700 5850 50  0000 C CNN
+F 2 "Package_DFN_QFN:Texas_S-PWQFN-N20" H 2800 4150 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/tps22993" H 1400 5450 50  0001 C CNN
+	1    1500 5000
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	800  4600 800  4800
+Wire Wire Line
+	800  4300 1000 4300
+Connection ~ 800  4300
+Wire Wire Line
+	800  4300 800  4400
+Wire Wire Line
+	1400 4100 1400 3800
+Wire Wire Line
+	1500 6300 1500 5900
+Wire Wire Line
+	2000 4800 3000 4800
+Wire Wire Line
+	2000 4900 3000 4900
+Wire Wire Line
+	600  5300 1000 5300
+Wire Wire Line
+	700  5400 1000 5400
+Wire Wire Line
+	700  5600 700  5500
+Wire Wire Line
+	700  5500 1000 5500
+Connection ~ 700  5600
+Wire Wire Line
+	900  2300 900  3700
+Wire Wire Line
+	900  3700 1500 3700
+Wire Wire Line
+	1500 3700 1500 4100
+Connection ~ 900  2300
+Wire Wire Line
+	900  2300 700  2300
+$Comp
+L Venus-256-rescue:Test_Point_Flag-Connector_Specialized TP101
+U 1 1 5B1F6758
+P 2300 5300
+F 0 "TP101" H 2559 5396 50  0000 L CNN
+F 1 "VOUT3_TP" H 2559 5305 50  0000 L CNN
+F 2 "TestPoint:TestPoint_Pad_1.0x1.0mm" H 2500 5300 50  0001 C CNN
+F 3 "" H 2500 5300 50  0001 C CNN
+	1    2300 5300
+	1    0    0    -1  
+$EndComp
+$Comp
+L Venus-256-rescue:Test_Point_Flag-Connector_Specialized TP102
+U 1 1 5B1F67A1
+P 2300 5500
+F 0 "TP102" H 2559 5596 50  0000 L CNN
+F 1 "VOUT4_TP" H 2559 5505 50  0000 L CNN
+F 2 "TestPoint:TestPoint_Pad_1.0x1.0mm" H 2500 5500 50  0001 C CNN
+F 3 "" H 2500 5500 50  0001 C CNN
+	1    2300 5500
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2000 5000 2200 5000
+Wire Wire Line
+	2200 5000 2200 5300
+Wire Wire Line
+	2200 5300 2300 5300
+Wire Wire Line
+	2000 5100 2100 5100
+Wire Wire Line
+	2100 5100 2100 5500
+Wire Wire Line
+	2100 5500 2300 5500
 $EndSCHEMATC
