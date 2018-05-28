@@ -9339,7 +9339,7 @@
   )
 
   (module TestPoint:TestPoint_Pad_1.0x1.0mm (layer F.Cu) (tedit 5A0F774F) (tstamp 5B15B8D8)
-    (at 177.8 78.74)
+    (at 43.18 76.2)
     (descr "SMD rectangular pad as test Point, square 1.0mm side length")
     (tags "test point SMD pad rectangle square")
     (path /5B1F6758)
@@ -9366,7 +9366,7 @@
   )
 
   (module TestPoint:TestPoint_Pad_1.0x1.0mm (layer F.Cu) (tedit 5A0F774F) (tstamp 5B15B8E6)
-    (at 177.8 83.82)
+    (at 43.18 81.28)
     (descr "SMD rectangular pad as test Point, square 1.0mm side length")
     (tags "test point SMD pad rectangle square")
     (path /5B1F67A1)
@@ -9393,7 +9393,7 @@
   )
 
   (module Package_DFN_QFN:Texas_S-PWQFN-N20 (layer F.Cu) (tedit 5B098D2B) (tstamp 5B15BCF5)
-    (at 183.642 81.28)
+    (at 53.34 78.74)
     (descr "20-Pin Plastic Quad Flatpack No-Lead Package, Body 3.0x3.0x0.8mm, Texas Instruments (http://www.ti.com/lit/ds/symlink/tps22993.pdf)")
     (tags "QFN 0.4")
     (path /5B0BC0D7)
