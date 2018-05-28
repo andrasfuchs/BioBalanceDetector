@@ -341,6 +341,15 @@
     (add_net "Net-(J301-Pad9)")
     (add_net "Net-(JP101-Pad1)")
     (add_net "Net-(JP102-Pad1)")
+  )
+
+  (net_class SensorLine ""
+    (clearance 0.4)
+    (trace_width 0.4)
+    (via_dia 0.6)
+    (via_drill 0.4)
+    (uvia_dia 0.3)
+    (uvia_drill 0.1)
     (add_net "Net-(TP1002-Pad1)")
     (add_net "Net-(TP1003-Pad1)")
     (add_net "Net-(TP1004-Pad1)")

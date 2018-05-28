@@ -1,0 +1,853 @@
+EESchema Schematic File Version 4
+LIBS:Venus-256-cache
+EELAYER 26 0
+EELAYER END
+$Descr A3 16535 11693
+encoding utf-8
+Sheet 5 10
+Title "Venus-256: Cell Master"
+Date "2018-05-02"
+Rev "A"
+Comp "Bio Balance Detector"
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+Wire Wire Line
+	7400 10800 7400 10900
+Wire Wire Line
+	7400 10900 7500 10900
+Wire Wire Line
+	7900 10900 7900 10800
+Wire Wire Line
+	7500 10800 7500 10900
+Connection ~ 7500 10900
+Wire Wire Line
+	7500 10900 7600 10900
+Wire Wire Line
+	7600 10800 7600 10900
+Wire Wire Line
+	7800 10800 7800 10900
+Wire Wire Line
+	7800 10900 7900 10900
+Wire Wire Line
+	7600 10900 7700 10900
+Connection ~ 7600 10900
+Connection ~ 7800 10900
+Wire Wire Line
+	7700 10800 7700 10900
+Connection ~ 7700 10900
+Wire Wire Line
+	7700 10900 7800 10900
+Wire Wire Line
+	7700 10900 7700 11000
+$Comp
+L Device:C_Small C514
+U 1 1 5AE1DB3B
+P 7100 2100
+AR Path="/5AE473C8/5AE1DB3B" Ref="C514"  Part="1" 
+AR Path="/5AF0307C/5AE1DB3B" Ref="C914"  Part="1" 
+F 0 "C514" H 7100 2200 50  0000 L CNN
+F 1 "100nF" H 7100 2000 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0603_1608Metric_Pad0.84x1.00mm_HandSolder" H 7100 2100 50  0001 C CNN
+F 3 "~" H 7100 2100 50  0001 C CNN
+	1    7100 2100
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	7400 1900 7100 1900
+Wire Wire Line
+	4700 2300 4700 2400
+Wire Wire Line
+	7100 2300 7100 2200
+Wire Wire Line
+	4700 2300 5000 2300
+Wire Wire Line
+	7100 1900 7100 2000
+Connection ~ 7100 1900
+$Comp
+L Device:C_Small C512
+U 1 1 5AE23144
+P 6800 2100
+AR Path="/5AE473C8/5AE23144" Ref="C512"  Part="1" 
+AR Path="/5AF0307C/5AE23144" Ref="C912"  Part="1" 
+F 0 "C512" H 6800 2200 50  0000 L CNN
+F 1 "100nF" H 6800 2000 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0603_1608Metric_Pad0.84x1.00mm_HandSolder" H 6800 2100 50  0001 C CNN
+F 3 "~" H 6800 2100 50  0001 C CNN
+	1    6800 2100
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:C_Small C510
+U 1 1 5AE23174
+P 6500 2100
+AR Path="/5AE473C8/5AE23174" Ref="C510"  Part="1" 
+AR Path="/5AF0307C/5AE23174" Ref="C910"  Part="1" 
+F 0 "C510" H 6500 2200 50  0000 L CNN
+F 1 "100nF" H 6500 2000 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0603_1608Metric_Pad0.84x1.00mm_HandSolder" H 6500 2100 50  0001 C CNN
+F 3 "~" H 6500 2100 50  0001 C CNN
+	1    6500 2100
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:C_Small C508
+U 1 1 5AE231A2
+P 6200 2100
+AR Path="/5AE473C8/5AE231A2" Ref="C508"  Part="1" 
+AR Path="/5AF0307C/5AE231A2" Ref="C908"  Part="1" 
+F 0 "C508" H 6200 2200 50  0000 L CNN
+F 1 "100nF" H 6200 2000 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0603_1608Metric_Pad0.84x1.00mm_HandSolder" H 6200 2100 50  0001 C CNN
+F 3 "~" H 6200 2100 50  0001 C CNN
+	1    6200 2100
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:C_Small C507
+U 1 1 5AE231D6
+P 5900 2100
+AR Path="/5AE473C8/5AE231D6" Ref="C507"  Part="1" 
+AR Path="/5AF0307C/5AE231D6" Ref="C907"  Part="1" 
+F 0 "C507" H 5900 2200 50  0000 L CNN
+F 1 "100nF" H 5900 2000 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0603_1608Metric_Pad0.84x1.00mm_HandSolder" H 5900 2100 50  0001 C CNN
+F 3 "~" H 5900 2100 50  0001 C CNN
+	1    5900 2100
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:C_Small C506
+U 1 1 5AE23204
+P 5600 2100
+AR Path="/5AE473C8/5AE23204" Ref="C506"  Part="1" 
+AR Path="/5AF0307C/5AE23204" Ref="C906"  Part="1" 
+F 0 "C506" H 5600 2200 50  0000 L CNN
+F 1 "100nF" H 5600 2000 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0603_1608Metric_Pad0.84x1.00mm_HandSolder" H 5600 2100 50  0001 C CNN
+F 3 "~" H 5600 2100 50  0001 C CNN
+	1    5600 2100
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:C_Small C504
+U 1 1 5AE23234
+P 5300 2100
+AR Path="/5AE473C8/5AE23234" Ref="C504"  Part="1" 
+AR Path="/5AF0307C/5AE23234" Ref="C904"  Part="1" 
+F 0 "C504" H 5300 2200 50  0000 L CNN
+F 1 "100nF" H 5300 2000 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0603_1608Metric_Pad0.84x1.00mm_HandSolder" H 5300 2100 50  0001 C CNN
+F 3 "~" H 5300 2100 50  0001 C CNN
+	1    5300 2100
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:C_Small C503
+U 1 1 5AE23266
+P 5000 2100
+AR Path="/5AE473C8/5AE23266" Ref="C503"  Part="1" 
+AR Path="/5AF0307C/5AE23266" Ref="C903"  Part="1" 
+F 0 "C503" H 5000 2200 50  0000 L CNN
+F 1 "100nF" H 5000 2000 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0603_1608Metric_Pad0.84x1.00mm_HandSolder" H 5000 2100 50  0001 C CNN
+F 3 "~" H 5000 2100 50  0001 C CNN
+	1    5000 2100
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:C_Small C501
+U 1 1 5AE2329A
+P 4700 2100
+AR Path="/5AE473C8/5AE2329A" Ref="C501"  Part="1" 
+AR Path="/5AF0307C/5AE2329A" Ref="C901"  Part="1" 
+F 0 "C501" H 4700 2200 50  0000 L CNN
+F 1 "10uF" H 4700 2000 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0603_1608Metric_Pad0.84x1.00mm_HandSolder" H 4700 2100 50  0001 C CNN
+F 3 "~" H 4700 2100 50  0001 C CNN
+	1    4700 2100
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4700 2300 4700 2200
+Connection ~ 4700 2300
+Wire Wire Line
+	4700 2000 4700 1900
+Wire Wire Line
+	4700 1900 5000 1900
+Connection ~ 4700 1900
+Wire Wire Line
+	5000 1900 5000 2000
+Connection ~ 5000 1900
+Wire Wire Line
+	5000 1900 5300 1900
+Wire Wire Line
+	5000 2200 5000 2300
+Connection ~ 5000 2300
+Wire Wire Line
+	5000 2300 5300 2300
+Wire Wire Line
+	5300 2000 5300 1900
+Connection ~ 5300 1900
+Wire Wire Line
+	5300 1900 5600 1900
+Wire Wire Line
+	5300 2200 5300 2300
+Connection ~ 5300 2300
+Wire Wire Line
+	5300 2300 5600 2300
+Wire Wire Line
+	5600 2000 5600 1900
+Connection ~ 5600 1900
+Wire Wire Line
+	5600 1900 5900 1900
+Wire Wire Line
+	5600 2200 5600 2300
+Connection ~ 5600 2300
+Wire Wire Line
+	5600 2300 5900 2300
+Wire Wire Line
+	5900 2000 5900 1900
+Connection ~ 5900 1900
+Wire Wire Line
+	5900 1900 6200 1900
+Wire Wire Line
+	5900 2200 5900 2300
+Connection ~ 5900 2300
+Wire Wire Line
+	5900 2300 6200 2300
+Wire Wire Line
+	6200 2000 6200 1900
+Connection ~ 6200 1900
+Wire Wire Line
+	6200 1900 6500 1900
+Wire Wire Line
+	6200 2200 6200 2300
+Connection ~ 6200 2300
+Wire Wire Line
+	6200 2300 6500 2300
+Wire Wire Line
+	6500 2000 6500 1900
+Connection ~ 6500 1900
+Wire Wire Line
+	6500 1900 6800 1900
+Wire Wire Line
+	6500 2200 6500 2300
+Connection ~ 6500 2300
+Wire Wire Line
+	6500 2300 6800 2300
+Wire Wire Line
+	6800 2200 6800 2300
+Connection ~ 6800 2300
+Wire Wire Line
+	6800 2300 7100 2300
+Wire Wire Line
+	6800 2000 6800 1900
+Connection ~ 6800 1900
+Wire Wire Line
+	6800 1900 7100 1900
+Wire Wire Line
+	7500 2800 7500 2750
+Wire Wire Line
+	7500 2750 7600 2750
+Wire Wire Line
+	7600 2800 7600 2750
+Connection ~ 7600 2750
+Wire Wire Line
+	7600 2750 7700 2750
+Wire Wire Line
+	7700 2800 7700 2750
+Connection ~ 7700 2750
+Wire Wire Line
+	7700 2750 7800 2750
+Wire Wire Line
+	7800 2800 7800 2750
+Connection ~ 7800 2750
+Wire Wire Line
+	7800 2750 7900 2750
+Wire Wire Line
+	7900 2800 7900 2750
+$Comp
+L Device:C_Small C516
+U 1 1 5AE4BC4C
+P 7600 1100
+AR Path="/5AE473C8/5AE4BC4C" Ref="C516"  Part="1" 
+AR Path="/5AF0307C/5AE4BC4C" Ref="C916"  Part="1" 
+F 0 "C516" H 7600 1200 50  0000 L CNN
+F 1 "100nF" H 7600 1000 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0603_1608Metric_Pad0.84x1.00mm_HandSolder" H 7600 1100 50  0001 C CNN
+F 3 "~" H 7600 1100 50  0001 C CNN
+	1    7600 1100
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	7600 1200 7600 1300
+Wire Wire Line
+	7600 1300 7300 1300
+Wire Wire Line
+	6400 1300 6400 1400
+Wire Wire Line
+	7600 1000 7600 900 
+Connection ~ 7600 900 
+Wire Wire Line
+	7600 900  7300 900 
+$Comp
+L Device:C_Small C515
+U 1 1 5AE50FA7
+P 7300 1100
+AR Path="/5AE473C8/5AE50FA7" Ref="C515"  Part="1" 
+AR Path="/5AF0307C/5AE50FA7" Ref="C915"  Part="1" 
+F 0 "C515" H 7300 1200 50  0000 L CNN
+F 1 "100nF" H 7300 1000 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0603_1608Metric_Pad0.84x1.00mm_HandSolder" H 7300 1100 50  0001 C CNN
+F 3 "~" H 7300 1100 50  0001 C CNN
+	1    7300 1100
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:C_Small C513
+U 1 1 5AE50FE1
+P 7000 1100
+AR Path="/5AE473C8/5AE50FE1" Ref="C513"  Part="1" 
+AR Path="/5AF0307C/5AE50FE1" Ref="C913"  Part="1" 
+F 0 "C513" H 7000 1200 50  0000 L CNN
+F 1 "100nF" H 7000 1000 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0603_1608Metric_Pad0.84x1.00mm_HandSolder" H 7000 1100 50  0001 C CNN
+F 3 "~" H 7000 1100 50  0001 C CNN
+	1    7000 1100
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:C_Small C511
+U 1 1 5AE5101D
+P 6700 1100
+AR Path="/5AE473C8/5AE5101D" Ref="C511"  Part="1" 
+AR Path="/5AF0307C/5AE5101D" Ref="C911"  Part="1" 
+F 0 "C511" H 6700 1200 50  0000 L CNN
+F 1 "100nF" H 6700 1000 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0603_1608Metric_Pad0.84x1.00mm_HandSolder" H 6700 1100 50  0001 C CNN
+F 3 "~" H 6700 1100 50  0001 C CNN
+	1    6700 1100
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:C_Small C509
+U 1 1 5AE5105B
+P 6400 1100
+AR Path="/5AE473C8/5AE5105B" Ref="C509"  Part="1" 
+AR Path="/5AF0307C/5AE5105B" Ref="C909"  Part="1" 
+F 0 "C509" H 6400 1200 50  0000 L CNN
+F 1 "100nF" H 6400 1000 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0603_1608Metric_Pad0.84x1.00mm_HandSolder" H 6400 1100 50  0001 C CNN
+F 3 "~" H 6400 1100 50  0001 C CNN
+	1    6400 1100
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6400 900  6400 1000
+Wire Wire Line
+	6400 1300 6400 1200
+Connection ~ 6400 1300
+Wire Wire Line
+	6700 1300 6700 1200
+Connection ~ 6700 1300
+Wire Wire Line
+	6700 1300 6400 1300
+Wire Wire Line
+	7000 1300 7000 1200
+Connection ~ 7000 1300
+Wire Wire Line
+	7000 1300 6700 1300
+Wire Wire Line
+	7300 1300 7300 1200
+Connection ~ 7300 1300
+Wire Wire Line
+	7300 1300 7000 1300
+Wire Wire Line
+	6400 900  6200 900 
+Connection ~ 6400 900 
+Wire Wire Line
+	7900 2750 7900 900 
+Wire Wire Line
+	7600 900  7900 900 
+Connection ~ 7900 2750
+Wire Wire Line
+	6000 10100 5800 10100
+Wire Wire Line
+	5400 10100 5400 10200
+$Comp
+L Device:C_Small C505
+U 1 1 5AE70A1B
+P 5400 10300
+AR Path="/5AE473C8/5AE70A1B" Ref="C505"  Part="1" 
+AR Path="/5AF0307C/5AE70A1B" Ref="C905"  Part="1" 
+F 0 "C505" H 5492 10346 50  0000 L CNN
+F 1 "10pF" H 5492 10255 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0603_1608Metric_Pad0.84x1.00mm_HandSolder" H 5400 10300 50  0001 C CNN
+F 3 "~" H 5400 10300 50  0001 C CNN
+	1    5400 10300
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:R_Small R501
+U 1 1 5AE70BDB
+P 5800 10300
+AR Path="/5AE473C8/5AE70BDB" Ref="R501"  Part="1" 
+AR Path="/5AF0307C/5AE70BDB" Ref="R901"  Part="1" 
+F 0 "R501" H 5859 10346 50  0000 L CNN
+F 1 "5.62K" H 5859 10255 50  0000 L CNN
+F 2 "Resistor_SMD:R_0603_1608Metric_Pad0.84x1.00mm_HandSolder" H 5800 10300 50  0001 C CNN
+F 3 "~" H 5800 10300 50  0001 C CNN
+	1    5800 10300
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5800 10200 5800 10100
+Connection ~ 5800 10100
+Wire Wire Line
+	5800 10100 5400 10100
+Wire Wire Line
+	5400 10400 5400 10500
+Wire Wire Line
+	5400 10500 5800 10500
+Wire Wire Line
+	5800 10500 5800 10600
+Wire Wire Line
+	5800 10500 5800 10400
+Connection ~ 5800 10500
+Wire Wire Line
+	6000 9900 5200 9900
+$Comp
+L Device:C_Small C502
+U 1 1 5AE98243
+P 4850 10000
+AR Path="/5AE473C8/5AE98243" Ref="C502"  Part="1" 
+AR Path="/5AF0307C/5AE98243" Ref="C902"  Part="1" 
+F 0 "C502" H 4942 10046 50  0000 L CNN
+F 1 "100nF" H 4942 9955 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0603_1608Metric_Pad0.84x1.00mm_HandSolder" H 4850 10000 50  0001 C CNN
+F 3 "~" H 4850 10000 50  0001 C CNN
+	1    4850 10000
+	1    0    0    -1  
+$EndComp
+Connection ~ 4850 9800
+Wire Wire Line
+	4850 9800 6000 9800
+Wire Wire Line
+	4300 9800 4400 9800
+Connection ~ 4400 9800
+Wire Wire Line
+	4400 9800 4850 9800
+$Comp
+L Device:L L501
+U 1 1 5AEB7A30
+P 4150 9800
+AR Path="/5AE473C8/5AEB7A30" Ref="L501"  Part="1" 
+AR Path="/5AF0307C/5AEB7A30" Ref="L901"  Part="1" 
+F 0 "L501" V 3972 9800 50  0000 C CNN
+F 1 "L" V 4063 9800 50  0000 C CNN
+F 2 "Inductor_SMD:L_0603_1608Metric_Pad0.84x1.00mm_HandSolder" H 4150 9800 50  0001 C CNN
+F 3 "~" H 4150 9800 50  0001 C CNN
+	1    4150 9800
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	4000 9800 3900 9800
+Wire Wire Line
+	5200 9900 5200 10200
+Wire Wire Line
+	4850 9800 4850 9900
+Wire Wire Line
+	4850 10100 4850 10200
+Wire Wire Line
+	4850 10200 5200 10200
+Wire Wire Line
+	5200 10200 5200 10300
+Connection ~ 5200 10200
+Wire Wire Line
+	6700 1000 6700 900 
+Connection ~ 6700 900 
+Wire Wire Line
+	6700 900  6400 900 
+Wire Wire Line
+	7000 1000 7000 900 
+Connection ~ 7000 900 
+Wire Wire Line
+	7000 900  6700 900 
+Wire Wire Line
+	7300 900  7300 1000
+Connection ~ 7300 900 
+Wire Wire Line
+	7300 900  7000 900 
+$Comp
+L Venus-256-rescue:ATSAME70Q21A-AN-MCU_Microchip_SAME U501
+U 1 1 5ACBEA02
+P 7300 6800
+AR Path="/5AE473C8/5ACBEA02" Ref="U501"  Part="1" 
+AR Path="/5AF0307C/5ACBEA02" Ref="U901"  Part="1" 
+F 0 "U501" H 6250 10650 50  0000 C CNN
+F 1 "ATSAME70Q21A-AN" H 6550 2950 50  0000 C CNN
+F 2 "Package_QFP:LQFP-144_20x20mm_P0.5mm" H 7300 6800 50  0001 C CNN
+F 3 "http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-11296-32-bit-Cortex-M7-Microcontroller-SAM-E70Q-SAM-E70N-SAM-E70J_Datasheet.pdf" H 7300 6800 50  0001 C CNN
+	1    7300 6800
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6500 2800 6500 2750
+Wire Wire Line
+	6500 2750 6600 2750
+Wire Wire Line
+	7400 2750 7400 1900
+Wire Wire Line
+	7300 2800 7300 2750
+Connection ~ 7300 2750
+Wire Wire Line
+	7300 2750 7400 2750
+Wire Wire Line
+	7200 2800 7200 2750
+Connection ~ 7200 2750
+Wire Wire Line
+	7200 2750 7300 2750
+Wire Wire Line
+	7100 2800 7100 2750
+Connection ~ 7100 2750
+Wire Wire Line
+	7100 2750 7200 2750
+Wire Wire Line
+	7000 2800 7000 2750
+Connection ~ 7000 2750
+Wire Wire Line
+	7000 2750 7100 2750
+Wire Wire Line
+	6900 2800 6900 2750
+Connection ~ 6900 2750
+Wire Wire Line
+	6900 2750 7000 2750
+Wire Wire Line
+	6700 2800 6700 2750
+Connection ~ 6700 2750
+Wire Wire Line
+	6700 2750 6900 2750
+Wire Wire Line
+	6600 2800 6600 2750
+Connection ~ 6600 2750
+Wire Wire Line
+	6600 2750 6700 2750
+Wire Wire Line
+	4700 1300 3900 1300
+Wire Wire Line
+	4700 1300 4700 1900
+Wire Wire Line
+	3900 1300 3900 9800
+Connection ~ 4700 1300
+Wire Wire Line
+	6200 700  6200 900 
+Wire Wire Line
+	4700 700  4700 1300
+Text HLabel 4700 700  0    50   Input ~ 0
+VCC_MCU_P3V3
+Text HLabel 6200 700  0    50   Input ~ 0
+VDDCORE
+Text HLabel 5800 10600 0    50   Input ~ 0
+GND
+Text HLabel 5200 10300 0    50   Input ~ 0
+GND
+Text HLabel 7700 11000 0    50   Input ~ 0
+GND
+Text HLabel 4700 2400 0    50   Input ~ 0
+GND
+Text HLabel 6400 1400 0    50   Input ~ 0
+GND
+Text HLabel 5700 7400 0    50   Output ~ 0
+TRACESWO
+Wire Wire Line
+	5700 7400 6000 7400
+Text HLabel 5700 7500 0    50   BiDi ~ 0
+SWDIO
+Text HLabel 5700 7600 0    50   Input ~ 0
+SWCLK
+Wire Wire Line
+	5700 7500 6000 7500
+Wire Wire Line
+	5700 7600 6000 7600
+Text HLabel 5700 9300 0    50   Input ~ 0
+TARGET_RESET
+Wire Wire Line
+	5700 9300 6000 9300
+$Comp
+L Device:LED_ARGB D501
+U 1 1 5AF7855D
+P 4900 4800
+AR Path="/5AE473C8/5AF7855D" Ref="D501"  Part="1" 
+AR Path="/5AF0307C/5AF7855D" Ref="D901"  Part="1" 
+F 0 "D501" H 4900 4333 50  0000 C CNN
+F 1 "LED_ARGB" H 4900 4424 50  0000 C CNN
+F 2 "LED_SMD:LED_RGB_1210" H 4900 4750 50  0001 C CNN
+F 3 "~" H 4900 4750 50  0001 C CNN
+	1    4900 4800
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	6000 4700 5200 4700
+Wire Wire Line
+	5200 4700 5200 4600
+Wire Wire Line
+	5200 4600 5100 4600
+Wire Wire Line
+	5100 4800 6000 4800
+Wire Wire Line
+	6000 4900 5200 4900
+Wire Wire Line
+	5200 4900 5200 5000
+Wire Wire Line
+	5200 5000 5100 5000
+Wire Wire Line
+	4700 4800 4600 4800
+Wire Wire Line
+	4600 4800 4600 5200
+Wire Wire Line
+	4600 5200 5300 5200
+Wire Wire Line
+	5300 5200 5300 5000
+Wire Wire Line
+	5300 5000 6000 5000
+Text HLabel 8900 6100 2    50   Output ~ 0
+SPI1_NPCS0
+Text HLabel 8900 8900 2    50   Output ~ 0
+SPI0_MISO
+Text HLabel 8900 9000 2    50   Input ~ 0
+SPI0_MOSI
+Text HLabel 8900 9100 2    50   Input ~ 0
+SPI0_SPCK
+Text HLabel 8900 6500 2    50   Output ~ 0
+SPI1_NPCS2
+Text HLabel 8900 6400 2    50   Output ~ 0
+SPI1_NPCS1
+NoConn ~ 8100 2800
+NoConn ~ 8200 2800
+NoConn ~ 8300 2800
+Text HLabel 4800 8000 0    50   Output ~ 0
+DAC0
+Text HLabel 8900 6600 2    50   Output ~ 0
+SPI1_NPCS3
+Text HLabel 8900 6200 2    50   Input ~ 0
+SPI1_MISO
+Text HLabel 8900 6300 2    50   Output ~ 0
+SPI1_MOSI
+Text HLabel 8900 6000 2    50   Output ~ 0
+SPI1_SPCK
+Wire Wire Line
+	3400 5700 6000 5700
+Wire Wire Line
+	8600 8900 8900 8900
+Wire Wire Line
+	8600 9000 8900 9000
+Wire Wire Line
+	8600 9100 8900 9100
+Wire Wire Line
+	8600 9900 8900 9900
+Wire Wire Line
+	8600 6000 8900 6000
+Wire Wire Line
+	8600 6100 8900 6100
+Wire Wire Line
+	8600 6200 8900 6200
+Wire Wire Line
+	8600 6300 8900 6300
+Wire Wire Line
+	8600 6400 8900 6400
+Wire Wire Line
+	8600 6500 8900 6500
+Wire Wire Line
+	8600 6600 8900 6600
+Wire Wire Line
+	6000 7000 5000 7000
+Wire Wire Line
+	5000 7000 5000 8000
+Wire Wire Line
+	5000 8000 6000 8000
+Wire Wire Line
+	4800 8000 5000 8000
+Connection ~ 5000 8000
+Text HLabel 5700 8200 0    50   Output ~ 0
+ADC_CONVST0
+Wire Wire Line
+	5700 8200 6000 8200
+Text HLabel 5700 5900 0    50   Input ~ 0
+ADC_BUSY0
+Text HLabel 5700 6000 0    50   Input ~ 0
+ADC_BUSY1
+Text HLabel 5700 6100 0    50   Input ~ 0
+ADC_BUSY2
+Text HLabel 5700 6200 0    50   Input ~ 0
+ADC_BUSY3
+Wire Wire Line
+	5700 5900 6000 5900
+Wire Wire Line
+	5700 6000 6000 6000
+Wire Wire Line
+	5700 6100 6000 6100
+Wire Wire Line
+	5700 6200 6000 6200
+Text HLabel 5700 8300 0    50   Output ~ 0
+ADC_CONVST1
+Text HLabel 5700 8400 0    50   Output ~ 0
+ADC_CONVST2
+Text HLabel 5700 8500 0    50   Output ~ 0
+ADC_CONVST3
+Wire Wire Line
+	5700 8300 6000 8300
+Wire Wire Line
+	5700 8400 6000 8400
+Wire Wire Line
+	5700 8500 6000 8500
+Text HLabel 5700 6300 0    50   Input ~ 0
+ADC_RESET
+Wire Wire Line
+	5700 6300 6000 6300
+$Comp
+L Venus-256-rescue:Test_Point-Connector_Specialized TP502
+U 1 1 5AE7EA0D
+P 3100 9700
+AR Path="/5AE473C8/5AE7EA0D" Ref="TP502"  Part="1" 
+AR Path="/5AF0307C/5AE7EA0D" Ref="TP902"  Part="1" 
+F 0 "TP502" V 3300 9700 50  0000 C CNN
+F 1 "AFE0_AD1" V 3204 9774 50  0000 C CNN
+F 2 "TestPoint:TestPoint_Pad_1.0x1.0mm" H 3300 9700 50  0001 C CNN
+F 3 "~" H 3300 9700 50  0001 C CNN
+	1    3100 9700
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Venus-256-rescue:Test_Point-Connector_Specialized TP501
+U 1 1 5AE7EBD0
+P 3100 9300
+AR Path="/5AE473C8/5AE7EBD0" Ref="TP501"  Part="1" 
+AR Path="/5AF0307C/5AE7EBD0" Ref="TP901"  Part="1" 
+F 0 "TP501" V 3300 9200 50  0000 L CNN
+F 1 "AFE0_AD0" V 3200 9200 50  0000 L CNN
+F 2 "TestPoint:TestPoint_Pad_1.0x1.0mm" H 3300 9300 50  0001 C CNN
+F 3 "~" H 3300 9300 50  0001 C CNN
+	1    3100 9300
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Venus-256-rescue:Test_Point-Connector_Specialized TP503
+U 1 1 5AE7F482
+P 3100 10100
+AR Path="/5AE473C8/5AE7F482" Ref="TP503"  Part="1" 
+AR Path="/5AF0307C/5AE7F482" Ref="TP903"  Part="1" 
+F 0 "TP503" V 3300 10200 50  0000 R CNN
+F 1 "ADVREF" V 3200 10250 50  0000 R CNN
+F 2 "TestPoint:TestPoint_Pad_1.0x1.0mm" H 3300 10100 50  0001 C CNN
+F 3 "~" H 3300 10100 50  0001 C CNN
+	1    3100 10100
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	8900 9900 8900 11100
+Wire Wire Line
+	8900 11100 3600 11100
+Wire Wire Line
+	3600 11100 3600 9300
+Wire Wire Line
+	3600 9300 3100 9300
+Wire Wire Line
+	3400 5700 3400 9700
+Wire Wire Line
+	3400 9700 3100 9700
+Wire Wire Line
+	4400 10100 3100 10100
+Wire Wire Line
+	4400 9800 4400 10100
+NoConn ~ 6000 3600
+NoConn ~ 6000 3700
+NoConn ~ 6000 3800
+NoConn ~ 6000 3900
+NoConn ~ 6000 4000
+NoConn ~ 6000 4100
+NoConn ~ 6000 4200
+NoConn ~ 6000 4300
+NoConn ~ 6000 4400
+NoConn ~ 6000 4500
+NoConn ~ 6000 4600
+NoConn ~ 8600 3600
+NoConn ~ 8600 3700
+NoConn ~ 8600 3800
+NoConn ~ 8600 3900
+NoConn ~ 8600 4000
+NoConn ~ 8600 4100
+NoConn ~ 8600 4200
+NoConn ~ 8600 4300
+NoConn ~ 8600 4400
+NoConn ~ 8600 4500
+NoConn ~ 8600 4600
+NoConn ~ 8600 4700
+NoConn ~ 8600 4800
+NoConn ~ 8600 4900
+NoConn ~ 8600 5000
+NoConn ~ 6000 5100
+NoConn ~ 6000 5200
+NoConn ~ 6000 5300
+NoConn ~ 6000 5400
+NoConn ~ 6000 5500
+NoConn ~ 6000 5600
+NoConn ~ 6000 5800
+NoConn ~ 8600 5100
+NoConn ~ 8600 5200
+NoConn ~ 8600 5300
+NoConn ~ 8600 5400
+NoConn ~ 8600 5500
+NoConn ~ 8600 5600
+NoConn ~ 8600 5700
+NoConn ~ 8600 5800
+NoConn ~ 8600 5900
+NoConn ~ 6000 6400
+NoConn ~ 6000 6500
+NoConn ~ 6000 6600
+NoConn ~ 6000 6700
+NoConn ~ 6000 6900
+NoConn ~ 6000 7100
+NoConn ~ 6000 7200
+NoConn ~ 6000 7300
+NoConn ~ 8600 6700
+NoConn ~ 8600 6900
+NoConn ~ 8600 7000
+NoConn ~ 8600 7100
+NoConn ~ 8600 7200
+NoConn ~ 8600 7300
+NoConn ~ 8600 7400
+NoConn ~ 8600 7500
+NoConn ~ 8600 7600
+NoConn ~ 8600 7700
+NoConn ~ 8600 7800
+NoConn ~ 8600 7900
+NoConn ~ 6000 7700
+NoConn ~ 6000 7800
+NoConn ~ 6000 7900
+NoConn ~ 6000 8600
+NoConn ~ 6000 8700
+NoConn ~ 6000 8900
+NoConn ~ 6000 9000
+NoConn ~ 6000 9400
+NoConn ~ 6000 9600
+NoConn ~ 8600 8000
+NoConn ~ 8600 8100
+NoConn ~ 8600 8200
+NoConn ~ 8600 8300
+NoConn ~ 8600 8400
+NoConn ~ 8600 8500
+NoConn ~ 8600 8600
+NoConn ~ 8600 8700
+NoConn ~ 8600 8800
+NoConn ~ 8600 9200
+NoConn ~ 8600 9300
+NoConn ~ 8600 9400
+NoConn ~ 8600 9500
+NoConn ~ 8600 9600
+NoConn ~ 8600 9700
+NoConn ~ 8600 9800
+NoConn ~ 8600 10000
+$EndSCHEMATC
