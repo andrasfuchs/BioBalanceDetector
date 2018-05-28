@@ -813,7 +813,6 @@ NoConn ~ 6000 7100
 NoConn ~ 6000 7200
 NoConn ~ 6000 7300
 NoConn ~ 8600 6700
-NoConn ~ 8600 6900
 NoConn ~ 8600 7000
 NoConn ~ 8600 7100
 NoConn ~ 8600 7200
@@ -850,4 +849,40 @@ NoConn ~ 8600 9600
 NoConn ~ 8600 9700
 NoConn ~ 8600 9800
 NoConn ~ 8600 10000
+$Comp
+L Jumper:Jumper_3_Open JP501
+U 1 1 5B10913A
+P 9850 6900
+AR Path="/5AE473C8/5B10913A" Ref="JP501"  Part="1" 
+AR Path="/5AF0307C/5B10913A" Ref="JP901"  Part="1" 
+F 0 "JP501" H 9850 7124 50  0000 C CNN
+F 1 "GPAD_JP" H 9850 7033 50  0000 C CNN
+F 2 "Jumper:SolderJumper-3_P1.3mm_Open_Pad1.0x1.5mm" H 9850 6900 50  0001 C CNN
+F 3 "~" H 9850 6900 50  0001 C CNN
+	1    9850 6900
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	8600 6900 9600 6900
+Wire Wire Line
+	9850 7050 9850 7200
+Text HLabel 10500 6900 2    50   Input ~ 0
+GND
+Wire Wire Line
+	10100 6900 10500 6900
+Wire Wire Line
+	10500 7200 9850 7200
+$Comp
+L Venus-256-rescue:Test_Point-Connector_Specialized TP504
+U 1 1 5B1555DD
+P 10500 7200
+AR Path="/5AE473C8/5B1555DD" Ref="TP504"  Part="1" 
+AR Path="/5AF0307C/5B1555DD" Ref="TP904"  Part="1" 
+F 0 "TP504" V 10700 7250 50  0000 L CNN
+F 1 "GPAD" V 10600 7250 50  0000 L CNN
+F 2 "TestPoint:TestPoint_Pad_1.0x1.0mm" H 10700 7200 50  0001 C CNN
+F 3 "~" H 10700 7200 50  0001 C CNN
+	1    10500 7200
+	0    1    -1   0   
+$EndComp
 $EndSCHEMATC
