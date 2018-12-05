@@ -19,7 +19,7 @@
 
   (layers
     (0 F.Cu signal)
-    (1 In1.Cu signal hide)
+    (1 In1.Cu signal)
     (2 In2.Cu signal)
     (31 B.Cu signal hide)
     (33 F.Adhes user hide)
@@ -19616,24 +19616,4 @@
   (segment (start 70.866 27.432) (end 64.77 27.432) (width 0.254) (layer B.Cu) (net 166) (tstamp 5B14A278))
   (segment (start 64.77 27.432) (end 64.77 26.67) (width 0.254) (layer B.Cu) (net 166) (tstamp 5B14A279))
 
-  (zone (net 159) (net_name "Net-(JP501-Pad2)") (layer In1.Cu) (tstamp 0) (hatch edge 0.508)
-    (connect_pads yes (clearance 0.508))
-    (min_thickness 0.254)
-    (fill yes (arc_segments 16) (thermal_gap 0.508) (thermal_bridge_width 0.508))
-    (polygon
-      (pts
-        (xy 71.25 20) (xy 173 20) (xy 173 122) (xy 71.25 122)
-      )
-    )
-  )
-  (zone (net 160) (net_name "Net-(JP901-Pad2)") (layer In1.Cu) (tstamp 0) (hatch edge 0.508)
-    (connect_pads yes (clearance 0.508))
-    (min_thickness 0.254)
-    (fill yes (arc_segments 16) (thermal_gap 0.508) (thermal_bridge_width 0.508))
-    (polygon
-      (pts
-        (xy 71 20) (xy 71 71) (xy 20 71) (xy 20 20)
-      )
-    )
-  )
 )
