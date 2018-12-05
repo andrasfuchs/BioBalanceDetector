@@ -21,7 +21,7 @@
     (0 F.Cu signal)
     (1 In1.Cu signal)
     (2 In2.Cu signal)
-    (31 B.Cu signal hide)
+    (31 B.Cu signal)
     (33 F.Adhes user hide)
     (35 F.Paste user hide)
     (36 B.SilkS user hide)
@@ -61,8 +61,8 @@
     (mod_edge_width 0.15)
     (mod_text_size 1 1)
     (mod_text_width 0.15)
-    (pad_size 1.524 1.524)
-    (pad_drill 0.762)
+    (pad_size 1 1)
+    (pad_drill 0.5)
     (pad_to_mask_clearance 0.2)
     (aux_axis_origin 15.24 15.24)
     (visible_elements 7FFFF7FF)
@@ -470,7 +470,7 @@
     (fp_line (start -1 1) (end -1 -1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end 1 1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end -1 -1) (layer B.CrtYd) (width 0.05))
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 56 "Net-(TP416-Pad1)"))
   )
 
@@ -6957,7 +6957,7 @@
     (fp_line (start -1 1) (end -1 -1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end 1 1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end -1 -1) (layer B.CrtYd) (width 0.05))
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 162 "Net-(TP401-Pad1)"))
   )
 
@@ -6984,7 +6984,7 @@
     (fp_text user %R (at 0 1.45) (layer B.Fab)
       (effects (font (size 1 1) (thickness 0.15)) (justify mirror))
     )
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 42 "Net-(TP402-Pad1)"))
   )
 
@@ -7011,7 +7011,7 @@
     (fp_line (start -1 1) (end -1 -1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end 1 1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end -1 -1) (layer B.CrtYd) (width 0.05))
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 43 "Net-(TP403-Pad1)"))
   )
 
@@ -7038,7 +7038,7 @@
     (fp_text user %R (at 0 1.45) (layer B.Fab)
       (effects (font (size 1 1) (thickness 0.15)) (justify mirror))
     )
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 44 "Net-(TP404-Pad1)"))
   )
 
@@ -7065,7 +7065,7 @@
     (fp_line (start -1 1) (end -1 -1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end 1 1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end -1 -1) (layer B.CrtYd) (width 0.05))
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 45 "Net-(TP405-Pad1)"))
   )
 
@@ -7092,7 +7092,7 @@
     (fp_text user %R (at 0 1.45) (layer B.Fab)
       (effects (font (size 1 1) (thickness 0.15)) (justify mirror))
     )
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 46 "Net-(TP406-Pad1)"))
   )
 
@@ -7119,7 +7119,7 @@
     (fp_line (start -1 1) (end -1 -1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end 1 1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end -1 -1) (layer B.CrtYd) (width 0.05))
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 47 "Net-(TP407-Pad1)"))
   )
 
@@ -7146,7 +7146,7 @@
     (fp_text user %R (at 0 1.45) (layer B.Fab)
       (effects (font (size 1 1) (thickness 0.15)) (justify mirror))
     )
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 48 "Net-(TP408-Pad1)"))
   )
 
@@ -7173,7 +7173,7 @@
     (fp_line (start -1 1) (end -1 -1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end 1 1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end -1 -1) (layer B.CrtYd) (width 0.05))
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 49 "Net-(TP409-Pad1)"))
   )
 
@@ -7200,7 +7200,7 @@
     (fp_text user %R (at 0 1.45) (layer B.Fab)
       (effects (font (size 1 1) (thickness 0.15)) (justify mirror))
     )
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 50 "Net-(TP410-Pad1)"))
   )
 
@@ -7227,7 +7227,7 @@
     (fp_line (start -1 1) (end -1 -1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end 1 1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end -1 -1) (layer B.CrtYd) (width 0.05))
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 51 "Net-(TP411-Pad1)"))
   )
 
@@ -7254,7 +7254,7 @@
     (fp_line (start -1 1) (end -1 -1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end 1 1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end -1 -1) (layer B.CrtYd) (width 0.05))
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 52 "Net-(TP412-Pad1)"))
   )
 
@@ -7281,7 +7281,7 @@
     (fp_line (start -1 1) (end -1 -1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end 1 1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end -1 -1) (layer B.CrtYd) (width 0.05))
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 53 "Net-(TP413-Pad1)"))
   )
 
@@ -7308,7 +7308,7 @@
     (fp_line (start -1 1) (end -1 -1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end 1 1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end -1 -1) (layer B.CrtYd) (width 0.05))
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 54 "Net-(TP414-Pad1)"))
   )
 
@@ -7335,7 +7335,7 @@
     (fp_text user %R (at 0 1.45) (layer B.Fab)
       (effects (font (size 1 1) (thickness 0.15)) (justify mirror))
     )
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 55 "Net-(TP415-Pad1)"))
   )
 
@@ -7447,7 +7447,7 @@
       (net 36 "Net-(C502-Pad1)"))
   )
 
-  (module TestPoint:TestPoint_Pad_1.0x1.0mm (layer B.Cu) (tedit 5A0F774F) (tstamp 5B14989D)
+  (module TestPoint:TestPoint_Pad_1.0x1.0mm (layer B.Cu) (tedit 5C0784F5) (tstamp 5B14989D)
     (at 115.57 26.67)
     (descr "SMD rectangular pad as test Point, square 1.0mm side length")
     (tags "test point SMD pad rectangle square")
@@ -7470,11 +7470,11 @@
     (fp_text user %R (at 0 1.45) (layer B.Fab)
       (effects (font (size 1 1) (thickness 0.15)) (justify mirror))
     )
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 163 "Net-(TP601-Pad1)"))
   )
 
-  (module TestPoint:TestPoint_Pad_1.0x1.0mm (layer B.Cu) (tedit 5A0F774F) (tstamp 5B1498AA)
+  (module TestPoint:TestPoint_Pad_1.0x1.0mm (layer B.Cu) (tedit 5C0784EC) (tstamp 5B1498AA)
     (at 102.87 26.67)
     (descr "SMD rectangular pad as test Point, square 1.0mm side length")
     (tags "test point SMD pad rectangle square")
@@ -7497,11 +7497,11 @@
     (fp_line (start -1 1) (end -1 -1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end 1 1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end -1 -1) (layer B.CrtYd) (width 0.05))
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 59 "Net-(TP602-Pad1)"))
   )
 
-  (module TestPoint:TestPoint_Pad_1.0x1.0mm (layer B.Cu) (tedit 5A0F774F) (tstamp 5B1498B7)
+  (module TestPoint:TestPoint_Pad_1.0x1.0mm (layer B.Cu) (tedit 5C0784E2) (tstamp 5B1498B7)
     (at 90.17 26.67)
     (descr "SMD rectangular pad as test Point, square 1.0mm side length")
     (tags "test point SMD pad rectangle square")
@@ -7524,11 +7524,11 @@
     (fp_text user %R (at 0 1.45) (layer B.Fab)
       (effects (font (size 1 1) (thickness 0.15)) (justify mirror))
     )
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 60 "Net-(TP603-Pad1)"))
   )
 
-  (module TestPoint:TestPoint_Pad_1.0x1.0mm (layer B.Cu) (tedit 5A0F774F) (tstamp 5B1498C4)
+  (module TestPoint:TestPoint_Pad_1.0x1.0mm (layer B.Cu) (tedit 5C07848D) (tstamp 5B1498C4)
     (at 77.47 26.67)
     (descr "SMD rectangular pad as test Point, square 1.0mm side length")
     (tags "test point SMD pad rectangle square")
@@ -7551,11 +7551,11 @@
     (fp_line (start -1 1) (end -1 -1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end 1 1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end -1 -1) (layer B.CrtYd) (width 0.05))
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 61 "Net-(TP604-Pad1)"))
   )
 
-  (module TestPoint:TestPoint_Pad_1.0x1.0mm (layer B.Cu) (tedit 5A0F774F) (tstamp 5B1498D1)
+  (module TestPoint:TestPoint_Pad_1.0x1.0mm (layer B.Cu) (tedit 5C07852C) (tstamp 5B1498D1)
     (at 115.57 39.37)
     (descr "SMD rectangular pad as test Point, square 1.0mm side length")
     (tags "test point SMD pad rectangle square")
@@ -7578,11 +7578,11 @@
     (fp_text user %R (at 0 1.45) (layer B.Fab)
       (effects (font (size 1 1) (thickness 0.15)) (justify mirror))
     )
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 62 "Net-(TP605-Pad1)"))
   )
 
-  (module TestPoint:TestPoint_Pad_1.0x1.0mm (layer B.Cu) (tedit 5A0F774F) (tstamp 5B1498DE)
+  (module TestPoint:TestPoint_Pad_1.0x1.0mm (layer B.Cu) (tedit 5C07851E) (tstamp 5B1498DE)
     (at 102.87 39.37)
     (descr "SMD rectangular pad as test Point, square 1.0mm side length")
     (tags "test point SMD pad rectangle square")
@@ -7605,11 +7605,11 @@
     (fp_line (start -1 1) (end -1 -1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end 1 1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end -1 -1) (layer B.CrtYd) (width 0.05))
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 63 "Net-(TP606-Pad1)"))
   )
 
-  (module TestPoint:TestPoint_Pad_1.0x1.0mm (layer B.Cu) (tedit 5A0F774F) (tstamp 5B1498EB)
+  (module TestPoint:TestPoint_Pad_1.0x1.0mm (layer B.Cu) (tedit 5C078510) (tstamp 5B1498EB)
     (at 90.17 39.37)
     (descr "SMD rectangular pad as test Point, square 1.0mm side length")
     (tags "test point SMD pad rectangle square")
@@ -7632,11 +7632,11 @@
     (fp_text user %R (at 0 1.45) (layer B.Fab)
       (effects (font (size 1 1) (thickness 0.15)) (justify mirror))
     )
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 64 "Net-(TP607-Pad1)"))
   )
 
-  (module TestPoint:TestPoint_Pad_1.0x1.0mm (layer B.Cu) (tedit 5A0F774F) (tstamp 5B1498F8)
+  (module TestPoint:TestPoint_Pad_1.0x1.0mm (layer B.Cu) (tedit 5C078506) (tstamp 5B1498F8)
     (at 77.47 39.37)
     (descr "SMD rectangular pad as test Point, square 1.0mm side length")
     (tags "test point SMD pad rectangle square")
@@ -7659,7 +7659,7 @@
     (fp_text user %R (at 0 1.45) (layer B.Fab)
       (effects (font (size 1 1) (thickness 0.15)) (justify mirror))
     )
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 65 "Net-(TP608-Pad1)"))
   )
 
@@ -7686,7 +7686,7 @@
     (fp_line (start -1 1) (end -1 -1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end 1 1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end -1 -1) (layer B.CrtYd) (width 0.05))
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 66 "Net-(TP609-Pad1)"))
   )
 
@@ -7713,11 +7713,11 @@
     (fp_text user %R (at 0 1.45) (layer B.Fab)
       (effects (font (size 1 1) (thickness 0.15)) (justify mirror))
     )
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 67 "Net-(TP610-Pad1)"))
   )
 
-  (module TestPoint:TestPoint_Pad_1.0x1.0mm (layer B.Cu) (tedit 5A0F774F) (tstamp 5B14991F)
+  (module TestPoint:TestPoint_Pad_1.0x1.0mm (layer B.Cu) (tedit 5C078541) (tstamp 5B14991F)
     (at 90.17 52.07)
     (descr "SMD rectangular pad as test Point, square 1.0mm side length")
     (tags "test point SMD pad rectangle square")
@@ -7740,11 +7740,11 @@
     (fp_line (start -1 1) (end -1 -1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end 1 1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end -1 -1) (layer B.CrtYd) (width 0.05))
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 68 "Net-(TP611-Pad1)"))
   )
 
-  (module TestPoint:TestPoint_Pad_1.0x1.0mm (layer B.Cu) (tedit 5A0F774F) (tstamp 5B14992C)
+  (module TestPoint:TestPoint_Pad_1.0x1.0mm (layer B.Cu) (tedit 5C078538) (tstamp 5B14992C)
     (at 77.47 52.07)
     (descr "SMD rectangular pad as test Point, square 1.0mm side length")
     (tags "test point SMD pad rectangle square")
@@ -7767,7 +7767,7 @@
     (fp_text user %R (at 0 1.45) (layer B.Fab)
       (effects (font (size 1 1) (thickness 0.15)) (justify mirror))
     )
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 69 "Net-(TP612-Pad1)"))
   )
 
@@ -7794,7 +7794,7 @@
     (fp_line (start -1 1) (end -1 -1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end 1 1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end -1 -1) (layer B.CrtYd) (width 0.05))
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 70 "Net-(TP613-Pad1)"))
   )
 
@@ -7821,7 +7821,7 @@
     (fp_text user %R (at 0 1.45) (layer B.Fab)
       (effects (font (size 1 1) (thickness 0.15)) (justify mirror))
     )
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 71 "Net-(TP614-Pad1)"))
   )
 
@@ -7848,7 +7848,7 @@
     (fp_line (start -1 1) (end -1 -1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end 1 1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end -1 -1) (layer B.CrtYd) (width 0.05))
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 72 "Net-(TP615-Pad1)"))
   )
 
@@ -7875,7 +7875,7 @@
     (fp_text user %R (at 0 1.45) (layer B.Fab)
       (effects (font (size 1 1) (thickness 0.15)) (justify mirror))
     )
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 73 "Net-(TP616-Pad1)"))
   )
 
@@ -7929,7 +7929,7 @@
     (fp_text user %R (at 0 1.45) (layer B.Fab)
       (effects (font (size 1 1) (thickness 0.15)) (justify mirror))
     )
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 164 "Net-(TP701-Pad1)"))
   )
 
@@ -7956,7 +7956,7 @@
     (fp_line (start -1 1) (end -1 -1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end 1 1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end -1 -1) (layer B.CrtYd) (width 0.05))
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 74 "Net-(TP702-Pad1)"))
   )
 
@@ -7983,7 +7983,7 @@
     (fp_text user %R (at 0 1.45) (layer B.Fab)
       (effects (font (size 1 1) (thickness 0.15)) (justify mirror))
     )
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 75 "Net-(TP703-Pad1)"))
   )
 
@@ -8010,7 +8010,7 @@
     (fp_line (start -1 1) (end -1 -1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end 1 1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end -1 -1) (layer B.CrtYd) (width 0.05))
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 76 "Net-(TP704-Pad1)"))
   )
 
@@ -8037,7 +8037,7 @@
     (fp_text user %R (at 0 1.45) (layer B.Fab)
       (effects (font (size 1 1) (thickness 0.15)) (justify mirror))
     )
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 77 "Net-(TP705-Pad1)"))
   )
 
@@ -8064,7 +8064,7 @@
     (fp_line (start -1 1) (end -1 -1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end 1 1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end -1 -1) (layer B.CrtYd) (width 0.05))
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 78 "Net-(TP706-Pad1)"))
   )
 
@@ -8091,7 +8091,7 @@
     (fp_line (start -1 1) (end -1 -1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end 1 1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end -1 -1) (layer B.CrtYd) (width 0.05))
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 79 "Net-(TP707-Pad1)"))
   )
 
@@ -8118,7 +8118,7 @@
     (fp_line (start -1 1) (end -1 -1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end 1 1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end -1 -1) (layer B.CrtYd) (width 0.05))
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 80 "Net-(TP708-Pad1)"))
   )
 
@@ -8145,7 +8145,7 @@
     (fp_text user %R (at 0 1.45) (layer B.Fab)
       (effects (font (size 1 1) (thickness 0.15)) (justify mirror))
     )
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 81 "Net-(TP709-Pad1)"))
   )
 
@@ -8172,7 +8172,7 @@
     (fp_line (start -1 1) (end -1 -1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end 1 1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end -1 -1) (layer B.CrtYd) (width 0.05))
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 82 "Net-(TP710-Pad1)"))
   )
 
@@ -8199,7 +8199,7 @@
     (fp_text user %R (at 0 1.45) (layer B.Fab)
       (effects (font (size 1 1) (thickness 0.15)) (justify mirror))
     )
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 83 "Net-(TP711-Pad1)"))
   )
 
@@ -8226,7 +8226,7 @@
     (fp_line (start -1 1) (end -1 -1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end 1 1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end -1 -1) (layer B.CrtYd) (width 0.05))
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 84 "Net-(TP712-Pad1)"))
   )
 
@@ -8253,7 +8253,7 @@
     (fp_text user %R (at 0 1.45) (layer B.Fab)
       (effects (font (size 1 1) (thickness 0.15)) (justify mirror))
     )
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 85 "Net-(TP713-Pad1)"))
   )
 
@@ -8280,7 +8280,7 @@
     (fp_line (start -1 1) (end -1 -1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end 1 1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end -1 -1) (layer B.CrtYd) (width 0.05))
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 86 "Net-(TP714-Pad1)"))
   )
 
@@ -8307,7 +8307,7 @@
     (fp_line (start -1 1) (end -1 -1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end 1 1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end -1 -1) (layer B.CrtYd) (width 0.05))
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 87 "Net-(TP715-Pad1)"))
   )
 
@@ -8334,7 +8334,7 @@
     (fp_line (start -1 1) (end -1 -1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end 1 1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end -1 -1) (layer B.CrtYd) (width 0.05))
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 88 "Net-(TP716-Pad1)"))
   )
 
@@ -8388,7 +8388,7 @@
     (fp_text user %R (at 0 1.45) (layer B.Fab)
       (effects (font (size 1 1) (thickness 0.15)) (justify mirror))
     )
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 165 "Net-(TP801-Pad1)"))
   )
 
@@ -8415,7 +8415,7 @@
     (fp_text user %R (at 0 1.45) (layer B.Fab)
       (effects (font (size 1 1) (thickness 0.15)) (justify mirror))
     )
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 89 "Net-(TP802-Pad1)"))
   )
 
@@ -8442,7 +8442,7 @@
     (fp_line (start -1 1) (end -1 -1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end 1 1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end -1 -1) (layer B.CrtYd) (width 0.05))
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 90 "Net-(TP803-Pad1)"))
   )
 
@@ -8469,7 +8469,7 @@
     (fp_text user %R (at 0 1.45) (layer B.Fab)
       (effects (font (size 1 1) (thickness 0.15)) (justify mirror))
     )
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 91 "Net-(TP804-Pad1)"))
   )
 
@@ -8496,7 +8496,7 @@
     (fp_text user %R (at 0 1.45) (layer B.Fab)
       (effects (font (size 1 1) (thickness 0.15)) (justify mirror))
     )
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 92 "Net-(TP805-Pad1)"))
   )
 
@@ -8523,7 +8523,7 @@
     (fp_text user %R (at 0 1.45) (layer B.Fab)
       (effects (font (size 1 1) (thickness 0.15)) (justify mirror))
     )
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 93 "Net-(TP806-Pad1)"))
   )
 
@@ -8550,7 +8550,7 @@
     (fp_line (start -1 1) (end -1 -1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end 1 1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end -1 -1) (layer B.CrtYd) (width 0.05))
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 94 "Net-(TP807-Pad1)"))
   )
 
@@ -8577,7 +8577,7 @@
     (fp_text user %R (at 0 1.45) (layer B.Fab)
       (effects (font (size 1 1) (thickness 0.15)) (justify mirror))
     )
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 95 "Net-(TP808-Pad1)"))
   )
 
@@ -8604,7 +8604,7 @@
     (fp_line (start -1 1) (end -1 -1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end 1 1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end -1 -1) (layer B.CrtYd) (width 0.05))
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 96 "Net-(TP809-Pad1)"))
   )
 
@@ -8631,7 +8631,7 @@
     (fp_text user %R (at 0 1.45) (layer B.Fab)
       (effects (font (size 1 1) (thickness 0.15)) (justify mirror))
     )
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 97 "Net-(TP810-Pad1)"))
   )
 
@@ -8658,7 +8658,7 @@
     (fp_line (start -1 1) (end -1 -1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end 1 1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end -1 -1) (layer B.CrtYd) (width 0.05))
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 98 "Net-(TP811-Pad1)"))
   )
 
@@ -8685,7 +8685,7 @@
     (fp_text user %R (at 0 1.45) (layer B.Fab)
       (effects (font (size 1 1) (thickness 0.15)) (justify mirror))
     )
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 99 "Net-(TP812-Pad1)"))
   )
 
@@ -8712,7 +8712,7 @@
     (fp_line (start -1 1) (end -1 -1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end 1 1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end -1 -1) (layer B.CrtYd) (width 0.05))
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 100 "Net-(TP813-Pad1)"))
   )
 
@@ -8739,7 +8739,7 @@
     (fp_text user %R (at 0 1.45) (layer B.Fab)
       (effects (font (size 1 1) (thickness 0.15)) (justify mirror))
     )
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 101 "Net-(TP814-Pad1)"))
   )
 
@@ -8766,7 +8766,7 @@
     (fp_line (start -1 1) (end -1 -1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end 1 1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end -1 -1) (layer B.CrtYd) (width 0.05))
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 102 "Net-(TP815-Pad1)"))
   )
 
@@ -8793,7 +8793,7 @@
     (fp_text user %R (at 0 1.45) (layer B.Fab)
       (effects (font (size 1 1) (thickness 0.15)) (justify mirror))
     )
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 103 "Net-(TP816-Pad1)"))
   )
 
@@ -8928,7 +8928,7 @@
     (fp_line (start -1 1) (end -1 -1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end 1 1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end -1 -1) (layer B.CrtYd) (width 0.05))
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 166 "Net-(TP1001-Pad1)"))
   )
 
@@ -8955,7 +8955,7 @@
     (fp_text user %R (at 0 1.45) (layer B.Fab)
       (effects (font (size 1 1) (thickness 0.15)) (justify mirror))
     )
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 104 "Net-(TP1002-Pad1)"))
   )
 
@@ -8982,11 +8982,11 @@
     (fp_line (start -1 1) (end -1 -1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end 1 1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end -1 -1) (layer B.CrtYd) (width 0.05))
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 105 "Net-(TP1003-Pad1)"))
   )
 
-  (module TestPoint:TestPoint_Pad_1.0x1.0mm (layer B.Cu) (tedit 5A0F774F) (tstamp 5B149B82)
+  (module TestPoint:TestPoint_Pad_1.0x1.0mm (layer B.Cu) (tedit 5C07845A) (tstamp 5B149B82)
     (at 26.67 26.67)
     (descr "SMD rectangular pad as test Point, square 1.0mm side length")
     (tags "test point SMD pad rectangle square")
@@ -9009,7 +9009,7 @@
     (fp_text user %R (at 0 1.45) (layer B.Fab)
       (effects (font (size 1 1) (thickness 0.15)) (justify mirror))
     )
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 106 "Net-(TP1004-Pad1)"))
   )
 
@@ -9036,7 +9036,7 @@
     (fp_line (start -1 1) (end -1 -1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end 1 1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end -1 -1) (layer B.CrtYd) (width 0.05))
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 107 "Net-(TP1005-Pad1)"))
   )
 
@@ -9063,7 +9063,7 @@
     (fp_text user %R (at 0 1.45) (layer B.Fab)
       (effects (font (size 1 1) (thickness 0.15)) (justify mirror))
     )
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 108 "Net-(TP1006-Pad1)"))
   )
 
@@ -9090,7 +9090,7 @@
     (fp_line (start -1 1) (end -1 -1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end 1 1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end -1 -1) (layer B.CrtYd) (width 0.05))
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 109 "Net-(TP1007-Pad1)"))
   )
 
@@ -9117,7 +9117,7 @@
     (fp_text user %R (at 0 1.45) (layer B.Fab)
       (effects (font (size 1 1) (thickness 0.15)) (justify mirror))
     )
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 110 "Net-(TP1008-Pad1)"))
   )
 
@@ -9144,7 +9144,7 @@
     (fp_line (start -1 1) (end -1 -1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end 1 1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end -1 -1) (layer B.CrtYd) (width 0.05))
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 111 "Net-(TP1009-Pad1)"))
   )
 
@@ -9171,7 +9171,7 @@
     (fp_text user %R (at 0 1.45) (layer B.Fab)
       (effects (font (size 1 1) (thickness 0.15)) (justify mirror))
     )
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 112 "Net-(TP1010-Pad1)"))
   )
 
@@ -9198,7 +9198,7 @@
     (fp_line (start -1 1) (end -1 -1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end 1 1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end -1 -1) (layer B.CrtYd) (width 0.05))
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 113 "Net-(TP1011-Pad1)"))
   )
 
@@ -9225,7 +9225,7 @@
     (fp_text user %R (at 0 1.45) (layer B.Fab)
       (effects (font (size 1 1) (thickness 0.15)) (justify mirror))
     )
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 114 "Net-(TP1012-Pad1)"))
   )
 
@@ -9252,7 +9252,7 @@
     (fp_line (start -1 1) (end -1 -1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end 1 1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end -1 -1) (layer B.CrtYd) (width 0.05))
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 115 "Net-(TP1013-Pad1)"))
   )
 
@@ -9279,7 +9279,7 @@
     (fp_text user %R (at 0 1.45) (layer B.Fab)
       (effects (font (size 1 1) (thickness 0.15)) (justify mirror))
     )
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 116 "Net-(TP1014-Pad1)"))
   )
 
@@ -9306,7 +9306,7 @@
     (fp_line (start -1 1) (end -1 -1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end 1 1) (layer B.CrtYd) (width 0.05))
     (fp_line (start 1 -1) (end -1 -1) (layer B.CrtYd) (width 0.05))
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 117 "Net-(TP1015-Pad1)"))
   )
 
@@ -9333,7 +9333,7 @@
     (fp_text user %R (at 0 1.45) (layer B.Fab)
       (effects (font (size 1 1) (thickness 0.15)) (justify mirror))
     )
-    (pad 1 smd rect (at 0 0) (size 1 1) (layers B.Cu B.Mask)
+    (pad 1 thru_hole rect (at 0 0) (size 1 1) (drill 0.5) (layers *.Cu *.Mask)
       (net 118 "Net-(TP1016-Pad1)"))
   )
 
