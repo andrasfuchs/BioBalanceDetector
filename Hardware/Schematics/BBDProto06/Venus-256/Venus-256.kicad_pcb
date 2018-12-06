@@ -3,7 +3,7 @@
   (general
     (thickness 1.6)
     (drawings 247)
-    (tracks 15846)
+    (tracks 15841)
     (zones 0)
     (modules 231)
     (nets 167)
@@ -65,7 +65,7 @@
     (pad_drill 0.5)
     (pad_to_mask_clearance 0.2)
     (aux_axis_origin 14.95 14.95)
-    (visible_elements 7FFFF7FF)
+    (visible_elements 7FFFFFFF)
     (pcbplotparams
       (layerselection 0x010fc_ffffffff)
       (usegerberextensions false)
@@ -1069,7 +1069,7 @@
   )
 
   (module Capacitor_SMD:C_0603_1608Metric_Pad0.84x1.00mm_HandSolder (layer F.Cu) (tedit 59FE48B8) (tstamp 5AF481AE)
-    (at 140.4 43.8875 270)
+    (at 143 43.8875 270)
     (descr "Capacitor SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC_7351 nominal with elongated pad for handsoldering. (Body size source: http://www.tortai-tech.com/upload/download/2011102023233369053.pdf), generated with kicad-footprint-generator")
     (tags "capacitor handsolder")
     (path /5AE9ECEB/5AE748DC)
@@ -1105,7 +1105,7 @@
   )
 
   (module Capacitor_SMD:C_0603_1608Metric_Pad0.84x1.00mm_HandSolder (layer F.Cu) (tedit 59FE48B8) (tstamp 5AF4817E)
-    (at 137.8 43.8875 90)
+    (at 141.05 43.8875 90)
     (descr "Capacitor SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC_7351 nominal with elongated pad for handsoldering. (Body size source: http://www.tortai-tech.com/upload/download/2011102023233369053.pdf), generated with kicad-footprint-generator")
     (tags "capacitor handsolder")
     (path /5AE9ECEB/5AE748E2)
@@ -1213,7 +1213,7 @@
   )
 
   (module Capacitor_SMD:C_0603_1608Metric_Pad0.84x1.00mm_HandSolder (layer F.Cu) (tedit 59FE48B8) (tstamp 5AF47CC5)
-    (at 178.16 46.25)
+    (at 181.35 46.25)
     (descr "Capacitor SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC_7351 nominal with elongated pad for handsoldering. (Body size source: http://www.tortai-tech.com/upload/download/2011102023233369053.pdf), generated with kicad-footprint-generator")
     (tags "capacitor handsolder")
     (path /5AE9ECEB/5AE39B5F)
@@ -1249,7 +1249,7 @@
   )
 
   (module Capacitor_SMD:C_0603_1608Metric_Pad0.84x1.00mm_HandSolder (layer F.Cu) (tedit 59FE48B8) (tstamp 5AF47C65)
-    (at 178.16 48.79)
+    (at 181.35 48.75)
     (descr "Capacitor SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC_7351 nominal with elongated pad for handsoldering. (Body size source: http://www.tortai-tech.com/upload/download/2011102023233369053.pdf), generated with kicad-footprint-generator")
     (tags "capacitor handsolder")
     (path /5AE9ECEB/5AE424D3)
@@ -1357,7 +1357,7 @@
   )
 
   (module Capacitor_SMD:C_0603_1608Metric_Pad0.84x1.00mm_HandSolder (layer F.Cu) (tedit 59FE48B8) (tstamp 5C0C421B)
-    (at 146.08 20.08)
+    (at 141.05 16.9)
     (descr "Capacitor SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC_7351 nominal with elongated pad for handsoldering. (Body size source: http://www.tortai-tech.com/upload/download/2011102023233369053.pdf), generated with kicad-footprint-generator")
     (tags "capacitor handsolder")
     (path /5AE9ECEB/5AEB23BE)
@@ -1393,7 +1393,7 @@
   )
 
   (module Capacitor_SMD:C_0603_1608Metric_Pad0.84x1.00mm_HandSolder (layer F.Cu) (tedit 59FE48B8) (tstamp 5C0C424B)
-    (at 146.08 22.62)
+    (at 141.05 18.85)
     (descr "Capacitor SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC_7351 nominal with elongated pad for handsoldering. (Body size source: http://www.tortai-tech.com/upload/download/2011102023233369053.pdf), generated with kicad-footprint-generator")
     (tags "capacitor handsolder")
     (path /5AE9ECEB/5AEB23C4)
@@ -1465,7 +1465,7 @@
   )
 
   (module Capacitor_SMD:C_0603_1608Metric_Pad0.84x1.00mm_HandSolder (layer F.Cu) (tedit 59FE48B8) (tstamp 5C0C41EB)
-    (at 151.81 20.08)
+    (at 151.81 16.9)
     (descr "Capacitor SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC_7351 nominal with elongated pad for handsoldering. (Body size source: http://www.tortai-tech.com/upload/download/2011102023233369053.pdf), generated with kicad-footprint-generator")
     (tags "capacitor handsolder")
     (path /5AE9ECEB/5AF0F415)
@@ -1501,7 +1501,7 @@
   )
 
   (module Capacitor_SMD:C_0603_1608Metric_Pad0.84x1.00mm_HandSolder (layer F.Cu) (tedit 59FE48B8) (tstamp 5C0C41BB)
-    (at 151.81 22.62)
+    (at 151.81 18.85)
     (descr "Capacitor SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC_7351 nominal with elongated pad for handsoldering. (Body size source: http://www.tortai-tech.com/upload/download/2011102023233369053.pdf), generated with kicad-footprint-generator")
     (tags "capacitor handsolder")
     (path /5AE9ECEB/5AF66660)
@@ -1573,7 +1573,7 @@
   )
 
   (module Capacitor_SMD:C_0603_1608Metric_Pad0.84x1.00mm_HandSolder (layer F.Cu) (tedit 59FE48B8) (tstamp 5AF47B45)
-    (at 178.16 37.98)
+    (at 181.35 37.98)
     (descr "Capacitor SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC_7351 nominal with elongated pad for handsoldering. (Body size source: http://www.tortai-tech.com/upload/download/2011102023233369053.pdf), generated with kicad-footprint-generator")
     (tags "capacitor handsolder")
     (path /5AE9ECEB/5AFC3D5B)
@@ -1609,7 +1609,7 @@
   )
 
   (module Capacitor_SMD:C_0603_1608Metric_Pad0.84x1.00mm_HandSolder (layer F.Cu) (tedit 59FE48B8) (tstamp 5AF47BA5)
-    (at 178.16 40.52)
+    (at 181.35 40.3)
     (descr "Capacitor SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC_7351 nominal with elongated pad for handsoldering. (Body size source: http://www.tortai-tech.com/upload/download/2011102023233369053.pdf), generated with kicad-footprint-generator")
     (tags "capacitor handsolder")
     (path /5AE9ECEB/5AF1A3C9)
@@ -9365,7 +9365,7 @@
   )
 
   (module TestPoint:TestPoint_Pad_1.0x1.0mm (layer F.Cu) (tedit 5A0F774F) (tstamp 5B15B8D8)
-    (at 179.4 21.45)
+    (at 182.65 17.55)
     (descr "SMD rectangular pad as test Point, square 1.0mm side length")
     (tags "test point SMD pad rectangle square")
     (path /5B1F6758)
@@ -9392,7 +9392,7 @@
   )
 
   (module TestPoint:TestPoint_Pad_1.0x1.0mm (layer F.Cu) (tedit 5A0F774F) (tstamp 5B15B8E6)
-    (at 179.4 25.35)
+    (at 182.65 20.8)
     (descr "SMD rectangular pad as test Point, square 1.0mm side length")
     (tags "test point SMD pad rectangle square")
     (path /5B1F67A1)
@@ -9419,7 +9419,7 @@
   )
 
   (module Package_DFN_QFN:Texas_S-PWQFN-N20 (layer F.Cu) (tedit 5B098D2B) (tstamp 5B16D633)
-    (at 172.25 22.86)
+    (at 172.9 18.2)
     (descr "20-Pin Plastic Quad Flatpack No-Lead Package, Body 3.0x3.0x0.8mm, Texas Instruments (http://www.ti.com/lit/ds/symlink/tps22993.pdf)")
     (tags "QFN 0.4")
     (path /5B0BC0D7)
@@ -9501,7 +9501,7 @@
   )
 
   (module Jumper:SolderJumper-2_P1.3mm_Bridged2Bar_Pad1.0x1.5mm (layer F.Cu) (tedit 5A3EABFC) (tstamp 5B16BDFA)
-    (at 163.15 25.35 270)
+    (at 165.1 18.2 270)
     (descr "SMD Solder Jumper, 1x1.5mm Pads, 0.3mm gap, bridged with 2 copper strips")
     (tags "solder jumper open")
     (path /5B23A184)
@@ -9531,7 +9531,7 @@
   )
 
   (module Jumper:SolderJumper-2_P1.3mm_Bridged2Bar_Pad1.0x1.5mm (layer F.Cu) (tedit 5A3EABFC) (tstamp 5B16BE0A)
-    (at 163.15 21.45 270)
+    (at 159.9 17.55 270)
     (descr "SMD Solder Jumper, 1x1.5mm Pads, 0.3mm gap, bridged with 2 copper strips")
     (tags "solder jumper open")
     (path /5B23A20E)
@@ -9623,7 +9623,7 @@
   )
 
   (module TestPoint:TestPoint_Pad_1.0x1.0mm (layer F.Cu) (tedit 5A0F774F) (tstamp 5C0C3CFA)
-    (at 152.1 73.45)
+    (at 152.1 72.15)
     (descr "SMD rectangular pad as test Point, square 1.0mm side length")
     (tags "test point SMD pad rectangle square")
     (path /5AE473C8/5B1555DD)
@@ -13273,11 +13273,6 @@
   (segment (start 117.834 63.418) (end 119.3943 63.418) (width 0.254) (layer B.Cu) (net 70))
   (segment (start 117.072 64.688) (end 115.548 64.688) (width 0.254) (layer B.Cu) (net 70))
   (segment (start 115.548 64.688) (end 115.4754 64.688) (width 0.254) (layer B.Cu) (net 70))
-  (segment (start 106.925 46.404) (end 106.925 45.4) (width 0.254) (layer F.Cu) (net 70))
-  (segment (start 106.925 46.410802) (end 106.925 46.404) (width 0.254) (layer F.Cu) (net 70))
-  (segment (start 114.543999 54.029801) (end 106.925 46.410802) (width 0.254) (layer F.Cu) (net 70))
-  (segment (start 114.543999 61.143999) (end 114.543999 54.029801) (width 0.254) (layer F.Cu) (net 70))
-  (segment (start 120.12 66.72) (end 114.543999 61.143999) (width 0.254) (layer F.Cu) (net 70))
   (segment (start 106.77 70.022) (end 105.923 71.292) (width 0.254) (layer B.Cu) (net 71))
   (segment (start 105.923 71.292) (end 107.617 71.292) (width 0.254) (layer B.Cu) (net 71))
   (segment (start 107.617 71.292) (end 106.77 70.022) (width 0.254) (layer B.Cu) (net 71))
