@@ -490,7 +490,7 @@ AR Path="/5AF0307C/5ACBEA02" Ref="U901"  Part="1"
 F 0 "U501" H 6250 10650 50  0000 C CNN
 F 1 "ATSAME70Q21A-AN" H 6550 2950 50  0000 C CNN
 F 2 "Package_QFP:LQFP-144_20x20mm_P0.5mm" H 7300 6800 50  0001 C CNN
-F 3 "http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-11296-32-bit-Cortex-M7-Microcontroller-SAM-E70Q-SAM-E70N-SAM-E70J_Datasheet.pdf" H 7300 6800 50  0001 C CNN
+F 3 "http://ww1.microchip.com/downloads/en/DeviceDoc/SAM-E70S70V70V71-Family-DataSheet-DS60001527C.pdf" H 7300 6800 50  0001 C CNN
 	1    7300 6800
 	1    0    0    -1  
 $EndComp
