@@ -371,7 +371,17 @@
     (add_net /RaspberryPiGPIOHeader/I2C_SDA1)
   )
 
-  (net_class PowerGround ""
+  (net_class Ground ""
+    (clearance 0.2)
+    (trace_width 0.2)
+    (via_dia 0.6)
+    (via_drill 0.4)
+    (uvia_dia 0.3)
+    (uvia_drill 0.1)
+    (add_net GND)
+  )
+
+  (net_class Power ""
     (clearance 0.2)
     (trace_width 0.2)
     (via_dia 0.6)
@@ -382,7 +392,6 @@
     (add_net /CellMaster-02/VCC_MCU_P3V3)
     (add_net /RaspberryPiGPIOHeader/DC_POWER_3V3)
     (add_net /RaspberryPiGPIOHeader/DC_POWER_5V0)
-    (add_net GND)
   )
 
   (net_class SensorLine ""
@@ -10192,7 +10201,7 @@
   (gr_line (start 203.2 129.54) (end 17.78 129.54) (layer Edge.Cuts) (width 0.15))
   (gr_line (start 203.2 17.78) (end 203.2 129.54) (layer Edge.Cuts) (width 0.15))
   (gr_line (start 17.78 17.78) (end 203.2 17.78) (layer Edge.Cuts) (width 0.15))
-  (gr_text "Bio Balance Detector \nVenus-256\n\nProto #6 Rev. A (2018-12-20)\n\nAndras Fuchs (andras.fuchs@gmail.com)" (at 45.72 101.6) (layer F.SilkS)
+  (gr_text "Bio Balance Detector \nModel: Venus-256\n\nProto #6 Rev. A (2018-12-20)\n\nAndras Fuchs (andras.fuchs@gmail.com)" (at 45.72 101.6) (layer F.SilkS)
     (effects (font (size 1.5 1.5) (thickness 0.3)))
   )
 
