@@ -241,3 +241,5 @@ Hardware/Schematics/**/*.bak
 Hardware/Schematics/**/*-cache.lib
 Hardware/Schematics/**/*.kicad_pcb-bak
 Measurements/WaveForms/ScreenCaptures/*.mkv
+Software/Source/BBDProto06/Setup/*.deb
+Software/Source/BBDProto06/Setup/*.tar.gz
