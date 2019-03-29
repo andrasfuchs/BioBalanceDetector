@@ -1,0 +1,17 @@
+
+@Pi> sudo pip3 install rpi_ws281x adafruit-circuitpython-neopixel
+
+@PC> WinSCP > Commands > Keep remote folder up to date (Ctrl+U)
+
+@PC> Visual Studio > open rpi_neopixel_simpletest.py
+
+@PC> PuTTY > sudo python3 ~/Documents/Work/rpi_neopixel_simpletest.py
+
+# https://learn.adafruit.com/neopixels-on-raspberry-pi/raspberry-pi-wiring
+# sudo pip3 install rpi_ws281x adafruit-circuitpython-neopixel
+# rpi_neopixel_simpletest.py
+
+# https://learn.adafruit.com/mlx90393-wide-range-3-axis-magnetometer/circuitpython
+# sudo pip3 install adafruit-circuitpython-mlx90393
+# sudo python3 ~/Documents/Work/adafruit_mlx90393_simpletest.py
+
