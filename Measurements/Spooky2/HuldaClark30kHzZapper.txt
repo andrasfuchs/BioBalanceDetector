@@ -1,0 +1,23 @@
+Hi Andrew,
+
+You need to create a User preset with the required settings.
+Presets Tab->Home Button->Shell (Empty) Presets->Contact-Killing (C) - JW
+Programs Tab->Load Clark 30KHz Zapper Contact
+Settings Tab->Signal Settings->Enter options as indicated:
+Spooky2 / Settings / Signal Settings
+Amplitude Out1: 9.5V Out2: 9.5V
+Offset    Out1: 100% Out2: 100%
+Settings Tab->Set up Output Shadowing and Waveform Setup as indicated:
+Output Shadowing
+Swap Waveform Every 0 seconds
+WaveForm Setup
+Out1: H-Bomb_Square
+Out2: Inverse + Sync
+Presets Tab->Click Save settings (Disk icon)->Give custom program a name. Ex. Clark 30 KHz Zapper - H_Bomb (C)
+Presets Tab->User (Home Button) or Person icon->Your custom program should appear in list.
+
+Program details:
+Clark 30KHz Zapper Contact
+30KHz 7 mins, pause 21 (7-21-7-21-7-21 mins), H-Bomb Square, 9.5V, 100% Pos Offset. Contact Mode.
+
+Cheers Karl. 
