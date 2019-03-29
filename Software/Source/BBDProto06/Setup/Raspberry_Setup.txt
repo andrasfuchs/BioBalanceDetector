@@ -1,0 +1,43 @@
+1, Format SD card with SD Card Formatter [https://www.sdcard.org/downloads/formatter_4/eula_windows/SDCardFormatterv5_WinEN.zip]
+
+2, Extract NOOBS to the SD card [https://www.raspberrypi.org/downloads/noobs/]
+
+3, Install Raspbian full
+
+4, Set fixed IP to 192.168.1.35 (wired) and 192.168.1.36 (wireless)
+
+5, Enable VNC, I2C and SPI interfaces
+
+6, Install updates
+
+7, Set timezone and WiFi country
+
+8, Use VNC Viewer to connect [https://www.realvnc.com/download/file/viewer.files/VNC-Viewer-6.19.107-Windows.exe]
+
+8, Setup SAMBA share [https://www.raspberrypi.org/magpi/samba-file-server/]
+
+9, Install .NET Core SDK ARM32 [https://dotnet.microsoft.com/download/dotnet-core/2.2]
+	Copy dotnet-sdk-2.2.105-linux-arm.tar.gz to Pi
+	mkdir -p $HOME/dotnet && tar zxf dotnet-sdk-2.2.105-linux-arm.tar.gz -C $HOME/dotnet
+	
+	# add these two lines to ~/.bashrc
+	export DOTNET_ROOT=$HOME/dotnet
+	export PATH=$PATH:$HOME/dotnet
+	
+10, Install VSDbg [https://github.com/OmniSharp/omnisharp-vscode/wiki/Remote-Debugging-On-Linux-Arm]
+	curl -sSL https://aka.ms/getvsdbgsh | bash /dev/stdin -r linux-arm -v latest -l ~/vsdbg
+
+11, Create a Raspberry Pi 3 app from template 
+	dotnet new -i "RaspberryPi.Template::*"
+	dotnet new coreiot -n MyNewIoTProject
+
+12, Add win10-arm;linux-arm as RuntimeIdentifiers
+
+13, Create a publish profile to publish to a local folder (debug,self-contained,netcoreapp2.2,linux-arm) 
+
+14, Set up WinSCP's Commands/Keep Remote Directory up to Date function on that folder
+
+15, Run the app on the Pi
+
+16, Attach debugger to the process on Pi using SSH
+	DEV: Visual Studio > Debug > Attach to process > SSH > Pi
