@@ -1,0 +1,55 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-left">
+    <h1 class="display-3">Status</h1>
+    <h2 class="display-4">System</h2>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th scope="row">IP Address</th>
+                <td>192.168.1.36:44333</td>
+            </tr>
+            <tr>
+                <th scope="row">API Access</th>
+                <td>https://192.168.1.36:44333/api/values</td>
+            </tr>
+            <tr>
+                <th scope="row">Model</th>
+                <td>Raspberry Pi 3 B</td>
+            </tr>
+            <tr>
+                <th scope="row">Architecture</th>
+                <td>Quad Core 1.2GHz Broadcom BCM2837 64bit CPU</td>
+            </tr>
+            <tr>
+                <th scope="row">.NET Version</th>
+                <td>.NET Core 3.0.100-preview5-011568</td>
+            </tr>
+            <tr>
+                <th scope="row">Software Version</th>
+                <td>BBD.Driver.Venus 0.1.128 (2019-05-14)</td>
+            </tr>
+            <tr>
+                <th scope="row">Local Time</th>
+                <td>@{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");}</td>
+            </tr>
+            <tr>
+                <th scope="row">Uptime</th>
+                <td>8h 52m 3s</td>
+            </tr>
+            <tr>
+                <th scope="row">CPU Load</th>
+                <td>10%</td>
+            </tr>
+            <tr>
+                <th scope="row">Memory Load</th>
+                <td>430 MB of 1024 MB free</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

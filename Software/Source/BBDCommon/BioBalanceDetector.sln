@@ -1,16 +1,18 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26730.8
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28902.138
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BBDDriver", "BBDDriver\BBDDriver.csproj", "{A58BBA86-239A-4280-99B8-CABA065ED3EF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BBD.DSP", "BBD.DSP\BBD.DSP.csproj", "{A58BBA86-239A-4280-99B8-CABA065ED3EF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "clFFT.NET", "clFFT.NET\clFFT.NET.csproj", "{73C13E55-53AD-47A1-B10C-B76344A5002F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFTWSharp", "FFTWSharp\FFTWSharp.csproj", "{BEA875B8-E28A-49C5-8E7E-6512DA65F7E1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BBDInterface", "BBDInterface\BBDInterface.csproj", "{AC447A78-666E-47FE-AC17-E1EA94950198}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BBD.GUI.Console", "BBD.GUI.Console\BBD.GUI.Console.csproj", "{AC447A78-666E-47FE-AC17-E1EA94950198}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KiCad_Pcbnew_generator", "KiCad_Pcbnew_generator\KiCad_Pcbnew_generator.csproj", "{013F4C3D-C1EA-4020-8E16-E28E1692099A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BBD.Driver.Venus", "BBD.Driver.Venus\BBD.Driver.Venus.csproj", "{7C0A4D0D-0E5B-4F9F-9B33-AB73A9F3E557}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,6 +40,10 @@ Global
 		{013F4C3D-C1EA-4020-8E16-E28E1692099A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{013F4C3D-C1EA-4020-8E16-E28E1692099A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{013F4C3D-C1EA-4020-8E16-E28E1692099A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C0A4D0D-0E5B-4F9F-9B33-AB73A9F3E557}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C0A4D0D-0E5B-4F9F-9B33-AB73A9F3E557}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C0A4D0D-0E5B-4F9F-9B33-AB73A9F3E557}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C0A4D0D-0E5B-4F9F-9B33-AB73A9F3E557}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
