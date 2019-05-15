@@ -1,0 +1,7 @@
+If you import this into WaveForms' Wavegen and set the amplitude to 5V, 2V, 1V it produces 0.035V, 0.015V, 0.008V Peak2Peak.
+
+Bemer for the programs 1,2,3,4,6,10 produces 0.011V, 0.022V, 0.031V, 0.041V, 0.063V and 0.094V Peak2Peak using the B.Spot.
+
+Bemer for the program 10 produces 6x 0.013V Peak2Peak using B.Mat.
+
+

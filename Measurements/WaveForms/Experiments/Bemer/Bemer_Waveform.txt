@@ -1,0 +1,11 @@
+Bemer B.Spot 10
+
+50kHz, 5'000 samples
+
+33.333 ms pattern Saw-tooth, probably between 100 Hz and 2000 Hz
+
+        @ -18.31ms ( 0.00ms)
+ 435 Hz @  -2.12ms (16.19ms)
+ 667 Hz @  +4.92ms (23.23ms)
+1750 Hz @ +13.94ms (32.25ms)
+
