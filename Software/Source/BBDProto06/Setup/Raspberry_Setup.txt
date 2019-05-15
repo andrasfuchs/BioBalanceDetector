@@ -31,7 +31,12 @@
 	dotnet new -i "RaspberryPi.Template::*"
 	dotnet new coreiot -n MyNewIoTProject
 
-12, Add win10-arm;linux-arm as RuntimeIdentifiers
+12, Preprare project
+	Add win10-arm;linux-arm as RuntimeIdentifiers
+	Install Pi packages:
+		Install-Package Unosquare.Raspberry.IO
+		Install-Package Unosquare.WiringPi
+		Install-Package Unosquare.RaspberryIO.Peripherals
 
 13, Create a publish profile to publish to a local folder (debug,self-contained,netcoreapp2.2,linux-arm) 
 
