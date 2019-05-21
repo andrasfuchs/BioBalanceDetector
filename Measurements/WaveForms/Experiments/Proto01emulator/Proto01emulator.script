@@ -8,12 +8,18 @@
 var avgSamplesCountShort = 8;       // ~1/4 seconds @ 32 samples and 8 kHz
 var avgSamplesCountLong = 160;		 // ~5 seconds @ 32 samples and 8 kHz
 
-var amplificationFactor = 500.0;   // the higher the amplification to more sensitive the device is (500-EM-noisy background  750-typical background)
+var amplificationFactor = 250.0;   // the higher the amplification to more sensitive the device is (500-EM-noisy background  750-typical background)
 
 var ledPower = 50;
 var ledR = 0;
 var ledG = 0;
 var ledB = 0;
+var ledW = 0;
+var blink = 0;
+
+// GreenRedBlueWhite color values for 8 WS2812 LEDs
+var leds = [0x00FF0000, 0x80800000, 0xFF000000, 0x80008000, 0x0000FF00, 0x00808000, 0xFFFFFF00, 0xFFFFFFFF] 
+
 
 var avgSamplesShort = [avgSamplesCountShort];
 var avgSamplesLong = [avgSamplesCountLong];
@@ -23,7 +29,14 @@ if(!('Scope1' in this)) throw "Please open a Scope instrument";
 
 plot1.X.Units.text = "s";
 plot1.Y1.AutoScale.checked = false;
-plot1.Y1.Range.value = 0.1;
+plot1.Y1.Range.value = 0.02;
+
+Supplies.start();
+Wavegen1.start();
+
+Patterns.Channels.DIO15.custom = HexToWS2812(leds, j%5 == 0);
+Patterns.run()    
+
 
 print("Initializing moving average buffers, please wait...");
 
@@ -34,12 +47,23 @@ while(Scope1.wait())
     var data = Scope1.Channel1.data;
     plot1.Y1.data = data;
 
-    var avg = 0
-    data.forEach(function(v){avg += v})
-    avg /= data.length
+    var rangeMin = +1000;
+    var rangeMax = -1000;
+    data.forEach(
+        function(v)
+        {
+            if (rangeMin > v) rangeMin = v;
+            if (rangeMax < v) rangeMax = v;
+        }
+    )
+    var range = rangeMax - rangeMin;
 
-    avgSamplesShort[j % avgSamplesCountShort] = avg;
-    avgSamplesLong[j % avgSamplesCountLong] = avg;
+    avgSamplesShort[j % avgSamplesCountShort] = range;
+
+    if (j < avgSamplesCountLong)
+    {
+        avgSamplesLong[j % avgSamplesCountLong] = range;
+    }
 
     var adcValueAvgShort = 0.0;   
     for (i=0; i<avgSamplesCountShort; i++)
@@ -55,12 +79,14 @@ while(Scope1.wait())
     }
     adcValueAvgLong /= avgSamplesCountLong;
     
-//    print("Short Average: "+adcValueAvgShort+" V | " + "Long Average: "+adcValueAvgLong+" V");
 
     j++;
+    if (j < avgSamplesCountLong) continue;
 
 
 var adcValueAvg = ((adcValueAvgShort - adcValueAvgLong) * amplificationFactor) + 0.5;
+
+Wavegen1.Channel1.Simple.Frequency.value = adcValueAvg * 1000 + 200;
 
 if ((adcValueAvg > 0.4) && (adcValueAvg < 0.6))
 	{
@@ -78,70 +104,104 @@ if ((adcValueAvg > 0.4) && (adcValueAvg < 0.6))
 	} else if (adcValueAvg <= 0.4)
 	{
 		ledR = 0;
-		ledG = 0;
+		ledG = Math.max(0, (adcValueAvg - 0.4) * 255);
 		ledB = 255;
 					
 		ledPower = (256 * (0.4 - adcValueAvg)) + 10;
 	} else if (adcValueAvg >= 0.6)
 	{
 		ledR = 255;
-		ledG = 0;
+		ledG = Math.max(0, (1.2 - adcValueAvg) * 255);
 		ledB = 0;
 					
 		ledPower = (256 * (adcValueAvg - 0.6)) + 10;
 	}
 
+    ledPower = ledPower / 256.0; 
+    if (ledPower > 1.0)
+    {
+        blink = Math.floor(Math.min(8, (ledPower - 1.0) / 0.1));
+        ledPower = 1.0;  
+    } 
+    else 
+    {
+        blink = 0;
+    }
 
-    if (ledR == 255)
+    ledR = Math.floor(ledR * ledPower);
+    ledG = Math.floor(ledG * ledPower);
+    ledB = Math.floor(ledB * ledPower);
+    ledW = Math.floor(ledW * ledPower);
+
+    if (ledR > 0)
     {
-        print("RED   ("+ledPower+")");
-        uartMessages[j%8] = "136 136 136 136 "+ToNeoPixelValue(ledPower)+"136 136 136 136 136 136 136 136";
+        print("RED   " + LedPowerToScale(ledPower));
     } else
-    if (ledB == 255)
+    if (ledB > 0)
     {
-        print("BLUE  ("+ledPower+")");
-        uartMessages[j%8] = "136 136 136 136 136 136 136 136 "+ToNeoPixelValue(ledPower)+"136 136 136 136";
+        print("BLUE  " + LedPowerToScale(ledPower));
     } else
-    if (ledG == 255)
+    if (ledG > 0)
     {
-        print("GREEN ("+ledPower+")");
-        uartMessages[j%8] = ToNeoPixelValue(ledPower)+"136 136 136 136 136 136 136 136 136 136 136 136";
+        print("GREEN " + LedPowerToScale(ledPower));
     }
 
 
-    var uartMessage = "";
-    for (l=j+7;l>=j;l--)
+    if (j%5 == 0) 
     {
-        uartMessage = uartMessage + " " + uartMessages[l%8];
+        for (l=6;l>=0;l--)
+        {
+            leds[l+1] = leds[l];
+        }
     }
-    Protocol.UART.Send(uartMessage,true);
-    wait(0.03);
+    leds[0] = (ledG << 24) + (ledR << 16) + (ledB << 8) + ledW;
+
+    Patterns.Channels.DIO15.custom = HexToWS2812(leds, j%5 == 0);
+    Patterns.run()    
+
+    wait(0.01);
 }
 
 
-function ToNeoPixelValue(floatValue) {
+function LedPowerToScale(ledPower)
+{
     var result = "";
-    var intValue = Math.floor(floatValue);
+    var minValue = 0.00;
+    var maxValue = 0.05;
 
-    for (k=0; k<4; k++)
+    result = result + "|";
+    for (k=0; k<20; k++)
     {
-        switch (intValue%4)
+        if ((ledPower > minValue) && (ledPower < maxValue))
         {
-            case (0):
-            result = "136 " + result;
-            break;
-            case (1):
-            result = "140 " + result;
-            break;
-            case (2):
-            result = "200 " + result;
-            break;
-            case (3):
-            result = "204 " + result;
-            break;
+            result = result + "*";
+        } 
+        else
+        {
+            result = result + "-";
         }
-        intValue = intValue >> 2;
+
+        minValue += 0.05;
+        maxValue += 0.05;
     }
-    
+    result = result + "|";
+
     return result;
+}
+
+function HexToWS2812(leds, ignoreBlink)
+{
+    var data = [] // custom patterns data
+    leds.forEach(function(grbw){ // for each led color
+        for(var i = 0; i < 32; i++){
+            // append to data 1,1,0 or 1,0,0 for each bit
+            data.push(1)
+            if ((grbw & 0x80000000) && ((ignoreBlink == true) || (blink <= 0))) data.push(1) // MSB 1 ?
+            else data.push(0)
+            data.push(0)
+            grbw <<= 1 // shift color code
+        }
+        blink--;
+    })
+    return data;
 }
