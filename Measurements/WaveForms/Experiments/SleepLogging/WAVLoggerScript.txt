@@ -1,0 +1,34 @@
+if(Index > Maximum) return
+
+const cChannel = 1
+const bps = 32 // bits per second
+
+var rgData = Scope.Channel1.data
+var cSamples = rgData.length
+var hzRate = round(Scope.Time.Rate.real)
+ 
+var file = File("~/Desktop/scope/acq"+Index+".wav")
+
+file.write("RIFF") // chunk descriptor
+file.appendUInt32(4+26+12+8+cChannel*cSamples*bps/8, false) // chunnk size
+file.append("WAVE") // sub-chunk
+
+file.append("fmt ") // sub-chunk
+file.appendUInt32(18, false) // sub-chunk size
+file.appendUInt16(3, false) //  format IEEE float
+file.appendUInt16(cChannel, false) // number of channels  
+file.appendUInt32(hzRate, false) // sample rate
+file.appendUInt32(hzRate*cChannel*bps/8, false) // byte rate
+file.appendUInt16(cChannel*bps/8, false) // block align
+file.appendUInt16(bps, false) // bits per sample
+
+file.appendUInt16(0, false) // sub-chunk required for IEEE float
+file.append("fact") // sub-chunk
+file.appendUInt32(4, false) // sub-chunk size
+file.appendUInt32(0, false) // sample length 0
+
+file.append("data") // sub-chunk
+file.appendUInt32(cChannel*cSamples*bps/8, false) // sub-chunk size
+file.appendFloat(rgData, false)
+
+Index++
