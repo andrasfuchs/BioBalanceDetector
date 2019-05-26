@@ -18,8 +18,8 @@ import wave
 import datetime
 import os
 
-buffersize = 4000;
-samplerate = 800;
+buffersize = 4096;			# samples / buffer
+samplerate = 8000;			# samples / second
 
 if sys.platform.startswith("win"):
     dwf = cdll.dwf
@@ -53,7 +53,7 @@ dwf.FDwfAnalogInBufferSizeInfo(hdwf, 0, byref(cBufMax))
 print("Device buffer size: "+str(cBufMax.value)) 
 
 #set up acquisition
-dwf.FDwfAnalogInFrequencySet(hdwf, c_double(samplerate))
+dwf.FDwfAnalogInFrequencySet(hdwf, c_double(samplerate/2))		# is this a bug?
 dwf.FDwfAnalogInBufferSizeSet(hdwf, c_int(buffersize)) 
 dwf.FDwfAnalogInChannelEnableSet(hdwf, c_int(0), c_bool(True))
 dwf.FDwfAnalogInChannelRangeSet(hdwf, c_int(0), c_double(5))
@@ -68,7 +68,7 @@ print("Opening WAV file '" + startfilename + "'");
 
 waveWrite = wave.open(startfilename, "wb");
 waveWrite.setnchannels(1);				# mono
-waveWrite.setsampwidth(2);				# 16 bit
+waveWrite.setsampwidth(4);				# 32 bit / sample
 waveWrite.setframerate(samplerate);
 waveWrite.setcomptype("NONE","No compression");
 
@@ -79,6 +79,7 @@ dwf.FDwfAnalogInConfigure(hdwf, c_bool(False), c_bool(True))
 
 print("Recording data @"+str(samplerate)+"Hz, press Ctrl+C to stop...");
 
+bufferCounter = 0;
 try:
 	while True:
 		while True:
@@ -91,6 +92,10 @@ try:
 		#dwf.FDwfAnalogInStatusData(hdwf, 1, rgdSamples, buffersize) # get channel 2 data
 
 		waveWrite.writeframes(rgdSamples);
+		bufferCounter += 1;
+		
+		if ((bufferCounter % 1) == 0):
+			print(str(waveWrite.tell() * 4) + " bytes were written");
 		
 except KeyboardInterrupt:
     pass	
