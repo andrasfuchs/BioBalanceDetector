@@ -15,6 +15,8 @@ import matplotlib.pyplot as plt
 import sys
 import numpy
 import wave
+import datetime
+import os
 
 buffersize = 4000;
 samplerate = 800;
@@ -59,9 +61,12 @@ dwf.FDwfAnalogInChannelRangeSet(hdwf, c_int(0), c_double(5))
 #wait at least 2 seconds for the offset to stabilize
 time.sleep(2)
 
-print("Opening WAV file")
+starttime = datetime.datetime.now();
+startfilename = "AD2_" + "{:04d}".format(starttime.year) + "{:02d}".format(starttime.month) + "{:02d}".format(starttime.day) + "_" + "{:02d}".format(starttime.hour) + "{:02d}".format(starttime.minute) + "{:02d}".format(starttime.second) + ".wav";
 
-waveWrite = wave.open("acquisition.wav", "wb");
+print("Opening WAV file '" + startfilename + "'");
+
+waveWrite = wave.open(startfilename, "wb");
 waveWrite.setnchannels(1);				# mono
 waveWrite.setsampwidth(2);				# 16 bit
 waveWrite.setframerate(samplerate);
@@ -97,11 +102,18 @@ waveWrite.close();
 
 dwf.FDwfDeviceCloseAll()
 
-#plot window
-dc = sum(rgdSamples)/len(rgdSamples)
-print("DC: "+str(dc)+"V")
+endtime = datetime.datetime.now();
+endfilename = "AD2_" + "{:04d}".format(starttime.year) + "{:02d}".format(starttime.month) + "{:02d}".format(starttime.day) + "_" + "{:02d}".format(starttime.hour) + "{:02d}".format(starttime.minute) + "{:02d}".format(starttime.second) + "-" + "{:02d}".format(endtime.hour) + "{:02d}".format(endtime.minute) + "{:02d}".format(endtime.second) + ".wav";
 
-plt.plot(numpy.fromiter(rgdSamples, dtype = numpy.float))
-plt.show()
+print("Renaming file from '" + startfilename + "' to '" + endfilename + "'");
+os.rename(startfilename, endfilename);
+
+
+#plot window
+#dc = sum(rgdSamples)/len(rgdSamples)
+#print("DC: "+str(dc)+"V")
+
+#plt.plot(numpy.fromiter(rgdSamples, dtype = numpy.float))
+#plt.show()
 
 
