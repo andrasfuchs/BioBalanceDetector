@@ -243,3 +243,4 @@ Hardware/Schematics/**/*.kicad_pcb-bak
 Measurements/WaveForms/ScreenCaptures/*.mkv
 Software/Source/BBDProto06/Setup/*.deb
 Software/Source/BBDProto06/Setup/*.tar.gz
+Measurements/WaveForms/Experiments/Bemer/Bemer_10.mkv
