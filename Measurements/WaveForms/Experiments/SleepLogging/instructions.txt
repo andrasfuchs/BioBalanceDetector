@@ -1,0 +1,11 @@
+Laptop with webcam
+1, start DroidCam on the phone and put the phone on the stand
+2, run OBS and load preset (720p stereo, x264, DroidCam video, laptop mic audio ch1, desktop audio ch2)
+3, connect headphones
+4, load meditation mp3
+5, put on conductive glove/sock/electrode
+6, start biosignal recording with start_aqusition.bat
+7, start recording in OBS
+8, play meditation mp3
+9, sign and say meditation depth while meditating
+10, stop recording
