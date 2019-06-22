@@ -1,4 +1,5 @@
 Laptop with webcam
+0, put phone into silent mode
 1, start DroidCam on the phone and put the phone on the stand
 2, run OBS and load preset (720p stereo, x264, DroidCam video, laptop mic audio ch1, desktop audio ch2)
 3, connect headphones
