@@ -240,6 +240,10 @@ Hardware/Schematics/**/_autosave-*.kicad_pcb
 Hardware/Schematics/**/*.bak
 Hardware/Schematics/**/*-cache.lib
 Hardware/Schematics/**/*.kicad_pcb-bak
+
+Measurements/**/__pycache__/*
 Measurements/WaveForms/ScreenCaptures/*.mkv
+Measurements/WaveForms/**/*.wav
+
 Software/Source/BBDProto06/Setup/*.deb
 Software/Source/BBDProto06/Setup/*.tar.gz
