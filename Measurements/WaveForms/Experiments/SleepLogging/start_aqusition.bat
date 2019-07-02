@@ -1,1 +1,1 @@
-python .\AnalogIn_AcquisitionSaveToWAV.py
+python .\AnalogIn_Record_Wave_Mono.py

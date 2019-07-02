@@ -1,4 +1,7 @@
-# Bio Balance Detector (BBD)
+<p align="center">
+  <img src="https://github.com/andrasfuchs/BioBalanceDetector/blob/master/Business/Branding/Logos/BioBalanceDetectorLogo_nobg_540x709.png"/>
+</p>
+
 Technically speaking Bio Balance Detector is a software and hardware combination (a data acquisition system - DAS) to detect, measure, display and analyze the electromagnetic energy field around living beings and indicate any potential health imbalance.  
   
 These very weak, but measurable electromagnetic fields are the same what our doctors use while using an EEG (electroencephalogram) and ECG (electrocardiogram) devices. We use the information gathered there mainly to detect if we are sleeping, awake or alert, or if there is any problem with our heart's. My goal is to extend this phenomenon's measurements to our hands, or even our whole body.  
