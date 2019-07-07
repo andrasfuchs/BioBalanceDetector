@@ -23,8 +23,8 @@ namespace BBD.DSP.Models.Source
     {
         // warning: interface guid changes when the driver is regenerated (by zadig)
         // the new DeviceGUID can be found in the .inf file in the 'C:\Users\{username}\usb_driver' folder.
-        //private const string DEVICE_INTERFACE_GUID = "{515CBB1B-8BCD-40F1-9B7D-6853970F6630}"; // Sheldon
-        private const string DEVICE_INTERFACE_GUID = "{1E04662A-6FF7-4864-B7B7-8BBA6658585F}"; // Mr. Pepper
+        private const string DEVICE_INTERFACE_GUID = "{515CBB1B-8BCD-40F1-9B7D-6853970F6630}"; // Sheldon
+        //private const string DEVICE_INTERFACE_GUID = "{1E04662A-6FF7-4864-B7B7-8BBA6658585F}"; // Mr. Pepper
         private const int DEVICE_VID = 0x03EB;
         private const int DEVICE_PID = 0x2405;
         private const string DEVICE_DESC = "Mercury-16";
@@ -182,7 +182,7 @@ namespace BBD.DSP.Models.Source
             public bool GoertzelPacketToUSART;
         }
 
-        public BBDMercury16Input(USBDeviceInfo selectedDevice = null) : base(8000, 8)
+        public BBDMercury16Input(USBDeviceInfo selectedDevice = null) : base(4000, 8)
         {
             string expectedDeviceID = $"USB\\VID_{DEVICE_VID}&PID_{DEVICE_PID}";
 
