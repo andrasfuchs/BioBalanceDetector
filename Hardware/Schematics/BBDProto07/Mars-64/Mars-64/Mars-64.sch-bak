@@ -1040,7 +1040,7 @@ U 1 1 5E309A8E
 P 10400 5700
 F 0 "JP4" V 10400 5802 50  0000 L CNN
 F 1 "Jumper_NC_Dual" V 10445 5802 50  0001 L CNN
-F 2 "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical" H 10400 5700 50  0001 C CNN
+F 2 "Jumper:SolderJumper-3_P1.3mm_Bridged2Bar12_Pad1.0x1.5mm_NumberLabels" H 10400 5700 50  0001 C CNN
 F 3 "~" H 10400 5700 50  0001 C CNN
 	1    10400 5700
 	0    1    1    0   
@@ -1220,7 +1220,7 @@ U 1 1 5E2E85D1
 P 9000 1000
 F 0 "J2" H 9050 1417 50  0000 C CNN
 F 1 "Conn_02x06_Top_Bottom" H 9050 1326 50  0001 C CNN
-F 2 "Connector_PinHeader_2.54mm:PinHeader_2x06_P2.54mm_Vertical_SMD" H 9000 1000 50  0001 C CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_2x06_P2.54mm_Vertical_SMD_mirrored" H 9000 1000 50  0001 C CNN
 F 3 "~" H 9000 1000 50  0001 C CNN
 	1    9000 1000
 	1    0    0    -1  

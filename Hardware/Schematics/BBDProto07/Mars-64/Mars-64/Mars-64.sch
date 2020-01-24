@@ -1220,7 +1220,7 @@ U 1 1 5E2E85D1
 P 9000 1000
 F 0 "J2" H 9050 1417 50  0000 C CNN
 F 1 "Conn_02x06_Top_Bottom" H 9050 1326 50  0001 C CNN
-F 2 "Connector_PinHeader_2.54mm:PinHeader_2x06_P2.54mm_Vertical_SMD" H 9000 1000 50  0001 C CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_2x06_P2.54mm_Vertical_SMD_mirrored" H 9000 1000 50  0001 C CNN
 F 3 "~" H 9000 1000 50  0001 C CNN
 	1    9000 1000
 	1    0    0    -1  

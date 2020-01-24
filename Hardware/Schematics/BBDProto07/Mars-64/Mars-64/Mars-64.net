@@ -1,7 +1,7 @@
 (export (version D)
   (design
     (source C:\Work\BioBalanceDetector\Hardware\Schematics\BBDProto07\Mars-64\Mars-64\Mars-64.sch)
-    (date "2020-01-24 14:56:20")
+    (date "2020-01-24 15:53:09")
     (tool "Eeschema (5.1.5)-3")
     (sheet (number 1) (name /) (tstamps /)
       (title_block
@@ -542,7 +542,7 @@
       (tstamp 5E2B679E))
     (comp (ref J2)
       (value Conn_02x06_Top_Bottom)
-      (footprint Connector_PinHeader_2.54mm:PinHeader_2x06_P2.54mm_Vertical_SMD)
+      (footprint Connector_PinHeader_2.54mm:PinHeader_2x06_P2.54mm_Vertical_SMD_mirrored)
       (datasheet ~)
       (libsource (lib Connector_Generic) (part Conn_02x06_Top_Bottom) (description "Generic connector, double row, 02x06, top/bottom pin numbering scheme (row 1: 1...pins_per_row, row2: pins_per_row+1 ... num_pins), script generated (kicad-library-utils/schlib/autogen/connector/)"))
       (sheetpath (names /) (tstamps /))
