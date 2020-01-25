@@ -1,4 +1,4 @@
-update=2020-01-24 13:49:35
+update=2020-01-25 00:16:30
 version=1
 last_client=kicad
 [general]
@@ -28,8 +28,8 @@ PageLayoutDescrFile=
 LastNetListRead=Mars-64.net
 CopperLayerCount=4
 BoardThickness=1.6
-AllowMicroVias=0
-AllowBlindVias=0
+AllowMicroVias=1
+AllowBlindVias=1
 RequireCourtyardDefinitions=0
 ProhibitOverlappingCourtyards=1
 MinTrackWidth=0.2

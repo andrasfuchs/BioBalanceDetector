@@ -1,0 +1,145 @@
+
+(session "Mars-64.ses"
+  (base_design "Mars-64.dsn")
+  (placement
+    (resolution um 10)
+    (component MountingHole:MountingHole_2.2mm_M2
+      (place H1 431800 -330200 front 0)
+      (place H4 787400 -787400 front 0)
+    )
+    (component MountingHole:MountingHole_2.2mm_M2::1
+      (place H2 787400 -330200 front 0)
+      (place H3 431800 -787400 front 0)
+    )
+    (component TestPoint:TestPoint_Pad_4.0x4.0mm
+      (place TP101 431800 -381000 front 0)
+      (place TP103 533400 -381000 front 0)
+      (place TP105 635000 -381000 front 0)
+      (place TP106 685800 -381000 front 0)
+      (place TP107 736600 -381000 front 0)
+      (place TP109 431800 -431800 front 0)
+      (place TP111 533400 -431800 front 0)
+      (place TP113 635000 -431800 front 0)
+      (place TP117 431800 -482600 front 0)
+      (place TP119 533400 -482600 front 0)
+      (place TP121 635000 -482600 front 0)
+      (place TP123 736600 -482600 front 0)
+      (place TP125 431800 -533400 front 0)
+      (place TP127 533400 -533400 front 0)
+      (place TP129 635000 -533400 front 0)
+      (place TP131 736600 -533400 front 0)
+      (place TP201 431800 -584200 front 0)
+      (place TP203 533400 -584200 front 0)
+      (place TP205 635000 -584200 front 0)
+      (place TP209 431800 -635000 front 0)
+      (place TP211 533400 -635000 front 0)
+      (place TP213 635000 -635000 front 0)
+      (place TP215 736600 -635000 front 0)
+      (place TP216 787400 -635000 front 0)
+      (place TP218 482600 -685800 front 0)
+      (place TP220 584200 -685800 front 0)
+      (place TP222 685800 -685800 front 0)
+      (place TP224 787400 -685800 front 0)
+      (place TP226 482600 -736600 front 0)
+      (place TP228 584200 -736600 front 0)
+      (place TP230 685800 -736600 front 0)
+    )
+    (component TestPoint:TestPoint_Pad_4.0x4.0mm::1
+      (place TP102 482600 -381000 front 0)
+      (place TP104 584200 -381000 front 0)
+      (place TP108 787400 -381000 front 0)
+      (place TP110 482600 -431800 front 0)
+      (place TP112 584200 -431800 front 0)
+      (place TP114 685800 -431800 front 0)
+      (place TP115 736600 -431800 front 0)
+      (place TP116 787400 -431800 front 0)
+      (place TP118 482600 -482600 front 0)
+      (place TP120 584200 -482600 front 0)
+      (place TP122 685800 -482600 front 0)
+      (place TP124 787400 -482600 front 0)
+      (place TP126 482600 -533400 front 0)
+      (place TP128 584200 -533400 front 0)
+      (place TP130 685800 -533400 front 0)
+      (place TP132 787400 -533400 front 0)
+      (place TP202 482600 -584200 front 0)
+      (place TP204 584200 -584200 front 0)
+      (place TP206 685800 -584200 front 0)
+      (place TP207 736600 -584200 front 0)
+      (place TP208 787400 -584200 front 0)
+      (place TP210 482600 -635000 front 0)
+      (place TP212 584200 -635000 front 0)
+      (place TP214 685800 -635000 front 0)
+      (place TP217 431800 -685800 front 0)
+      (place TP219 533400 -685800 front 0)
+      (place TP221 635000 -685800 front 0)
+      (place TP223 736600 -685800 front 0)
+      (place TP225 431800 -736600 front 0)
+      (place TP227 533400 -736600 front 0)
+      (place TP229 635000 -736600 front 0)
+      (place TP231 736600 -736600 front 0)
+      (place TP232 787400 -736600 front 0)
+    )
+    (component "Package_QFP:TQFP-48-1EP_7x7mm_P0.5mm_EP5x5mm"
+      (place U101 609600 -457200 back 90)
+    )
+    (component "Package_QFP:TQFP-48-1EP_7x7mm_P0.5mm_EP5x5mm::1"
+      (place U102 609600 -660400 back 90)
+    )
+    (component "Connector_Coaxial:SMA_Amphenol_132134-10_Vertical"
+      (place J101 762000 -406400 back 180)
+    )
+    (component "Connector_Coaxial:SMA_Amphenol_132134-10_Vertical::1"
+      (place J102 762000 -711200 back 180)
+    )
+    (component TestPoint:TestPoint_Pad_1.0x1.0mm
+      (place TPAGND1 533400 -330200 back 180)
+    )
+    (component "Jumper:SolderJumper-3_P1.3mm_Bridged2Bar12_Pad1.0x1.5mm_NumberLabels"
+      (place JP4 685800 -330200 back 180)
+    )
+    (component "Mars-64:PinHeader_2x06_P2.54mm_Vertical_SMD_TopBottom"
+      (place Pmod1 762000 -558800 back 180)
+    )
+    (component "Mars-64:PinHeader_2x06_P2.54mm_Vertical_SMD_TopBottom_Mirrored"
+      (place Pmod2 457200 -558800 back 180)
+    )
+  )
+  (was_is
+  )
+  (routes 
+    (resolution um 10)
+    (parser
+      (host_cad "KiCad's Pcbnew")
+      (host_version "(5.1.5)-3")
+    )
+    (library_out 
+      (padstack "Via[0-3]_800:400_um"
+        (shape
+          (circle F.Cu 8000 0 0)
+        )
+        (shape
+          (circle In1.Cu 8000 0 0)
+        )
+        (shape
+          (circle In2.Cu 8000 0 0)
+        )
+        (shape
+          (circle B.Cu 8000 0 0)
+        )
+        (attach off)
+      )
+    )
+    (network_out 
+      (net @:no_net_0
+        (wire 
+          (polygon In1.Cu 0
+            406400 -762000
+            812800 -762000
+            812800 -355600
+            406400 -355600
+          )
+        )
+      )
+    )
+  )
+)
