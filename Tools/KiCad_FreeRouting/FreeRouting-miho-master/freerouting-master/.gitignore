@@ -1,0 +1,9 @@
+build
+out
+/.nb-gradle/
+.gradle/
+.idea/
+freerouting.iml
+tmp
+
+
