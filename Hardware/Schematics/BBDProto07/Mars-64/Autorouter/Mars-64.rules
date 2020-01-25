@@ -8,33 +8,33 @@
     (eu.mihosoft.freerouting.autoroute on)
     (postroute on)
     (vias on)
-    (via_costs 50)
+    (via_costs 20)
     (plane_via_costs 5)
     (start_ripup_costs 100)
-    (start_pass_no 1)
+    (start_pass_no 2057)
     (layer_rule F.Cu
       (active on)
       (preferred_direction vertical)
-      (preferred_direction_trace_costs 1.8)
-      (against_preferred_direction_trace_costs 3.0)
+      (preferred_direction_trace_costs 2.8)
+      (against_preferred_direction_trace_costs 4.0)
     )
     (layer_rule In1.Cu
-      (active off)
+      (active on)
       (preferred_direction horizontal)
-      (preferred_direction_trace_costs 1.0)
-      (against_preferred_direction_trace_costs 1.9)
+      (preferred_direction_trace_costs 5.0)
+      (against_preferred_direction_trace_costs 5.9)
     )
     (layer_rule In2.Cu
       (active on)
       (preferred_direction horizontal)
       (preferred_direction_trace_costs 1.0)
-      (against_preferred_direction_trace_costs 2.2)
+      (against_preferred_direction_trace_costs 1.7)
     )
     (layer_rule B.Cu
       (active on)
       (preferred_direction vertical)
-      (preferred_direction_trace_costs 1.8)
-      (against_preferred_direction_trace_costs 2.7)
+      (preferred_direction_trace_costs 1.2)
+      (against_preferred_direction_trace_costs 1.9)
     )
   )
   (rule
@@ -58,14 +58,50 @@
     )
     (attach off)
   )
+  (padstack "Via[1-3]_800:400_um"
+    (shape
+      (circle In1.Cu 800.0 0.0 0.0)
+    )
+    (shape
+      (circle In2.Cu 800.0 0.0 0.0)
+    )
+    (shape
+      (circle B.Cu 800.0 0.0 0.0)
+    )
+    (attach off)
+  )
+  (padstack "Via[0-2]_800:400_um"
+    (shape
+      (circle F.Cu 800.0 0.0 0.0)
+    )
+    (shape
+      (circle In1.Cu 800.0 0.0 0.0)
+    )
+    (shape
+      (circle In2.Cu 800.0 0.0 0.0)
+    )
+    (attach off)
+  )
   (via 
     "Via[0-3]_800:400_um" "Via[0-3]_800:400_um" default
   )
   (via 
-    "Via[0-3]_800:400_um-kicad_default" "Via[0-3]_800:400_um" default
+    "Via[1-3]_800:400_um" "Via[1-3]_800:400_um" default
+  )
+  (via 
+    "Via[0-2]_800:400_um" "Via[0-2]_800:400_um" default
+  )
+  (via 
+    "Via[0-3]_800:400_um-kicad_default" "Via[0-3]_800:400_um" "kicad_default"
+  )
+  (via 
+    "Via[1-3]_800:400_um-kicad_default" "Via[1-3]_800:400_um" "kicad_default"
+  )
+  (via 
+    "Via[0-2]_800:400_um-kicad_default" "Via[0-2]_800:400_um" "kicad_default"
   )
   (via_rule
-    default "Via[0-3]_800:400_um"
+    default "Via[0-3]_800:400_um" "Via[1-3]_800:400_um" "Via[0-2]_800:400_um"
   )
   (via_rule
     "kicad_default" "Via[0-3]_800:400_um-kicad_default"
@@ -83,17 +119,6 @@
   )
   (class "kicad_default"
     "/~SPI_CE" "/SPI_MOSI" "/SPI_CLK" GND /VCC3V3 /AGND /DA /DB
-    "Net-(J101-Pad2)"
-    (clearance_class default)
-    (via_rule kicad_default)
-    (rule
-      (width 250.0)
-    )
-    (circuit 
-      (use_layer F.Cu In1.Cu In2.Cu B.Cu)
-    )
-  )
-  (class "sensor_lines"
     "Net-(TP101-Pad1)" "Net-(TP102-Pad1)" "Net-(TP103-Pad1)" "Net-(TP104-Pad1)" "Net-(TP105-Pad1)" "Net-(TP106-Pad1)" "Net-(TP107-Pad1)" "Net-(TP108-Pad1)"
     "Net-(TP109-Pad1)" "Net-(TP110-Pad1)" "Net-(TP111-Pad1)" "Net-(TP112-Pad1)" "Net-(TP113-Pad1)" "Net-(TP114-Pad1)" "Net-(TP115-Pad1)" "Net-(TP116-Pad1)"
     "Net-(TP117-Pad1)" "Net-(TP118-Pad1)" "Net-(TP119-Pad1)" "Net-(TP120-Pad1)" "Net-(TP121-Pad1)" "Net-(TP122-Pad1)" "Net-(TP123-Pad1)" "Net-(TP124-Pad1)"
@@ -102,7 +127,8 @@
     "Net-(TP209-Pad1)" "Net-(TP210-Pad1)" "Net-(TP211-Pad1)" "Net-(TP212-Pad1)" "Net-(TP213-Pad1)" "Net-(TP214-Pad1)" "Net-(TP215-Pad1)" "Net-(TP216-Pad1)"
     "Net-(TP217-Pad1)" "Net-(TP218-Pad1)" "Net-(TP219-Pad1)" "Net-(TP220-Pad1)" "Net-(TP221-Pad1)" "Net-(TP222-Pad1)" "Net-(TP223-Pad1)" "Net-(TP224-Pad1)"
     "Net-(TP225-Pad1)" "Net-(TP226-Pad1)" "Net-(TP227-Pad1)" "Net-(TP228-Pad1)" "Net-(TP229-Pad1)" "Net-(TP230-Pad1)" "Net-(TP231-Pad1)" "Net-(TP232-Pad1)"
-    (clearance_class default)
+    "Net-(J101-Pad2)"
+    (clearance_class "kicad_default")
     (via_rule kicad_default)
     (rule
       (width 250.0)
