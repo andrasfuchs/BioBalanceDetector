@@ -3,7 +3,7 @@
   (general
     (thickness 1.6)
     (drawings 6)
-    (tracks 64)
+    (tracks 75)
     (zones 0)
     (modules 76)
     (nets 74)
@@ -258,7 +258,7 @@
   )
 
   (module MountingHole:MountingHole_2.2mm_M2 (layer F.Cu) (tedit 56D1B4CB) (tstamp 5E2B254D)
-    (at 43.18 33.02)
+    (at 38.1 33.02)
     (descr "Mounting Hole 2.2mm, no annular, M2")
     (tags "mounting hole 2.2mm no annular m2")
     (path /5E2B4EA5)
@@ -278,7 +278,7 @@
   )
 
   (module MountingHole:MountingHole_2.2mm_M2 (layer F.Cu) (tedit 56D1B4CB) (tstamp 5E2B2555)
-    (at 78.74 33.02)
+    (at 83.82 33.02)
     (descr "Mounting Hole 2.2mm, no annular, M2")
     (tags "mounting hole 2.2mm no annular m2")
     (path /5E2B5DA6)
@@ -298,7 +298,7 @@
   )
 
   (module MountingHole:MountingHole_2.2mm_M2 (layer F.Cu) (tedit 56D1B4CB) (tstamp 5E2B255D)
-    (at 43.18 78.74)
+    (at 38.1 78.74)
     (descr "Mounting Hole 2.2mm, no annular, M2")
     (tags "mounting hole 2.2mm no annular m2")
     (path /5E2B6620)
@@ -318,7 +318,7 @@
   )
 
   (module MountingHole:MountingHole_2.2mm_M2 (layer F.Cu) (tedit 56D1B4CB) (tstamp 5E2B2565)
-    (at 78.74 78.74)
+    (at 83.82 78.74)
     (descr "Mounting Hole 2.2mm, no annular, M2")
     (tags "mounting hole 2.2mm no annular m2")
     (path /5E2B679E)
@@ -2520,7 +2520,7 @@
   )
 
   (module TestPoint:TestPoint_Pad_1.0x1.0mm (layer B.Cu) (tedit 5A0F774F) (tstamp 5E2B71F9)
-    (at 49.53 33.02)
+    (at 43.18 33.02)
     (descr "SMD rectangular pad as test Point, square 1.0mm side length")
     (tags "test point SMD pad rectangle square")
     (path /5E34D2B6)
@@ -2546,8 +2546,8 @@
       (net 6 /AGND))
   )
 
-  (module Jumper:SolderJumper-3_P1.3mm_Bridged2Bar12_Pad1.0x1.5mm_NumberLabels (layer B.Cu) (tedit 5C756B16) (tstamp 5E2B7CA0)
-    (at 72.39 33.02)
+  (module Jumper:SolderJumper-3_P1.3mm_Bridged2Bar12_Pad1.0x1.5mm_NumberLabels (layer B.Cu) (tedit 5C756B16) (tstamp 5E3422FB)
+    (at 77.47 33.02)
     (descr "SMD Solder Jumper, 1x1.5mm Pads, 0.3mm gap, pads 1-2 Bridged2Bar with 2 copper strip, labeled with numbers")
     (tags "solder jumper open")
     (path /5E309A8E)
@@ -2839,7 +2839,18 @@
   (gr_line (start 86.36 86.36) (end 35.56 86.36) (layer Edge.Cuts) (width 0.05))
   (gr_line (start 35.56 25.4) (end 86.36 25.4) (layer Edge.Cuts) (width 0.05))
 
-  (via blind (at 49.53 33.02) (size 0.8) (drill 0.4) (layers In1.Cu B.Cu) (net 6))
+  (via blind (at 40.005 58.42) (size 0.8) (drill 0.4) (layers In1.Cu B.Cu) (net 6))
+  (via blind (at 81.915 58.42) (size 0.8) (drill 0.4) (layers In1.Cu B.Cu) (net 6))
+  (via blind (at 76.2 34.925) (size 0.8) (drill 0.4) (layers In1.Cu B.Cu) (net 6))
+  (via blind (at 43.18 34.925) (size 0.8) (drill 0.4) (layers In1.Cu B.Cu) (net 6))
+  (via blind (at 43.18 33.02) (size 0.8) (drill 0.4) (layers In1.Cu B.Cu) (net 6) (tstamp 5E342246))
+  (segment (start 81.915 59.07) (end 82.535 59.69) (width 0.25) (layer B.Cu) (net 6))
+  (segment (start 81.915 58.42) (end 81.915 59.07) (width 0.25) (layer B.Cu) (net 6))
+  (segment (start 40.005 59.07) (end 39.385 59.69) (width 0.25) (layer B.Cu) (net 6))
+  (segment (start 40.005 58.42) (end 40.005 59.07) (width 0.25) (layer B.Cu) (net 6))
+  (segment (start 43.18 34.925) (end 43.18 33.02) (width 0.25) (layer B.Cu) (net 6))
+  (segment (start 76.2 33.05) (end 76.17 33.02) (width 0.25) (layer B.Cu) (net 6))
+  (segment (start 76.2 34.925) (end 76.2 33.05) (width 0.25) (layer B.Cu) (net 6))
   (via blind (at 43.18 38.1) (size 0.8) (drill 0.4) (layers F.Cu In2.Cu) (net 9))
   (via blind (at 48.26 38.1) (size 0.8) (drill 0.4) (layers F.Cu In2.Cu) (net 10))
   (via blind (at 53.34 38.1) (size 0.8) (drill 0.4) (layers F.Cu In2.Cu) (net 11))
@@ -2904,13 +2915,13 @@
   (via blind (at 73.66 73.66) (size 0.8) (drill 0.4) (layers F.Cu In2.Cu) (net 71))
   (via blind (at 78.74 73.66) (size 0.8) (drill 0.4) (layers F.Cu In2.Cu) (net 72))
 
-  (zone (net 6) (net_name /AGND) (layer In1.Cu) (tstamp 5E2C3765) (hatch edge 0.508)
+  (zone (net 6) (net_name /AGND) (layer In1.Cu) (tstamp 5E342226) (hatch edge 0.508)
     (connect_pads yes (clearance 0.508))
     (min_thickness 0.254)
-    (fill (arc_segments 32) (thermal_gap 0.508) (thermal_bridge_width 0.508))
+    (fill yes (arc_segments 32) (thermal_gap 0.508) (thermal_bridge_width 0.508))
     (polygon
       (pts
-        (xy 81.28 76.2) (xy 40.64 76.2) (xy 40.64 35.56) (xy 81.28 35.56)
+        (xy 82.55 77.47) (xy 39.37 77.47) (xy 39.37 34.29) (xy 82.55 34.29)
       )
     )
   )
