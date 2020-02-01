@@ -14,7 +14,7 @@ Right now, with my [Mercury-16 prototype](https://github.com/andrasfuchs/BioBala
 You can browse the technical challenges I worked and I am working on on the [implementation wiki page](https://github.com/andrasfuchs/BioBalanceDetector/wiki/Implementation). Future plans include, but not limited to: fractal antenna design, analog low-pass Butterworth filters, Goertzel algorithm implementation on the cells, emitters, USB 3.0, Unity3D GUI and many more.  
   
 I realize at this point that I need experienced, passionate people to more forward. I'm currently looking for people with the following expertise, so don't hesitate to contact me:  
-* Hardware designer: PCB, antenna and analog low pass filter design  
+* Hardware designer: PCB with [KiCad](https://www.kicad-pcb.org/), antenna and analog low pass filter design  
 * Microcontroller firmware programmer: Atmel XMEGA programming with AVR C  
 * PC driver developer: .NET, C#, signal processing and WebSockets  
 * GUI: Unity3D, C# and WebSockets  
