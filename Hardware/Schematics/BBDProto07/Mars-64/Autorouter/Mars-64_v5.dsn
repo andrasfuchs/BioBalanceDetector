@@ -1,4 +1,4 @@
-(pcb "C:\Work\BioBalanceDetector\Hardware\Schematics\BBDProto07\Mars-64\Autorouter\Mars-64.dsn"
+(pcb "C:\Work\BioBalanceDetector\Hardware\Schematics\BBDProto07\Mars-64\Autorouter\Mars-64_v5.dsn"
   (parser
     (string_quote ")
     (space_in_quoted_tokens on)
@@ -33,11 +33,11 @@
       )
     )
     (boundary
-      (path pcb 0  86360 -81280  35560 -81280  35560 -30480  86360 -30480
-            86360 -81280)
+      (path pcb 0  86360 -86360  35560 -86360  35560 -25400  86360 -25400
+            86360 -86360)
     )
-    (plane @:no_net_0 (polygon In1.Cu 0  81280 -76200  40640 -76200  40640 -35560  81280 -35560
-            81280 -76200))
+    (plane /AGND (polygon In1.Cu 0  82550 -77470  39370 -77470  39370 -34290  82550 -34290
+            82550 -77470))
     (via "Via[0-3]_800:400_um" "Via[1-3]_800:400_um" "Via[0-2]_800:400_um")
     (rule
       (width 250)
@@ -48,12 +48,12 @@
   )
   (placement
     (component MountingHole:MountingHole_2.2mm_M2
-      (place H1 43180 -33020 front 0 (PN MountingHole))
-      (place H4 78740 -78740 front 0 (PN MountingHole))
+      (place H1 38100 -33020 front 0 (PN MountingHole))
+      (place H4 83820 -78740 front 0 (PN MountingHole))
     )
     (component MountingHole:MountingHole_2.2mm_M2::1
-      (place H2 78740 -33020 front 0 (PN MountingHole))
-      (place H3 43180 -78740 front 0 (PN MountingHole))
+      (place H2 83820 -33020 front 0 (PN MountingHole))
+      (place H3 38100 -78740 front 0 (PN MountingHole))
     )
     (component TestPoint:TestPoint_Pad_4.0x4.0mm
       (place TP101 43180 -38100 front 0 (PN TestPoint_Small))
@@ -136,10 +136,10 @@
       (place J102 76200 -71120 back 180 (PN Conn_Coaxial))
     )
     (component TestPoint:TestPoint_Pad_1.0x1.0mm
-      (place TPAGND1 49530 -33020 back 180 (PN TestPoint_Small))
+      (place TPAGND1 43180 -33020 back 180 (PN TestPoint_Small))
     )
     (component "Jumper:SolderJumper-3_P1.3mm_Bridged2Bar12_Pad1.0x1.5mm_NumberLabels"
-      (place JP4 72390 -33020 back 180 (PN Jumper_NC_Dual))
+      (place JP4 77470 -33020 back 180 (PN Jumper_NC_Dual))
     )
     (component "Mars-64:PinHeader_2x06_P2.54mm_Vertical_SMD_TopBottom"
       (place Pmod1 80010 -55880 back 180 (PN Conn_02x06_Top_Bottom))
@@ -694,8 +694,6 @@
     )
   )
   (network
-    (net @:no_net_0
-    )
     (net /~SPI_CE
       (pins U101-17 U102-17 Pmod1-1 Pmod2-1)
     )
@@ -943,7 +941,7 @@
     )
   )
   (wiring
-    (via "Via[1-3]_800:400_um"  49530 -33020 (net /AGND)(type protect))
+    (via "Via[1-3]_800:400_um"  43180 -33020 (net /AGND)(type protect))
     (via "Via[0-2]_800:400_um"  43180 -38100 (net "Net-(TP101-Pad1)")(type protect))
     (via "Via[0-2]_800:400_um"  48260 -38100 (net "Net-(TP102-Pad1)")(type protect))
     (via "Via[0-2]_800:400_um"  53340 -38100 (net "Net-(TP103-Pad1)")(type protect))

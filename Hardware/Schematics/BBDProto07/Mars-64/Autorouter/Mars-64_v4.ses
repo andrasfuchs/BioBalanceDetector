@@ -1,6 +1,6 @@
 
-(session "Mars-64.ses"
-  (base_design "Mars-64.dsn")
+(session "Mars-64_v4.ses"
+  (base_design "Mars-64_v4.dsn")
   (placement
     (resolution um 10)
     (component MountingHole:MountingHole_2.2mm_M2
@@ -98,10 +98,10 @@
       (place JP4 723900 -330200 back 180)
     )
     (component "Mars-64:PinHeader_2x06_P2.54mm_Vertical_SMD_TopBottom"
-      (place Pmod1 787400 -558800 back 180)
+      (place Pmod1 800100 -558800 back 180)
     )
     (component "Mars-64:PinHeader_2x06_P2.54mm_Vertical_SMD_TopBottom_Mirrored"
-      (place Pmod2 431800 -558800 back 180)
+      (place Pmod2 419100 -558800 back 180)
     )
   )
   (was_is

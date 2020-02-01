@@ -1,5 +1,5 @@
 
-(rules PCB Mars-64
+(rules PCB Mars-64_v4
   (snap_angle 
     fortyfive_degree
   )
@@ -8,33 +8,33 @@
     (eu.mihosoft.freerouting.autoroute on)
     (postroute on)
     (vias on)
-    (via_costs 20)
+    (via_costs 50)
     (plane_via_costs 5)
     (start_ripup_costs 100)
-    (start_pass_no 2057)
+    (start_pass_no 1)
     (layer_rule F.Cu
       (active on)
       (preferred_direction vertical)
-      (preferred_direction_trace_costs 2.8)
-      (against_preferred_direction_trace_costs 4.0)
+      (preferred_direction_trace_costs 2.1)
+      (against_preferred_direction_trace_costs 2.7)
     )
     (layer_rule In1.Cu
       (active on)
       (preferred_direction horizontal)
-      (preferred_direction_trace_costs 5.0)
-      (against_preferred_direction_trace_costs 5.9)
+      (preferred_direction_trace_costs 2.9)
+      (against_preferred_direction_trace_costs 3.5)
     )
     (layer_rule In2.Cu
       (active on)
       (preferred_direction horizontal)
-      (preferred_direction_trace_costs 1.0)
+      (preferred_direction_trace_costs 1.1)
       (against_preferred_direction_trace_costs 1.7)
     )
     (layer_rule B.Cu
       (active on)
       (preferred_direction vertical)
-      (preferred_direction_trace_costs 1.2)
-      (against_preferred_direction_trace_costs 1.9)
+      (preferred_direction_trace_costs 1.8)
+      (against_preferred_direction_trace_costs 2.4)
     )
   )
   (rule
@@ -107,7 +107,6 @@
     "kicad_default" "Via[0-3]_800:400_um-kicad_default"
   )
   (class default
-    "@:no_net_0"
     (clearance_class default)
     (via_rule default)
     (rule
@@ -118,7 +117,7 @@
     )
   )
   (class "kicad_default"
-    "/~SPI_CE" "/SPI_MOSI" "/SPI_CLK" GND /VCC3V3 /AGND /DA /DB
+    /AGND "/~SPI_CE" "/SPI_MOSI" "/SPI_CLK" GND /VCC3V3 /DA /DB
     "Net-(TP101-Pad1)" "Net-(TP102-Pad1)" "Net-(TP103-Pad1)" "Net-(TP104-Pad1)" "Net-(TP105-Pad1)" "Net-(TP106-Pad1)" "Net-(TP107-Pad1)" "Net-(TP108-Pad1)"
     "Net-(TP109-Pad1)" "Net-(TP110-Pad1)" "Net-(TP111-Pad1)" "Net-(TP112-Pad1)" "Net-(TP113-Pad1)" "Net-(TP114-Pad1)" "Net-(TP115-Pad1)" "Net-(TP116-Pad1)"
     "Net-(TP117-Pad1)" "Net-(TP118-Pad1)" "Net-(TP119-Pad1)" "Net-(TP120-Pad1)" "Net-(TP121-Pad1)" "Net-(TP122-Pad1)" "Net-(TP123-Pad1)" "Net-(TP124-Pad1)"

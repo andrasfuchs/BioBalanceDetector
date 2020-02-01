@@ -1,4 +1,4 @@
-(pcb "C:\Work\BioBalanceDetector\Hardware\Schematics\BBDProto07\Mars-64\Autorouter\Mars-64.dsn"
+(pcb "C:\Work\BioBalanceDetector\Hardware\Schematics\BBDProto07\Mars-64\Autorouter\Mars-64_v4.dsn"
   (parser
     (string_quote ")
     (space_in_quoted_tokens on)
@@ -33,10 +33,10 @@
       )
     )
     (boundary
-      (path pcb 0  86360 -81280  35560 -81280  35560 -30480  86360 -30480
-            86360 -81280)
+      (path pcb 0  86360 -86360  35560 -86360  35560 -25400  86360 -25400
+            86360 -86360)
     )
-    (plane @:no_net_0 (polygon In1.Cu 0  81280 -76200  40640 -76200  40640 -35560  81280 -35560
+    (plane /AGND (polygon In1.Cu 0  81280 -76200  40640 -76200  40640 -35560  81280 -35560
             81280 -76200))
     (via "Via[0-3]_800:400_um" "Via[1-3]_800:400_um" "Via[0-2]_800:400_um")
     (rule
@@ -694,8 +694,6 @@
     )
   )
   (network
-    (net @:no_net_0
-    )
     (net /~SPI_CE
       (pins U101-17 U102-17 Pmod1-1 Pmod2-1)
     )
