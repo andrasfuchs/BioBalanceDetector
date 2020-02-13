@@ -25,10 +25,10 @@ F 3 "https://www.analog.com/media/en/technical-documentation/data-sheets/ADG725_
 	1    0    0    -1  
 $EndComp
 $Comp
-L Connector_Generic:Conn_02x06_Top_Bottom Pmod1
+L Connector_Generic:Conn_02x06_Top_Bottom PmodM1
 U 1 1 5E2AF0E4
 P 9000 2200
-F 0 "Pmod1" H 9050 2617 50  0000 C CNN
+F 0 "PmodM1" H 9050 2617 50  0000 C CNN
 F 1 "Conn_02x06_Top_Bottom" H 9050 2526 50  0001 C CNN
 F 2 "Mars-64:PinHeader_2x06_P2.54mm_Vertical_SMD_TopBottom" H 9000 2200 50  0001 C CNN
 F 3 "~" H 9000 2200 50  0001 C CNN
@@ -1192,10 +1192,10 @@ F 3 "~" H 1400 1100 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Connector_Generic:Conn_02x06_Top_Bottom Pmod2
+L Connector_Generic:Conn_02x06_Top_Bottom PmodF2
 U 1 1 5E2E85D1
 P 9000 1000
-F 0 "Pmod2" H 9050 1417 50  0000 C CNN
+F 0 "PmodF2" H 9050 1417 50  0000 C CNN
 F 1 "Conn_02x06_Top_Bottom" H 9050 1326 50  0001 C CNN
 F 2 "Mars-64:PinHeader_2x06_P2.54mm_Vertical_SMD_TopBottom_Mirrored" H 9000 1000 50  0001 C CNN
 F 3 "~" H 9000 1000 50  0001 C CNN
