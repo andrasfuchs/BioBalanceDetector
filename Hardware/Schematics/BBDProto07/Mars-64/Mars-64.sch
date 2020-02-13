@@ -6,7 +6,7 @@ encoding utf-8
 Sheet 1 1
 Title "Mars-64"
 Date "2020-01-23"
-Rev "A"
+Rev "B"
 Comp "Bio Balance Detector"
 Comment1 ""
 Comment2 ""
@@ -19,7 +19,7 @@ U 1 1 5E2A9665
 P 3300 3900
 F 0 "U101" H 3000 5950 50  0000 L CNN
 F 1 "ADG731" H 3000 5850 50  0000 L CNN
-F 2 "Package_QFP:TQFP-48-1EP_7x7mm_P0.5mm_EP5x5mm" H 3550 1950 50  0001 L CNN
+F 2 "Package_QFP:TQFP-48_7x7mm_P0.5mm" H 3550 1950 50  0001 L CNN
 F 3 "https://www.analog.com/media/en/technical-documentation/data-sheets/ADG725_731.pdf" H 3310 4300 50  0001 C CNN
 	1    3300 3900
 	1    0    0    -1  
@@ -41,7 +41,7 @@ U 1 1 5E2C09E7
 P 6600 3900
 F 0 "U102" H 6300 5950 50  0000 L CNN
 F 1 "ADG731" H 6300 5850 50  0000 L CNN
-F 2 "Package_QFP:TQFP-48-1EP_7x7mm_P0.5mm_EP5x5mm" H 6850 1950 50  0001 L CNN
+F 2 "Package_QFP:TQFP-48_7x7mm_P0.5mm" H 6850 1950 50  0001 L CNN
 F 3 "https://www.analog.com/media/en/technical-documentation/data-sheets/ADG725_731.pdf" H 6610 4300 50  0001 C CNN
 	1    6600 3900
 	1    0    0    -1  

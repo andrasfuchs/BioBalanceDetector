@@ -1,4 +1,4 @@
-15879887906009503
+15878308028520252
 Battery
 BatteryHolder_Bulgin_BX0036_1xC
 Bulgin Battery Holder, BX0036, Battery Type C (https://www.bulgin.com/products/pub/media/bulgin/data/Battery_holders.pdf)
@@ -29450,13 +29450,6 @@ Through hole pin header THT 2x06 2.54mm double row
 12
 Connector_PinHeader_2.54mm
 PinHeader_2x06_P2.54mm_Vertical_SMD
-surface-mounted straight pin header, 2x06, 2.54mm pitch, double rows
-Surface mounted pin header SMD 2x06 2.54mm double row
-0
-12
-12
-Connector_PinHeader_2.54mm
-PinHeader_2x06_P2.54mm_Vertical_SMD_mirrored
 surface-mounted straight pin header, 2x06, 2.54mm pitch, double rows
 Surface mounted pin header SMD 2x06 2.54mm double row
 0
