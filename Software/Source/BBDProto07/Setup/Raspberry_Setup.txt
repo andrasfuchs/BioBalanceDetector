@@ -1,0 +1,52 @@
+1, Format SD card with SD Card Formatter [https://www.sdcard.org/downloads/formatter_4/eula_windows/SDCardFormatterv5_WinEN.zip]
+
+2, Extract NOOBS to the SD card [https://www.raspberrypi.org/downloads/noobs/]
+
+3, Install Raspbian full
+
+4, Set fixed IP to 192.168.1.35 (wired) and 192.168.1.36 (wireless)
+
+5, Enable VNC, I2C and SPI interfaces
+
+6, Install updates
+
+7, Set timezone and WiFi country
+
+8, Use VNC Viewer to connect [https://www.realvnc.com/download/file/viewer.files/VNC-Viewer-6.19.107-Windows.exe]
+
+8, Setup SAMBA share [https://www.raspberrypi.org/magpi/samba-file-server/]
+
+9, Install .NET Core SDK ARM32 [https://dotnet.microsoft.com/download/dotnet-core/current]
+	Copy dotnet-sdk-3.1.101-linux-arm.tar.gz to Pi
+	mkdir -p $HOME/dotnet && tar zxf dotnet-sdk-3.1.101-linux-arm.tar.gz -C $HOME/dotnet
+	
+	# add these two lines to ~/.bashrc
+	export DOTNET_ROOT=$HOME/dotnet
+	export PATH=$PATH:$HOME/dotnet
+	
+10, Install VSDbg [https://github.com/OmniSharp/omnisharp-vscode/wiki/Remote-Debugging-On-Linux-Arm]
+	curl -sSL https://aka.ms/getvsdbgsh | bash /dev/stdin -r linux-arm -v latest -l ~/vsdbg
+	
+11, Switch to the Windows 10 machine	
+	
+12, Download WinSCP client and its .NET assembly / COM library [https://winscp.net/eng/downloads.php]
+	
+13, Start a new .NET Core 3.1 project in Visual Studio 2019
+
+14, Install Pi packages:
+		Install-Package Unosquare.Raspberry.IO
+		Install-Package Unosquare.WiringPi
+		Install-Package Unosquare.RaspberryIO.Peripherals
+		
+15, Build the project
+
+16, Create a DeployToPi.ps1 script in the project folder [https://medium.com/@lewwybogus/debugging-your-net-core-3-app-on-your-raspberry-pi-with-visual-studio-2019-9662348e79d9]
+
+17, Put this .ps1 file into the root of the new project, and extract the WinSCP .NET assembly (WinSCPnet.dll) into that folder too
+
+18, Open PowerShell with administrator privileges, run "Set-ExecutionPolicy RemoteSigned", and run ".\DeployToPi.ps1" 
+
+19, Press Ctrl + Alt + P in Visual Studio, and attach to SSH/192.168.1.36/
+
+20, Next time press Shift + Alt + P to reattach the debugger to the same process
+
