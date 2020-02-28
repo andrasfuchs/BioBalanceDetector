@@ -1,7 +1,7 @@
 (export (version D)
   (design
     (source C:\Work\BioBalanceDetector\Hardware\Schematics\BBDProto07\Mars-64\Mars-64.sch)
-    (date "2020-02-28 10:35:00")
+    (date "2020-02-28 10:40:26")
     (tool "Eeschema (5.1.5)-3")
     (sheet (number 1) (name /) (tstamps /)
       (title_block
@@ -549,6 +549,7 @@
       (tstamp 5E2E85D1))
     (comp (ref JP5)
       (value SolderJumper_2_Bridged)
+      (footprint Jumper:SolderJumper-2_P1.3mm_Bridged_RoundedPad1.0x1.5mm)
       (datasheet ~)
       (libsource (lib Jumper) (part SolderJumper_2_Bridged) (description "Solder Jumper, 2-pole, closed/bridged"))
       (sheetpath (names /) (tstamps /))

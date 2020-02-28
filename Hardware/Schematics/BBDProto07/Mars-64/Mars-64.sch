@@ -1282,7 +1282,7 @@ U 1 1 5E66019A
 P 3000 6200
 F 0 "JP5" H 3000 6313 50  0000 C CNN
 F 1 "SolderJumper_2_Bridged" H 3000 6314 50  0001 C CNN
-F 2 "" H 3000 6200 50  0001 C CNN
+F 2 "Jumper:SolderJumper-2_P1.3mm_Bridged_RoundedPad1.0x1.5mm" H 3000 6200 50  0001 C CNN
 F 3 "~" H 3000 6200 50  0001 C CNN
 	1    3000 6200
 	1    0    0    -1  
