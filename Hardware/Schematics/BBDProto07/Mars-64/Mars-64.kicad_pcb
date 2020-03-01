@@ -2485,7 +2485,7 @@
   )
 
   (module Package_QFP:TQFP-48_7x7mm_P0.5mm (layer B.Cu) (tedit 5A02F146) (tstamp 5E5AF320)
-    (at 81.28 68.58 180)
+    (at 78.74 68.58 180)
     (descr "48 LEAD TQFP 7x7mm (see MICREL TQFP7x7-48LD-PL-1.pdf)")
     (tags "QFP 0.5")
     (path /5E2A9665)

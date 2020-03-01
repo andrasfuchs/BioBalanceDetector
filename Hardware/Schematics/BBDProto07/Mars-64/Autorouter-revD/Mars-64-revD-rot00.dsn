@@ -142,10 +142,10 @@
       (place PmodF2 68580 -53340 back 180 (PN Conn_02x06_Top_Bottom))
     )
     (component "Package_QFP:TQFP-48_7x7mm_P0.5mm"
-      (place U101 81280 -68580 back 0 (PN ADG731))
+      (place U101 78740 -68580 back 0 (PN ADG731))
     )
     (component "Package_QFP:TQFP-48_7x7mm_P0.5mm::1"
-      (place U102 76200 -137160 back 180 (PN ADG731))
+      (place U102 76200 -137160 back 0 (PN ADG731))
     )
     (component "Jumper:SolderJumper-2_P1.3mm_Bridged_RoundedPad1.0x1.5mm"
       (place JP5 60960 -134620 back 180 (PN SolderJumper_2_Bridged))
