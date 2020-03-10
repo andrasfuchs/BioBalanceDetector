@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading;
 using System.Device.Spi;
+using Iot.Device.Ad7193;
 using Unosquare.RaspberryIO;
 using Unosquare.RaspberryIO.Abstractions;
 using Unosquare.WiringPi;
@@ -14,7 +15,7 @@ namespace Mars_64
 		private const int PI_3_SPI_SPEED_MIN = 320000;
 		private const int PI_3_SPI_SPEED_MAX = 20480000;
 
-		private static Iot.Device.Ad7193.Ad7193 ad7193;
+		private static Ad7193 ad7193;
 
 		static void Main(string[] args)
 		{
@@ -28,17 +29,17 @@ namespace Mars_64
 			settings.Mode = SpiMode.Mode3;
 			SpiDevice ad7193SpiDevice = SpiDevice.Create(settings);
 
-			ad7193 = new Iot.Device.Ad7193.Ad7193(ad7193SpiDevice);
+			ad7193 = new Ad7193(ad7193SpiDevice);
 
 			Console.WriteLine($"-- Resetting and calibrating AD7193.");
 			ad7193.Reset();
 			ad7193.Calibrate();
-			ad7193.SetPGAGain(Iot.Device.Ad7193.Ad7193.Gain.X1);
+			ad7193.SetPGAGain(Ad7193.Gain.X1);
 			ad7193.SetPsuedoDifferentialInputs(true);
 			ad7193.AppendStatusRegisterToData = true;
 
 
-			Iot.Device.Ad7193.Ad7193.Channel ch = Iot.Device.Ad7193.Ad7193.Channel.CH07;
+			Ad7193.Channel ch = Ad7193.Channel.CH07;
 			Console.WriteLine($"-- Setting channel to {ch}.");
 			ad7193.SetChannel(ch);
 
@@ -60,12 +61,6 @@ namespace Mars_64
 				ad7193.StartSingleConversion();
 				ad7193.WaitForADC();
 				uint adcValue = ad7193.ReadADCValue();
-
-				if (ad7193.AppendStatusRegisterToData)
-				{
-					byte chNum = (byte)(adcValue & 0xFF);
-					adcValue = (adcValue & 0xFFFFFF00) >> 8;
-				}
 
 				samplesRead++;
 				if (samplesRead % 100 == 0)

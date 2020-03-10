@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Mars_64.Iot.Device.Ad7193;
+using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Device.Spi;
 using System.Diagnostics;
@@ -21,13 +23,15 @@ namespace Iot.Device.Ad7193
 
         // metadata (Iot.ISpiDevice)
         public const SpiMode ValidSpiModes = SpiMode.Mode3;
-        public const int MaximumSpifrequency = 10000000;    // min 100 ns SCLK high and low
+        public const int MaximumSpifrequency = 10000000;    // min 100 ns SCLK pulse width
 
         // metadata (Iot.IAdcDevice)
         public const int ADCCount = 1;
         public const int ADCBitrate = 24;
         public const int ADCSamplerate = 4800;
         public const int ADCInputChannelCount = 8;
+
+        public BlockingCollection<AdcValue> adcValues = new BlockingCollection<AdcValue>();
 
 
         // AD7193 Register Map
@@ -89,7 +93,7 @@ namespace Iot.Device.Ad7193
         public string Status
         {
             get
-            {                
+            {
                 uint register = GetRegisterValue(AD7193_REG_STAT);
 
                 sb.Clear();
@@ -110,7 +114,7 @@ namespace Iot.Device.Ad7193
         public string Mode
         {
             get
-            {                
+            {
                 uint register = GetRegisterValue(AD7193_REG_MODE);
 
                 string mode = UInt32ToBinaryString((register & 0b1110_0000_0000_0000_0000_0000) >> 21, 3);
@@ -172,7 +176,7 @@ namespace Iot.Device.Ad7193
         public string Config
         {
             get
-            {                
+            {
                 uint register = GetRegisterValue(AD7193_REG_CONF);
 
                 sb.Clear();
@@ -207,7 +211,7 @@ namespace Iot.Device.Ad7193
         public bool IsIdle
         {
             get
-            {                
+            {
                 uint mode = GetRegisterValue(AD7193_REG_MODE);
                 return ((mode & 0b1110_0000_0000_0000_0000_0000) >> 21) == 0b011;
             }
@@ -216,7 +220,7 @@ namespace Iot.Device.Ad7193
         public bool IsReady
         {
             get
-            {                
+            {
                 uint status = GetRegisterValue(AD7193_REG_STAT);
 
                 return (status & 0b1000_0000) != 0b1000_0000;
@@ -226,7 +230,7 @@ namespace Iot.Device.Ad7193
         public bool HasErrors
         {
             get
-            {                
+            {
                 uint status = GetRegisterValue(AD7193_REG_STAT);
 
                 return (status & 0b0100_0000) == 0b0100_0000;
@@ -241,6 +245,7 @@ namespace Iot.Device.Ad7193
                 if (value)
                 {
                     SetRegisterValue(AD7193_REG_COMM, 0b0101_1100);
+                    // TODO: start a new thread to read the status register all the time
                 }
                 else
                 {
@@ -413,7 +418,19 @@ namespace Iot.Device.Ad7193
         /// <returns>24-bit raw value of the last ADC result (+ status byte if enabled)</returns>
         public uint ReadADCValue()
         {
-            return GetRegisterValue(AD7193_REG_DATA);
+            uint raw = GetRegisterValue(AD7193_REG_DATA);
+
+            // update the status register cache if we have it here
+            if (this.AppendStatusRegisterToData)
+            {
+                registerCache[AD7193_REG_STAT] = (byte)(raw & 0xFF);
+                raw = (raw & 0xFFFFFF00) >> 8;
+            }
+
+            adcValues.Add(new AdcValue() { Raw = raw, Time = DateTime.UtcNow, Channel = (byte)(registerCache[AD7193_REG_STAT] & 0b0000_1111) });
+            // TODO: call event
+
+            return raw;
         }
 
         /// <summary>
