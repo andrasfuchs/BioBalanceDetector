@@ -8,6 +8,10 @@
 
   <ItemGroup>
     <PackageReference Include="Iot.Device.Bindings" Version="1.0.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.8">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="System.Device.Gpio" Version="1.0.0" />
     <PackageReference Include="Unosquare.PiGpio" Version="0.3.1" />
     <PackageReference Include="Unosquare.Raspberry.IO" Version="0.27.0" />

@@ -4,9 +4,9 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Device.Spi;
 using System.Diagnostics;
-using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Iot.Device.Ad7193
 {
@@ -23,7 +23,7 @@ namespace Iot.Device.Ad7193
 
         // metadata (Iot.ISpiDevice)
         public const SpiMode ValidSpiModes = SpiMode.Mode3;
-        public const int MaximumSpifrequency = 10000000;    // min 100 ns SCLK pulse width
+        public const int MaximumSpiFrequency = 10000000;    // min 100 ns SCLK pulse width
 
         // metadata (Iot.IAdcDevice)
         public const int ADCCount = 1;
@@ -31,7 +31,12 @@ namespace Iot.Device.Ad7193
         public const int ADCSamplerate = 4800;
         public const int ADCInputChannelCount = 8;
 
-        public BlockingCollection<AdcValue> adcValues = new BlockingCollection<AdcValue>();
+
+        private object spiTransferLock = new object();
+        private Stopwatch stopWatch = new Stopwatch();
+        //public ConcurrentQueue<AdcValue> AdcValues = new ConcurrentQueue<AdcValue>();
+        public BlockingCollection<AdcValue> AdcValues = new BlockingCollection<AdcValue>();
+        public event EventHandler<AdcValueReceivedEventArgs> AdcValueReceived;
 
 
         // AD7193 Register Map
@@ -62,6 +67,7 @@ namespace Iot.Device.Ad7193
             X128 = 0b111
         }
 
+        [Flags]
         public enum Channel
         {
             CH00 = 0b00_0000_0001,
@@ -296,6 +302,8 @@ namespace Iot.Device.Ad7193
             }
         }
 
+        public bool JitterCorrection { get; set; }
+
         public Ad7193(SpiDevice spiDevice)
         {
             if (spiDevice.ConnectionSettings.Mode != SpiMode.Mode3)
@@ -410,13 +418,60 @@ namespace Iot.Device.Ad7193
             registerCache[AD7193_REG_MODE] |= 0x200000; // single conversion mode bits (MD2 = 0, MD1 = 0, MD0 = 1)
 
             SetRegisterValue(AD7193_REG_MODE, registerCache[AD7193_REG_MODE]);
+
+            stopWatch.Restart();
+        }
+
+        public void StartContinuousConversion(uint frequency = ADCSamplerate)
+        {            
+            registerCache[AD7193_REG_MODE] &= 0x1FFFFF; // keep all bit values except Mode bits
+            registerCache[AD7193_REG_MODE] |= 0x000000; // continuous conversion mode bits (MD2 = 0, MD1 = 0, MD0 = 0)
+
+            SetRegisterValue(AD7193_REG_MODE, registerCache[AD7193_REG_MODE]);
+
+            ContinuousRead = true;
+
+            
+            long samplePerTicks = Stopwatch.Frequency / frequency;
+            if (samplePerTicks == 0) samplePerTicks = 1;
+
+            stopWatch.Restart();
+            Task samplingTask = Task.Run(() =>
+            {
+                long samples = 0;
+                long nextSampleAt = stopWatch.ElapsedTicks;
+                long elapsedTicks = 0;
+                long jitter = 0;
+                long maxJitterCorrectionPerSample = Math.Max(Stopwatch.Frequency / 100000, 1);
+                while (stopWatch.IsRunning)
+                {
+                    elapsedTicks = stopWatch.ElapsedTicks;
+                    if (elapsedTicks >= nextSampleAt)
+                    {
+                        nextSampleAt = elapsedTicks + samplePerTicks;
+                        ReadADCValue();
+                        samples++;
+                        jitter = (elapsedTicks - (samples * samplePerTicks));
+                        if (this.JitterCorrection)
+                        {
+                            if (jitter > 0)
+                            {
+                                nextSampleAt -= Math.Min(jitter, maxJitterCorrectionPerSample);
+                            } else if (jitter < 0)
+                            {
+                                nextSampleAt += Math.Min(-jitter, maxJitterCorrectionPerSample);
+                            }
+                        }
+                    }
+                }
+            });           
         }
 
         /// <summary>
         /// Reads the current ADC result value on the selected channel
         /// </summary>
         /// <returns>24-bit raw value of the last ADC result (+ status byte if enabled)</returns>
-        public uint ReadADCValue()
+        public uint? ReadADCValue()
         {
             uint raw = GetRegisterValue(AD7193_REG_DATA);
 
@@ -427,8 +482,21 @@ namespace Iot.Device.Ad7193
                 raw = (raw & 0xFFFFFF00) >> 8;
             }
 
-            adcValues.Add(new AdcValue() { Raw = raw, Time = DateTime.UtcNow, Channel = (byte)(registerCache[AD7193_REG_STAT] & 0b0000_1111) });
-            // TODO: call event
+            // check if we have an error
+            if (this.HasErrors)
+            {
+                return null;
+            }
+
+            // create the new AdcValue object and calculate the voltage
+            var adcValue = new AdcValue() { Raw = raw, Time = stopWatch.ElapsedTicks, Channel = (byte)(registerCache[AD7193_REG_STAT] & 0b0000_1111), Voltage = RawValueToVoltage(raw) };
+
+            // add it to the collection
+            //AdcValues.Enqueue(adcValue);
+            AdcValues.Add(adcValue);
+
+            // call the event handler
+            AdcValueReceived?.Invoke(this, new AdcValueReceivedEventArgs(adcValue));
 
             return raw;
         }
@@ -455,7 +523,7 @@ namespace Iot.Device.Ad7193
         /// </summary>
         /// <param name="channel">Channel index</param>
         /// <returns></returns>
-        public uint ReadSingleADCValue(Channel channel)
+        public uint? ReadSingleADCValue(Channel channel)
         {
             SetChannel(channel);
 
@@ -472,10 +540,10 @@ namespace Iot.Device.Ad7193
         /// </summary>
         /// <param name="adcValue">The raw ADC result</param>
         /// <returns></returns>
-        public float ADCValueToVoltage(uint adcValue)
+        public float RawValueToVoltage(uint adcValue)
         {
             float voltage = 0;
-            float mVref = 2.5f;
+            float mVref = 2.5f;     // 2.5V on REFIN1+ and REFIN1- (on the Digilent PmodAD5 board)
             byte mPolarity = 0;
 
             ulong pgaSetting = registerCache[AD7193_REG_CONF] & 0x000007;  // keep only the PGA setting bits
@@ -483,22 +551,22 @@ namespace Iot.Device.Ad7193
 
             switch (pgaSetting)
             {
-                case 0:
+                case 0b000:
                     pgaGain = 1;
                     break;
-                case 3:
+                case 0b011:
                     pgaGain = 8;
                     break;
-                case 4:
+                case 0b100:
                     pgaGain = 16;
                     break;
-                case 5:
+                case 0b101:
                     pgaGain = 32;
                     break;
-                case 6:
+                case 0b110:
                     pgaGain = 64;
                     break;
-                case 7:
+                case 0b111:
                     pgaGain = 128;
                     break;
             }
@@ -550,7 +618,10 @@ namespace Iot.Device.Ad7193
 
 
             byte[] readBuffer = new byte[writeBuffer.Length];
-            spiDevice.TransferFullDuplex(writeBuffer, readBuffer);
+            lock (spiTransferLock)
+            {
+                spiDevice.TransferFullDuplex(writeBuffer, readBuffer);
+            }
             readBuffer = readBuffer[1..];
 
             registerCache[registerAddress] = ByteArrayToUInt32(readBuffer);
@@ -579,7 +650,10 @@ namespace Iot.Device.Ad7193
             byte[] buffer = UInt32ToByteArray(registerValue, byteNumber);
             Array.Copy(buffer, 0, writeBuffer, 1, byteNumber);
 
-            spiDevice.Write(writeBuffer);
+            lock (spiTransferLock)
+            {
+                spiDevice.Write(writeBuffer);
+            }
             writeBuffer = writeBuffer[1..];
 
             //Debug.WriteLine($"Write Register - address: {registerAddress.ToString("X2")}, command: {commandByte.ToString("X2")}, sent: {String.Join(' ', writeBuffer.Select(x => x.ToString("X2")))}");
@@ -601,7 +675,7 @@ namespace Iot.Device.Ad7193
             return result;
         }
 
-        private int GetCommAddress(int x)
+        private static int GetCommAddress(int x)
         {
             return (((x) & 0x07) << 3);
         }

@@ -7,6 +7,7 @@ using Unosquare.RaspberryIO;
 using Unosquare.RaspberryIO.Abstractions;
 using Unosquare.WiringPi;
 using Unosquare.PiGpio.ManagedModel;
+using System.Diagnostics;
 
 namespace Mars_64
 {
@@ -16,6 +17,11 @@ namespace Mars_64
 		private const int PI_3_SPI_SPEED_MAX = 20480000;
 
 		private static Ad7193 ad7193;
+		private static DateTime firstDataRead;
+		private static double lastChecked = 0;
+		private static int lastCount = 0;
+		private static int samplesTaken = 0;
+
 
 		static void Main(string[] args)
 		{
@@ -26,52 +32,88 @@ namespace Mars_64
 			// set SPI bus ID: 0
 			// AD7193 CS Pin: 1
 			SpiConnectionSettings settings = new SpiConnectionSettings(0, 1);
+			settings.ClockFrequency = Ad7193.MaximumSpiFrequency;
 			settings.Mode = SpiMode.Mode3;
 			SpiDevice ad7193SpiDevice = SpiDevice.Create(settings);
 
 			ad7193 = new Ad7193(ad7193SpiDevice);
 
-			Console.WriteLine($"-- Resetting and calibrating AD7193.");
-			ad7193.Reset();
-			ad7193.Calibrate();
-			ad7193.SetPGAGain(Ad7193.Gain.X1);
-			ad7193.SetPsuedoDifferentialInputs(true);
-			ad7193.AppendStatusRegisterToData = true;
+			InitAd7193(Ad7193.Channel.CH00, Ad7193.Gain.X1);
 
+			uint readFrequency = 1200;
 
-			Ad7193.Channel ch = Ad7193.Channel.CH07;
-			Console.WriteLine($"-- Setting channel to {ch}.");
-			ad7193.SetChannel(ch);
+			ad7193.AdcValueReceived += Ad7193_AdcValueReceived;
 
-
-			DateTime firstDataRead = DateTime.UtcNow;
-			int samplesRead = 0;
 			while (true)
 			{
-				while (ad7193.HasErrors)
+				if (readFrequency == 0)
 				{
-					Console.WriteLine("!! ERROR !!");
-					Console.WriteLine($"AD7193 status: {ad7193.Status}");
-					Console.WriteLine($"AD7193 mode: {ad7193.Mode}");
-					Console.WriteLine($"AD7193 config: {ad7193.Config}");
-					Thread.Sleep(500);
+					ad7193.StartSingleConversion();
+					ad7193.WaitForADC();
+					ad7193.ReadADCValue();
+				}
+				else
+				{
+					if (samplesTaken == 0)
+					{
+						ad7193.StartContinuousConversion(readFrequency);
+					}
+					Thread.Sleep(250);
 				}
 
-
-				ad7193.StartSingleConversion();
-				ad7193.WaitForADC();
-				uint adcValue = ad7193.ReadADCValue();
-
-				samplesRead++;
-				if (samplesRead % 100 == 0)
+				if (ad7193.HasErrors)
 				{
 					Console.WriteLine();
-					Console.WriteLine($"AD7193 status: {ad7193.Status}");
-					Console.WriteLine($"AD7193 mode: {ad7193.Mode}");
-					Console.WriteLine($"AD7193 config: {ad7193.Config}");
-					Console.WriteLine($"ADC value on channel {ch}: {ad7193.ADCValueToVoltage(adcValue).ToString("0.0000")} V [{adcValue.ToString("N0")}] | sample rate: {((double)samplesRead / (DateTime.UtcNow - firstDataRead).TotalSeconds).ToString("N1")} SPS");
+					Console.WriteLine("!! ERROR !!");
+					ShowStatus();
+					Console.WriteLine();
+					Thread.Sleep(5000);
 				}
 			}
+		}
+
+		private static void Ad7193_AdcValueReceived(object sender, Iot.Device.Ad7193.AdcValueReceivedEventArgs e)
+		{
+			if (firstDataRead == DateTime.MinValue) firstDataRead = DateTime.UtcNow;
+			double secondsElapsed = (DateTime.UtcNow - firstDataRead).TotalSeconds;
+
+			samplesTaken++;
+
+			// show the results in every 0.25 seconds
+			if (secondsElapsed - lastChecked > 0.25)
+			{
+				double sps = (double)(samplesTaken - lastCount) / (secondsElapsed - lastChecked);
+
+				lastCount = samplesTaken;
+				lastChecked = secondsElapsed;
+
+				Iot.Device.Ad7193.AdcValue adcValue = e.AdcValue;
+
+				Console.WriteLine($"ADC value on channel {adcValue.Channel}: {adcValue.Voltage.ToString("0.0000").PadLeft(9)} V [{adcValue.Raw.ToString("N0").PadLeft(13)}] | sample rate: {sps.ToString("N1")} SPS");
+			}
+		}
+
+		private static void ShowStatus()
+		{
+			Console.WriteLine();
+			Console.WriteLine($"AD7193 status: {ad7193.Status}");
+			Console.WriteLine($"AD7193 mode: {ad7193.Mode}");
+			Console.WriteLine($"AD7193 config: {ad7193.Config}");
+		}
+
+		private static void InitAd7193(Ad7193.Channel ch, Ad7193.Gain gain)
+		{
+			Console.WriteLine($"-- Resetting and calibrating AD7193.");
+			ad7193.Reset();
+			ad7193.SetPGAGain(gain);
+			ad7193.Calibrate();
+			ad7193.SetPsuedoDifferentialInputs(false);
+			ad7193.AppendStatusRegisterToData = true;
+			ad7193.JitterCorrection = true;
+
+
+			Console.WriteLine($"-- Setting channel to {ch} and gain to {gain}.");
+			ad7193.SetChannel(ch);
 		}
 
 		private static void WaitForDebugger()
@@ -81,8 +123,10 @@ namespace Mars_64
 			while (true)
 			{
 				Console.WriteLine(++i + " ");
-				if (System.Diagnostics.Debugger.IsAttached) break;
-				System.Threading.Thread.Sleep(1000);
+				if (Debugger.IsAttached) break;
+				Thread.Sleep(1000);
+
+				if (i > 30) break;
 			}
 			Console.WriteLine();
 		}
@@ -112,3 +156,4 @@ namespace Mars_64
 
 	}
 }
+ 
