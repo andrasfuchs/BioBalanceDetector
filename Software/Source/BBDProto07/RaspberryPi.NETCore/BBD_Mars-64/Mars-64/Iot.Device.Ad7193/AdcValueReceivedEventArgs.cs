@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Mars_64.Iot.Device.Ad7193
+namespace Bbd.Mars64.Iot.Device.Ad7193
 {
     public class AdcValueReceivedEventArgs : EventArgs
     {
@@ -10,7 +8,7 @@ namespace Mars_64.Iot.Device.Ad7193
         {
             this.adcValue = adcValue;
         }
-        private AdcValue adcValue;
+        private readonly AdcValue adcValue;
         public AdcValue AdcValue
         {
             get { return adcValue; }

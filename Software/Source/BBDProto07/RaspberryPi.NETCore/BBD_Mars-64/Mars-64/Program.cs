@@ -1,15 +1,10 @@
 ﻿using System;
-using System.Linq;
 using System.Threading;
 using System.Device.Spi;
-using Iot.Device.Ad7193;
-using Unosquare.RaspberryIO;
-using Unosquare.RaspberryIO.Abstractions;
-using Unosquare.WiringPi;
-using Unosquare.PiGpio.ManagedModel;
 using System.Diagnostics;
+using Bbd.Mars64.Iot.Device.Ad7193;
 
-namespace Mars_64
+namespace Bbd.Mars64.AD7193Sample
 {
 	class Program
 	{
@@ -105,30 +100,6 @@ namespace Mars_64
 			}
 			Console.WriteLine();
 		}
-
-		private static Unosquare.RaspberryIO.Peripherals.Ad7193 InitUnosquareAd7193()
-		{
-			if (string.IsNullOrWhiteSpace(Pi.Info.OperatingSystem.ToString()))
-			{
-				Console.WriteLine("ERROR: You must run this app on a Raspberry Pi");
-				return null;
-			}
-
-			Console.WriteLine("Raspberry Pi OS: " + Pi.Info.OperatingSystem);
-
-			Pi.Init<BootstrapWiringPi>();
-
-			//IGpioPin ad7193_CE0 = Pi.Gpio[BcmPin.Gpio08];
-			//ad7193_CE0.PinMode = GpioPinDriveMode.Output;
-
-			Pi.Spi.Channel1Frequency = PI_3_SPI_SPEED_MIN;
-			ISpiChannel ad7193_SPI = Pi.Spi.Channel1;
-
-			Console.WriteLine("Speed of SPI channel 1: " + (Pi.Spi.Channel1Frequency / 1024.0).ToString("0.00") + " kHz");
-
-			return new Unosquare.RaspberryIO.Peripherals.Ad7193(ad7193_SPI);
-		}
-
 	}
 }
  

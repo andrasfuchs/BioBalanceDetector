@@ -1,5 +1,4 @@
-﻿using Mars_64.Iot.Device.Ad7193;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Device.Spi;
@@ -8,7 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Iot.Device.Ad7193
+namespace Bbd.Mars64.Iot.Device.Ad7193
 {
     public class Ad7193 : IDisposable
     {
