@@ -2,9 +2,9 @@
 using System.Threading;
 using System.Device.Spi;
 using System.Diagnostics;
-using Bbd.Mars64.Iot.Device.Ad7193;
+using BBD.Mars.Iot.Device.Ad7193;
 
-namespace Bbd.Mars64.AD7193Sample
+namespace BBD.Mars.AD7193Sample
 {
 	class Program
 	{
@@ -21,8 +21,6 @@ namespace Bbd.Mars64.AD7193Sample
 		static void Main(string[] args)
 		{
 			WaitForDebugger();
-
-			//InitUnosquare();
 
 			// set SPI bus ID: 0
 			// AD7193 CS Pin: 1
@@ -42,17 +40,33 @@ namespace Bbd.Mars64.AD7193Sample
 			ad7193.AppendStatusRegisterToData = true;
 			ad7193.JitterCorrection = true;
 
-			ad7193.SetChannel(Ad7193.Channel.CH00 | Ad7193.Channel.CH01);
 			ad7193.AdcValueReceived += Ad7193_AdcValueReceived;
-			//ad7193.StartContinuousConversion();
-			ad7193.StartSingleConversion();
+
+
+			Console.WriteLine("Starting 100 single conversion on CH0...");
+			ad7193.SetChannel(Ad7193.Channel.CH00);
+
+			for (int i = 0; i < 100; i++)
+			{
+				ad7193.StartSingleConversion();
+				ad7193.WaitForADC();
+				ad7193.ReadADCValue();
+				Thread.Sleep(25);
+			}
+
+			Thread.Sleep(1000);
+
+
+			Console.WriteLine();
+			Console.WriteLine();
+			Console.WriteLine("Starting continuous conversion on CH0 and CH1...");
+			ad7193.SetChannel(Ad7193.Channel.CH00 | Ad7193.Channel.CH01);
+			ad7193.StartContinuousConversion();
 
 			while (true)
 			{
 				if (ad7193.HasErrors)
 				{
-					Console.WriteLine();
-					Console.WriteLine("!! ERROR !!");
 					Console.WriteLine();
 					Console.WriteLine($"AD7193 status: {ad7193.Status}");
 					Console.WriteLine($"AD7193 mode: {ad7193.Mode}");
@@ -60,7 +74,6 @@ namespace Bbd.Mars64.AD7193Sample
 					Console.WriteLine();
 					Thread.Sleep(5000);
 				}
-
 				Thread.Sleep(250);
 			}
 		}
@@ -89,7 +102,8 @@ namespace Bbd.Mars64.AD7193Sample
 		private static void WaitForDebugger()
 		{
 			int i = 0;
-			Console.WriteLine("Waiting for the debugger to attach... ");
+			Console.WriteLine("Waiting for the debugger to attach for 30 seconds... ");
+			Console.WriteLine("(To attach the debugger in Visual Studio, press Ctrl+Alt+P, select SSH, set the IP address of the Raspberry Pi, enter your credentials, select the process, and click Attach. Press Shift+Alt+P next time.) ");
 			while (true)
 			{
 				Console.WriteLine(++i + " ");

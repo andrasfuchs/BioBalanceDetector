@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Bbd.Mars64.Iot.Device.Ad7193
+namespace BBD.Mars.Iot.Device.Ad7193
 {
     public class Ad7193 : IDisposable
     {
