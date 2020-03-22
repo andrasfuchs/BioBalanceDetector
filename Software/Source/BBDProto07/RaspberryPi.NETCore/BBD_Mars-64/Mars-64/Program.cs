@@ -36,39 +36,37 @@ namespace Mars_64
 			settings.Mode = SpiMode.Mode3;
 			SpiDevice ad7193SpiDevice = SpiDevice.Create(settings);
 
+
 			ad7193 = new Ad7193(ad7193SpiDevice);
 
-			InitAd7193(Ad7193.Channel.CH00, Ad7193.Gain.X1);
+			Console.WriteLine($"-- Resetting and calibrating AD7193.");
+			ad7193.Reset();
+			ad7193.SetPGAGain(Ad7193.Gain.X1);
+			ad7193.Calibrate();
+			ad7193.SetPsuedoDifferentialInputs(false);
+			ad7193.AppendStatusRegisterToData = true;
+			ad7193.JitterCorrection = true;
 
-			uint readFrequency = 1200;
-
+			ad7193.SetChannel(Ad7193.Channel.CH00 | Ad7193.Channel.CH01);
 			ad7193.AdcValueReceived += Ad7193_AdcValueReceived;
+			//ad7193.StartContinuousConversion();
+			ad7193.StartSingleConversion();
 
 			while (true)
 			{
-				if (readFrequency == 0)
-				{
-					ad7193.StartSingleConversion();
-					ad7193.WaitForADC();
-					ad7193.ReadADCValue();
-				}
-				else
-				{
-					if (samplesTaken == 0)
-					{
-						ad7193.StartContinuousConversion(readFrequency);
-					}
-					Thread.Sleep(250);
-				}
-
 				if (ad7193.HasErrors)
 				{
 					Console.WriteLine();
 					Console.WriteLine("!! ERROR !!");
-					ShowStatus();
+					Console.WriteLine();
+					Console.WriteLine($"AD7193 status: {ad7193.Status}");
+					Console.WriteLine($"AD7193 mode: {ad7193.Mode}");
+					Console.WriteLine($"AD7193 config: {ad7193.Config}");
 					Console.WriteLine();
 					Thread.Sleep(5000);
 				}
+
+				Thread.Sleep(250);
 			}
 		}
 
@@ -91,29 +89,6 @@ namespace Mars_64
 
 				Console.WriteLine($"ADC value on channel {adcValue.Channel}: {adcValue.Voltage.ToString("0.0000").PadLeft(9)} V [{adcValue.Raw.ToString("N0").PadLeft(13)}] | sample rate: {sps.ToString("N1")} SPS");
 			}
-		}
-
-		private static void ShowStatus()
-		{
-			Console.WriteLine();
-			Console.WriteLine($"AD7193 status: {ad7193.Status}");
-			Console.WriteLine($"AD7193 mode: {ad7193.Mode}");
-			Console.WriteLine($"AD7193 config: {ad7193.Config}");
-		}
-
-		private static void InitAd7193(Ad7193.Channel ch, Ad7193.Gain gain)
-		{
-			Console.WriteLine($"-- Resetting and calibrating AD7193.");
-			ad7193.Reset();
-			ad7193.SetPGAGain(gain);
-			ad7193.Calibrate();
-			ad7193.SetPsuedoDifferentialInputs(false);
-			ad7193.AppendStatusRegisterToData = true;
-			ad7193.JitterCorrection = true;
-
-
-			Console.WriteLine($"-- Setting channel to {ch} and gain to {gain}.");
-			ad7193.SetChannel(ch);
 		}
 
 		private static void WaitForDebugger()
