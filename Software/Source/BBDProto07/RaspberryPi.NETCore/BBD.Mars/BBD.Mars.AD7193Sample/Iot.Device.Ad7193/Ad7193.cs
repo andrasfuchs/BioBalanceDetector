@@ -13,18 +13,18 @@ namespace BBD.Mars.Iot.Device.Ad7193
     {
         private SpiDevice spiDevice = null;
 
-        // metadata (Iot.IDevice)
+        // metadata for IDevice
         public const string Manufacturer = "Analog Devices";
         public const string Product = "AD7193";
         public const string ProductCategory = "ADC";
         public const string ProductDescription = "4-Channel, 4.8 kHz, Ultralow Noise, 24-Bit Sigma-Delta ADC with PGA";
         public Uri DataSheetURI = new Uri("https://www.analog.com/media/en/technical-documentation/data-sheets/AD7193.pdf");
 
-        // metadata (Iot.ISpiDevice)
+        // metadata for ISpiDevice
         public const SpiMode ValidSpiModes = SpiMode.Mode3;
         public const int MaximumSpiFrequency = 10000000;    // min 100 ns SCLK pulse width
 
-        // metadata (Iot.IAdcDevice)
+        // metadata for IAdcDevice
         public const int ADCCount = 1;
         public const int ADCBitrate = 24;
         public const int ADCSamplerate = 4800;
@@ -81,7 +81,7 @@ namespace BBD.Mars.Iot.Device.Ad7193
             Shrt = 0b10_0000_0000
         }
 
-        public enum Averaging
+        public enum AveragingModes
         {
             Off = 0b00,
             Avg2 = 0b01,
@@ -89,11 +89,35 @@ namespace BBD.Mars.Iot.Device.Ad7193
             Avg16 = 0b11
         }
 
+        public enum AnalogInputModes
+        {
+            FourDifferentialAnalogInputs = 0b0,
+            EightPseudoDifferentialAnalogInputs = 0b1
+        }
+
         // Default register settings
         private uint[] registerCache = { 0x00, 0x080060, 0x000117, 0x000000, 0xa2, 0x00, 0x000000, 0x000000 };
         private byte[] registerSize = { 1, 3, 3, 3, 1, 1, 3, 3 };
 
         private StringBuilder sb = new StringBuilder();
+
+
+        /// <summary>
+        /// The external reference voltage value. The default is 2.5V on REFIN1+ and REFIN1- (on the Digilent Pmod AD5 board)
+        /// </summary>
+        public float VReference { get; set; } = 2.50f;
+
+        public Gain PGAGain
+        {
+            set
+            {
+                registerCache[AD7193_REG_CONF] &= 0xFF_FFF8;          // keep all bit values except Gain bits
+                registerCache[AD7193_REG_CONF] |= (uint)value;
+
+                SetRegisterValue(AD7193_REG_CONF, registerCache[AD7193_REG_CONF]);
+            }
+        }
+
 
         public string Status
         {
@@ -250,7 +274,6 @@ namespace BBD.Mars.Iot.Device.Ad7193
                 if (value)
                 {
                     SetRegisterValue(AD7193_REG_COMM, 0b0101_1100);
-                    // TODO: start a new thread to read the status register all the time
                 }
                 else
                 {
@@ -303,6 +326,121 @@ namespace BBD.Mars.Iot.Device.Ad7193
 
         public bool JitterCorrection { get; set; }
 
+        /// <summary>
+        /// Switches from differential input to pseudo differential inputs.
+        /// When the pseudo bit is set to 1, the AD7193 is configured to have eight pseudo differential analog inputs. When pseudo bit is set to 0, the AD7193 is configured to have four differential analog inputs.
+        /// </summary>
+        public AnalogInputModes AnalogInputMode 
+        { 
+            get
+            {
+                return (AnalogInputModes)((registerCache[AD7193_REG_CONF] & 0b0000_0100_0000_0000_0000_0000) >> 18);
+            }
+
+            set
+            {
+                registerCache[AD7193_REG_CONF] &= 0b1111_1011_1111_1111_1111_1111;
+
+                if (value == AnalogInputModes.FourDifferentialAnalogInputs)
+                {
+                    registerCache[AD7193_REG_CONF] |= 0 << 11;
+                }
+
+                if (value == AnalogInputModes.EightPseudoDifferentialAnalogInputs)
+                {
+                    registerCache[AD7193_REG_CONF] |= 1 << 11;
+                }
+
+                SetRegisterValue(AD7193_REG_CONF, registerCache[AD7193_REG_CONF]);
+
+            }
+        }
+
+        /// <summary>
+        /// Changes the currently selected channel
+        /// </summary>
+        /// <param name="channel">Channel index</param>
+        public Channel ActiveChannels
+        {
+            set
+            {
+                // generate Channel settings bits for Configuration write
+                uint channelBits = (uint)value << 8;
+
+                // write Channel bits to Config register, keeping other bits as is
+                registerCache[AD7193_REG_CONF] &= 0xFC00FF;       // keep all bit values except Channel bits
+                registerCache[AD7193_REG_CONF] |= channelBits;
+
+                // write channel selected to Configuration register
+                SetRegisterValue(AD7193_REG_CONF, registerCache[AD7193_REG_CONF]);
+            }
+        }
+
+
+        /// <summary>
+        /// Sets the amount of averaging. The data from the sinc filter is averaged by 2, 8, or 16. The averaging reduces the output data rate for a given FS word; however, the RMS noise improves.
+        /// </summary>
+        public AveragingModes Averaging
+        {
+            set
+            {
+                registerCache[AD7193_REG_MODE] &= 0xFC_FFFF;                //keep all bit values except Averaging setting bits
+                registerCache[AD7193_REG_MODE] |= ((uint)value) << 16;
+
+                SetRegisterValue(AD7193_REG_MODE, registerCache[AD7193_REG_MODE]);
+            }
+        }
+
+        /// <summary>
+        /// Set the filter output data rate select bits. The 10 bits of data programmed into these bits determine the filter cutoff frequency, the position of the first notch of the filter, and the output data rate for the part.
+        /// </summary>
+        /// <param name="filterRate"></param>
+        public ushort Filter
+        {
+            set
+            {
+                if (value > 0x03FF)
+                {
+                    throw new ArgumentException("Filter rate is too high, it must be a 10-bit value.");
+                }
+
+                registerCache[AD7193_REG_MODE] &= 0xFFFC00;         //keep all bit values except Filter setting bits
+                registerCache[AD7193_REG_MODE] |= (uint)value << 0;
+
+                SetRegisterValue(AD7193_REG_MODE, registerCache[AD7193_REG_MODE]);
+            }
+        }
+
+        public uint Offset 
+        { 
+            get
+            {
+                registerCache[AD7193_REG_OFFSET] = GetRegisterValue(AD7193_REG_OFFSET) & 0b0000_0000_1111_1111_1111_1111_1111_1111;
+                return registerCache[AD7193_REG_OFFSET];
+            }
+
+            set
+            {
+                registerCache[AD7193_REG_OFFSET] = value & 0b0000_0000_1111_1111_1111_1111_1111_1111;
+                SetRegisterValue(AD7193_REG_OFFSET, registerCache[AD7193_REG_OFFSET]);
+            }
+        }
+
+        public uint FullScale
+        {
+            get
+            {
+                registerCache[AD7193_REG_FULLSCALE] = GetRegisterValue(AD7193_REG_FULLSCALE) & 0b0000_0000_1111_1111_1111_1111_1111_1111;
+                return registerCache[AD7193_REG_FULLSCALE];
+            }
+
+            set
+            {
+                registerCache[AD7193_REG_FULLSCALE] = value & 0b0000_0000_1111_1111_1111_1111_1111_1111;
+                SetRegisterValue(AD7193_REG_FULLSCALE, registerCache[AD7193_REG_FULLSCALE]);
+            }
+        }
+
         public Ad7193(SpiDevice spiDevice)
         {
             if (spiDevice.ConnectionSettings.Mode != SpiMode.Mode3)
@@ -322,58 +460,6 @@ namespace BBD.Mars.Iot.Device.Ad7193
             {
                 spiDevice.Write(new byte[] { 0xFF });
             }
-        }
-
-        public void SetPGAGain(Gain gain)
-        {
-            registerCache[AD7193_REG_CONF] &= 0xFFFFF8;          // keep all bit values except Gain bits
-            registerCache[AD7193_REG_CONF] |= (uint)gain;
-
-            SetRegisterValue(AD7193_REG_CONF, registerCache[AD7193_REG_CONF]);
-        }
-
-        /// <summary>
-        /// Set the filter output data rate select bits. The 10 bits of data programmed into these bits determine the filter cutoff frequency, the position of the first notch of the filter, and the output data rate for the part.
-        /// </summary>
-        /// <param name="filterRate"></param>
-        public void SetFilter(uint filterRate)
-        {
-            if (filterRate > 0x03FF)
-            {
-                throw new ArgumentException("Filter rate is too high, it must be a 10-bit value.", nameof(filterRate));
-            }
-
-            registerCache[AD7193_REG_MODE] &= 0xFFFC00;         //keep all bit values except Filter setting bits
-            registerCache[AD7193_REG_MODE] |= filterRate << 0;
-
-            SetRegisterValue(AD7193_REG_MODE, registerCache[AD7193_REG_MODE]);
-        }
-
-        /// <summary>
-        /// Sets the amount of averaging.  The data from the sinc filter is averaged by 2, 8, or 16. The averaging reduces the output data rate for a given FS word; however, the rms noise improves.
-        /// </summary>
-        /// <param name="averaging"></param>
-        public void SetAveraging(Averaging averaging)
-        {
-            registerCache[AD7193_REG_MODE] &= 0xFC_FFFF;         //keep all bit values except Filter setting bits
-            registerCache[AD7193_REG_MODE] |= ((uint)averaging) << 16;
-
-            SetRegisterValue(AD7193_REG_MODE, registerCache[AD7193_REG_MODE]);
-        }
-
-        /// <summary>
-        /// Switches from differential input to pseudo differential inputs
-        /// </summary>
-        public void SetPsuedoDifferentialInputs(bool psuedoDifferentialInputs)
-        {
-            registerCache[AD7193_REG_CONF] &= 0b1111_1011_1111_1111_1111_1111;
-
-            if (psuedoDifferentialInputs)
-            {
-                registerCache[AD7193_REG_CONF] |= 1 << 11;
-            }
-
-            SetRegisterValue(AD7193_REG_CONF, registerCache[AD7193_REG_CONF]);
         }
 
         /// <summary>
@@ -501,30 +587,13 @@ namespace BBD.Mars.Iot.Device.Ad7193
         }
 
         /// <summary>
-        /// Changes the currently selected channel
-        /// </summary>
-        /// <param name="channel">Channel index</param>
-        public void SetChannel(Channel channel)
-        {
-            // generate Channel settings bits for Configuration write
-            uint channelBits = (uint)channel << 8;
-
-            // write Channel bits to Config register, keeping other bits as is
-            registerCache[AD7193_REG_CONF] &= 0xFC00FF;       // keep all bit values except Channel bits
-            registerCache[AD7193_REG_CONF] |= channelBits;
-
-            // write channel selected to Configuration register
-            SetRegisterValue(AD7193_REG_CONF, registerCache[AD7193_REG_CONF]);
-        }
-
-        /// <summary>
         /// Reads a single value on the selected channel
         /// </summary>
         /// <param name="channel">Channel index</param>
         /// <returns></returns>
         public uint? ReadSingleADCValue(Channel channel)
         {
-            SetChannel(channel);
+            this.ActiveChannels = channel;
 
             StartSingleConversion();
 
@@ -541,11 +610,10 @@ namespace BBD.Mars.Iot.Device.Ad7193
         /// <returns></returns>
         public float RawValueToVoltage(uint adcValue)
         {
-            float voltage = 0;
-            float mVref = 2.5f;     // 2.5V on REFIN1+ and REFIN1- (on the Digilent PmodAD5 board)
-            byte mPolarity = 0;
+            // 0 - bipolar (ranges from ±19.53 mV to ±2.5 V) ; 1 - unipolar (ranges from 0 mV to 19.53 mV to 0 V to 2.5 V)
+            byte mPolarity = (byte)(registerCache[AD7193_REG_CONF] & 0b0000_0000_0000_0000_0000_1000 >> 3);
 
-            ulong pgaSetting = registerCache[AD7193_REG_CONF] & 0x000007;  // keep only the PGA setting bits
+            ulong pgaSetting = registerCache[AD7193_REG_CONF] & 0b0000_0000_0000_0000_0000_0111;  // keep only the PGA setting bits
             float pgaGain = 1;
 
             switch (pgaSetting)
@@ -570,7 +638,7 @@ namespace BBD.Mars.Iot.Device.Ad7193
                     break;
             }
 
-
+            float voltage = 0;
             if (mPolarity == 1)
             {
                 voltage = (float)adcValue / 16777216.0f;
@@ -580,7 +648,7 @@ namespace BBD.Mars.Iot.Device.Ad7193
                 voltage = ((float)adcValue / 8388608.0f) - 1.0f;
             }
 
-            voltage *= (mVref / pgaGain);
+            voltage *= (this.VReference / pgaGain);
 
 
             return (voltage);

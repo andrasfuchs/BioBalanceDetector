@@ -31,20 +31,24 @@ namespace BBD.Mars.AD7193Sample
 
 
 			ad7193 = new Ad7193(ad7193SpiDevice);
+			ad7193.AdcValueReceived += Ad7193_AdcValueReceived;
 
 			Console.WriteLine($"-- Resetting and calibrating AD7193.");
 			ad7193.Reset();
-			ad7193.SetPGAGain(Ad7193.Gain.X1);
-			ad7193.Calibrate();
-			ad7193.SetPsuedoDifferentialInputs(false);
+			ad7193.PGAGain = Ad7193.Gain.X1;
+			ad7193.Averaging = Ad7193.AveragingModes.Off;
+			ad7193.AnalogInputMode = Ad7193.AnalogInputModes.EightPseudoDifferentialAnalogInputs;
 			ad7193.AppendStatusRegisterToData = true;
 			ad7193.JitterCorrection = true;
+			ad7193.Filter = 0;
 
-			ad7193.AdcValueReceived += Ad7193_AdcValueReceived;
+			Console.WriteLine($"AD7193 before calibration: offset={ad7193.Offset.ToString("x")}, full-scale={ad7193.FullScale.ToString("x")}");
+			ad7193.Calibrate();
+			Console.WriteLine($"AD7193  after calibration: offset={ad7193.Offset.ToString("x")}, full-scale={ad7193.FullScale.ToString("x")}");
 
 
-			Console.WriteLine("Starting 100 single conversion on CH0...");
-			ad7193.SetChannel(Ad7193.Channel.CH00);
+			Console.WriteLine("Starting 100 single conversions on CH0...");
+			ad7193.ActiveChannels = Ad7193.Channel.CH00;
 
 			for (int i = 0; i < 100; i++)
 			{
@@ -60,19 +64,21 @@ namespace BBD.Mars.AD7193Sample
 			Console.WriteLine();
 			Console.WriteLine();
 			Console.WriteLine("Starting continuous conversion on CH0 and CH1...");
-			ad7193.SetChannel(Ad7193.Channel.CH00 | Ad7193.Channel.CH01);
+			ad7193.ActiveChannels = Ad7193.Channel.CH00 | Ad7193.Channel.CH01;
 			ad7193.StartContinuousConversion();
 
+			int loopcounter = 0;
 			while (true)
 			{
-				if (ad7193.HasErrors)
+				loopcounter++;
+				if (ad7193.HasErrors || (loopcounter % 50 == 0))
 				{
 					Console.WriteLine();
 					Console.WriteLine($"AD7193 status: {ad7193.Status}");
 					Console.WriteLine($"AD7193 mode: {ad7193.Mode}");
 					Console.WriteLine($"AD7193 config: {ad7193.Config}");
 					Console.WriteLine();
-					Thread.Sleep(5000);
+					Thread.Sleep(1500);
 				}
 				Thread.Sleep(250);
 			}
@@ -95,7 +101,7 @@ namespace BBD.Mars.AD7193Sample
 
 				Iot.Device.Ad7193.AdcValue adcValue = e.AdcValue;
 
-				Console.WriteLine($"ADC value on channel {adcValue.Channel}: {adcValue.Voltage.ToString("0.0000").PadLeft(9)} V [{adcValue.Raw.ToString("N0").PadLeft(13)}] | sample rate: {sps.ToString("N1")} SPS");
+				Console.WriteLine($"Channel {adcValue.Channel.ToString().PadLeft(2)}: {adcValue.Voltage.ToString("0.0000").PadLeft(11)} V | {adcValue.Raw.ToString("N0").PadLeft(13)} | {sps.ToString("N1").PadLeft(9)} SPS");
 			}
 		}
 
