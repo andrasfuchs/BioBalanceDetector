@@ -4,11 +4,27 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>BBD.Mars</RootNamespace>
+    <CodeAnalysisRuleSet>StyleCop.Analyzers.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Iot.Device.Ad7193\**" />
+    <EmbeddedResource Remove="Iot.Device.Ad7193\**" />
+    <None Remove="Iot.Device.Ad7193\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Iot.Device.Bindings" Version="1.0.0" />
+    <PackageReference Include="NetCoreServer" Version="3.0.7" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="System.Device.Gpio" Version="1.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\..\..\dotnet\iot\src\devices\Ad7193\Ad7193.csproj" />
   </ItemGroup>
 
 </Project>
