@@ -62,13 +62,14 @@ namespace BBD.Mars.AD7193Sample
 
             Thread.Sleep(1000);
 
-            StartUdpSink(udpSinkAddresses);
+            StartUdpSinks(udpSinkAddresses);
             Thread.Sleep(1000);
 
             Console.WriteLine();
             Console.WriteLine();
             Console.WriteLine("Starting continuous conversion on CH0 and CH1...");
-            ad7193.StartContinuousConversion(Channel.CH00 | Channel.CH01);
+            //ad7193.StartContinuousConversion(Channel.CH00 | Channel.CH01);
+            ad7193.StartContinuousConversion(Channel.CH00);
 
             int loopcounter = 0;
             while (true)
@@ -119,8 +120,16 @@ namespace BBD.Mars.AD7193Sample
                     udpSinkBuffers[i].AddRange(BitConverter.GetBytes((float)e.AdcValue.Voltage));
                     if (udpSinkBuffers[i].Count >= udpSinkPayload)
                     {
-                        Console.WriteLine($"Sending {udpSinkBuffers[i].Count} bytes of data to {udpSinks[i].Endpoint.Address}:{udpSinks[i].Endpoint.Port}...");
-                        udpSinks[i].Send(udpSinkBuffers[i].ToArray());
+                        //Console.WriteLine($"Sending {udpSinkBuffers[i].Count} bytes of data to {udpSinks[i].Endpoint.Address}:{udpSinks[i].Endpoint.Port}...");
+                        try
+                        {
+                            udpSinks[i].Send(udpSinkBuffers[i].ToArray());
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error on {udpSinks[i].Endpoint.Address}:{udpSinks[i].Endpoint.Port} UDP endpoint - {ex.Message}");
+                            udpSinks[i].Reconnect();
+                        }
                         udpSinkBuffers[i].Clear();
                     }
                 }
@@ -152,7 +161,7 @@ namespace BBD.Mars.AD7193Sample
             Console.WriteLine();
         }        
 
-        private static void StartUdpSink(string[] udpSinkAddresses)
+        private static void StartUdpSinks(string[] udpSinkAddresses)
         {
             udpSinks.Clear();
 
@@ -164,7 +173,12 @@ namespace BBD.Mars.AD7193Sample
                 int port = Int32.Parse(sinkAddress.Split(':')[1]);
 
                 var client = new NetCoreServer.UdpClient(address, port);
-                udpSinks.Add();
+                client.OptionExclusiveAddressUse = false;
+                client.OptionReuseAddress = false;
+                client.OptionSendBufferSize = udpSinkPayload;
+                client.Connect();
+                
+                udpSinks.Add(client);
                 udpSinkBuffers.Add(new List<byte>());
                 //udpSink.Start();
             }
