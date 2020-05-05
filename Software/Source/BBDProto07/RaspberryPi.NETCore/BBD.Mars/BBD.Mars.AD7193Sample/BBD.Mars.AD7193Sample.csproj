@@ -15,16 +15,18 @@
 
   <ItemGroup>
     <PackageReference Include="Iot.Device.Bindings" Version="1.0.0" />
-    <PackageReference Include="NetCoreServer" Version="3.0.7" />
-    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
+    <PackageReference Include="NetCoreServer" Version="3.0.12" />
     <PackageReference Include="System.Device.Gpio" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\..\..\..\dotnet\iot\src\devices\Ad7193\Ad7193.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Device.Gpio">
+      <HintPath>..\..\..\..\..\..\..\dotnet\iot\artifacts\bin\System.Device.Gpio\Debug\netstandard2.0\ref\System.Device.Gpio.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>
