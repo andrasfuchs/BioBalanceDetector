@@ -5,8 +5,8 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 1 1
 Title "Mars-64"
-Date "2020-02-28"
-Rev "C"
+Date "2020-05-10"
+Rev "E"
 Comp "Bio Balance Detector"
 Comment1 ""
 Comment2 ""
@@ -1352,4 +1352,8 @@ Wire Wire Line
 Connection ~ 10100 2800
 Wire Wire Line
 	10100 2800 10100 2900
+Text Label 9400 2000 0    50   ~ 0
+VSS
+Text Label 9400 800  0    50   ~ 0
+VSS
 $EndSCHEMATC
