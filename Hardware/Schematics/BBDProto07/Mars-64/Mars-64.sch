@@ -25,17 +25,6 @@ F 3 "https://www.analog.com/media/en/technical-documentation/data-sheets/ADG725_
 	1    0    0    -1  
 $EndComp
 $Comp
-L Connector_Generic:Conn_02x06_Top_Bottom PmodM1
-U 1 1 5E2AF0E4
-P 9000 2200
-F 0 "PmodM1" H 9050 2617 50  0000 C CNN
-F 1 "Conn_02x06_Top_Bottom" H 9050 2526 50  0001 C CNN
-F 2 "Mars-64:PinHeader_2x06_P2.54mm_Vertical_SMD_TopBottom" H 9000 2200 50  0001 C CNN
-F 3 "~" H 9000 2200 50  0001 C CNN
-	1    9000 2200
-	1    0    0    -1  
-$EndComp
-$Comp
 L Analog_Switch:ADG731 U102
 U 1 1 5E2C09E7
 P 6600 3900
@@ -1054,17 +1043,6 @@ Wire Wire Line
 Wire Wire Line
 	7600 4400 7600 4700
 Connection ~ 7600 4700
-$Comp
-L Connector:TestPoint_Small TPAGND1
-U 1 1 5E34D2B6
-P 10400 3900
-F 0 "TPAGND1" H 10448 3900 50  0000 L CNN
-F 1 "TestPoint_Small" H 10448 3855 50  0001 L CNN
-F 2 "TestPoint:TestPoint_Pad_1.0x1.0mm" H 10600 3900 50  0001 C CNN
-F 3 "~" H 10600 3900 50  0001 C CNN
-	1    10400 3900
-	1    0    0    -1  
-$EndComp
 Connection ~ 10400 3900
 Wire Wire Line
 	10400 3900 10400 4950
@@ -1088,28 +1066,6 @@ Text Label 9400 2400 0    50   ~ 0
 GND
 Text Label 9400 2500 0    50   ~ 0
 VCC3V3
-$Comp
-L Connector:Conn_Coaxial J102
-U 1 1 5E2B58A0
-P 8100 4900
-F 0 "J102" H 8200 4829 50  0000 L CNN
-F 1 "Conn_Coaxial" H 8200 4784 50  0001 L CNN
-F 2 "Connector_Coaxial:SMA_Amphenol_132134-10_Vertical" H 8100 4900 50  0001 C CNN
-F 3 " ~" H 8100 4900 50  0001 C CNN
-	1    8100 4900
-	1    0    0    -1  
-$EndComp
-$Comp
-L Connector:Conn_Coaxial J101
-U 1 1 5E2B6373
-P 9000 4700
-F 0 "J101" H 9100 4629 50  0000 L CNN
-F 1 "Conn_Coaxial" H 9100 4584 50  0001 L CNN
-F 2 "Connector_Coaxial:SMA_Amphenol_132134-10_Vertical" H 9000 4700 50  0001 C CNN
-F 3 " ~" H 9000 4700 50  0001 C CNN
-	1    9000 4700
-	1    0    0    -1  
-$EndComp
 Wire Wire Line
 	9000 4900 9000 5200
 Connection ~ 9000 5200
@@ -1121,7 +1077,7 @@ U 1 1 5E2B4EA5
 P 1100 900
 F 0 "H1" H 1200 900 50  0000 L CNN
 F 1 "MountingHole" H 1200 855 50  0001 L CNN
-F 2 "MountingHole:MountingHole_2.2mm_M2" H 1100 900 50  0001 C CNN
+F 2 "MountingHole:MountingHole_2.7mm_M2.5" H 1100 900 50  0001 C CNN
 F 3 "~" H 1100 900 50  0001 C CNN
 	1    1100 900 
 	1    0    0    -1  
@@ -1132,7 +1088,7 @@ U 1 1 5E2B5DA6
 P 1400 900
 F 0 "H2" H 1500 900 50  0000 L CNN
 F 1 "MountingHole" H 1500 855 50  0001 L CNN
-F 2 "MountingHole:MountingHole_2.2mm_M2" H 1400 900 50  0001 C CNN
+F 2 "MountingHole:MountingHole_2.7mm_M2.5" H 1400 900 50  0001 C CNN
 F 3 "~" H 1400 900 50  0001 C CNN
 	1    1400 900 
 	1    0    0    -1  
@@ -1143,7 +1099,7 @@ U 1 1 5E2B6620
 P 1100 1100
 F 0 "H3" H 1200 1100 50  0000 L CNN
 F 1 "MountingHole" H 1200 1055 50  0001 L CNN
-F 2 "MountingHole:MountingHole_2.2mm_M2" H 1100 1100 50  0001 C CNN
+F 2 "MountingHole:MountingHole_2.7mm_M2.5" H 1100 1100 50  0001 C CNN
 F 3 "~" H 1100 1100 50  0001 C CNN
 	1    1100 1100
 	1    0    0    -1  
@@ -1154,20 +1110,9 @@ U 1 1 5E2B679E
 P 1400 1100
 F 0 "H4" H 1500 1100 50  0000 L CNN
 F 1 "MountingHole" H 1500 1055 50  0001 L CNN
-F 2 "MountingHole:MountingHole_2.2mm_M2" H 1400 1100 50  0001 C CNN
+F 2 "MountingHole:MountingHole_2.7mm_M2.5" H 1400 1100 50  0001 C CNN
 F 3 "~" H 1400 1100 50  0001 C CNN
 	1    1400 1100
-	1    0    0    -1  
-$EndComp
-$Comp
-L Connector_Generic:Conn_02x06_Top_Bottom PmodF2
-U 1 1 5E2E85D1
-P 9000 1000
-F 0 "PmodF2" H 9050 1417 50  0000 C CNN
-F 1 "Conn_02x06_Top_Bottom" H 9050 1326 50  0001 C CNN
-F 2 "Mars-64:PinHeader_2x06_P2.54mm_Vertical_SMD_TopBottom_Mirrored" H 9000 1000 50  0001 C CNN
-F 3 "~" H 9000 1000 50  0001 C CNN
-	1    9000 1000
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
@@ -1356,4 +1301,59 @@ Text Label 9400 2000 0    50   ~ 0
 VSS
 Text Label 9400 800  0    50   ~ 0
 VSS
+$Comp
+L Connector:TestPoint_Small TPAGND1
+U 1 1 5E34D2B6
+P 10400 3900
+F 0 "TPAGND1" H 10448 3900 50  0000 L CNN
+F 1 "TestPoint_Small" H 10448 3855 50  0001 L CNN
+F 2 "TestPoint:TestPoint_Pad_1.0x1.0mm" H 10600 3900 50  0001 C CNN
+F 3 "~" H 10600 3900 50  0001 C CNN
+	1    10400 3900
+	1    0    0    -1  
+$EndComp
+$Comp
+L Connector:Conn_Coaxial J102
+U 1 1 5E2B58A0
+P 8100 4900
+F 0 "J102" H 8200 4829 50  0000 L CNN
+F 1 "Conn_Coaxial" H 8200 4784 50  0001 L CNN
+F 2 "Connector_Coaxial:SMA_Amphenol_132134-10_Vertical" H 8100 4900 50  0001 C CNN
+F 3 " ~" H 8100 4900 50  0001 C CNN
+	1    8100 4900
+	1    0    0    -1  
+$EndComp
+$Comp
+L Connector:Conn_Coaxial J101
+U 1 1 5E2B6373
+P 9000 4700
+F 0 "J101" H 9100 4629 50  0000 L CNN
+F 1 "Conn_Coaxial" H 9100 4584 50  0001 L CNN
+F 2 "Connector_Coaxial:SMA_Amphenol_132134-10_Vertical" H 9000 4700 50  0001 C CNN
+F 3 " ~" H 9000 4700 50  0001 C CNN
+	1    9000 4700
+	1    0    0    -1  
+$EndComp
+$Comp
+L Connector_Generic:Conn_02x06_Top_Bottom PmodF2
+U 1 1 5E2E85D1
+P 9000 1000
+F 0 "PmodF2" H 9050 1417 50  0000 C CNN
+F 1 "Conn_02x06_Top_Bottom" H 9050 1326 50  0001 C CNN
+F 2 "Mars-64:PinHeader_2x06_P2.54mm_Vertical_SMD_TopBottom" H 9000 1000 50  0001 C CNN
+F 3 "~" H 9000 1000 50  0001 C CNN
+	1    9000 1000
+	1    0    0    -1  
+$EndComp
+$Comp
+L Connector_Generic:Conn_02x06_Top_Bottom PmodM1
+U 1 1 5E2AF0E4
+P 9000 2200
+F 0 "PmodM1" H 9050 2617 50  0000 C CNN
+F 1 "Conn_02x06_Top_Bottom" H 9050 2526 50  0001 C CNN
+F 2 "Mars-64:PinHeader_2x06_P2.54mm_Vertical_SMD_TopBottom_Mirrored" H 9000 2200 50  0001 C CNN
+F 3 "~" H 9000 2200 50  0001 C CNN
+	1    9000 2200
+	1    0    0    -1  
+$EndComp
 $EndSCHEMATC
