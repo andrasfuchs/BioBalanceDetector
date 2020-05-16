@@ -758,10 +758,10 @@
       (net 74 /VSS))
     (pad 1 smd rect (at 2.525 6.35) (size 3.15 1) (layers B.Cu B.Paste B.Mask)
       (net 1 /~SPI_CE))
-    (model ${KISYS3DMOD}/Connector_PinHeader_2.54mm.3dshapes/PinHeader_2x06_P2.54mm_Vertical_SMD.wrl
-      (at (xyz 0 0 0))
+    (model /Mars-64.3dshapes/Samtec_TSM-106-01-T-DH.stp
+      (offset (xyz 6.5 0 1.5))
       (scale (xyz 1 1 1))
-      (rotate (xyz 0 0 0))
+      (rotate (xyz 90 -180 90))
     )
   )
 
@@ -869,10 +869,10 @@
       (net 74 /VSS))
     (pad 1 smd rect (at -2.525 6.35) (size 3.15 1) (layers B.Cu B.Paste B.Mask)
       (net 1 /~SPI_CE))
-    (model ${KISYS3DMOD}/Connector_PinHeader_2.54mm.3dshapes/PinHeader_2x06_P2.54mm_Vertical_SMD.wrl
-      (at (xyz 0 0 0))
+    (model /Mars-64.3dshapes/Samtec_SMH-106-02-T-D.stp
+      (offset (xyz -5 0 2.5))
       (scale (xyz 1 1 1))
-      (rotate (xyz 0 0 0))
+      (rotate (xyz 90 180 -90))
     )
   )
 
@@ -2664,6 +2664,11 @@
       (scale (xyz 1 1 1))
       (rotate (xyz 0 0 0))
     )
+    (model /Mars-64.3dshapes/SMA_Connector_Jack_J819-ND.stp
+      (offset (xyz 0 0 9))
+      (scale (xyz 1 1 1))
+      (rotate (xyz 0 -90 0))
+    )
   )
 
   (module Connector_Coaxial:SMA_Amphenol_132134-10_Vertical (layer B.Cu) (tedit 5B2F4C50) (tstamp 5E5AF12E)
@@ -2725,6 +2730,11 @@
       (at (xyz 0 0 0))
       (scale (xyz 1 1 1))
       (rotate (xyz 0 0 0))
+    )
+    (model /Mars-64.3dshapes/SMA_Connector_Jack_J819-ND.stp
+      (offset (xyz 0 0 9))
+      (scale (xyz 1 1 1))
+      (rotate (xyz 0 -90 0))
     )
   )
 
