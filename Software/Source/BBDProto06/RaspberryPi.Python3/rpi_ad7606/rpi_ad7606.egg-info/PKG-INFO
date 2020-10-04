@@ -1,0 +1,16 @@
+Metadata-Version: 1.2
+Name: rpi-ad7606
+Version: 0.1.2.7
+Summary: Alpha library for interfacing a Raspberry Pi with an Analog Devices AD7606 ADC.
+Home-page: http://air.eece.wustl.edu/people/ben-sumlin/
+Author: Benjamin Sumlin
+Author-email: bsumlin@wustl.edu
+License: MIT
+Description-Content-Type: UNKNOWN
+Description: 0.1.2.7 - SUPER ALPHA.
+Keywords: ADC
+Platform: UNKNOWN
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Science/Research
+Classifier: Programming Language :: Python :: 3 :: Only
+Requires-Python: >=3

@@ -1,0 +1,2 @@
+pigpio
+numpy

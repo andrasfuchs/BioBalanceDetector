@@ -1,0 +1,11 @@
+README.md
+setup.py
+rpi_ad7606/__init__.py
+rpi_ad7606/_version.py
+rpi_ad7606/rpi_ad7606.py
+rpi_ad7606.egg-info/PKG-INFO
+rpi_ad7606.egg-info/SOURCES.txt
+rpi_ad7606.egg-info/dependency_links.txt
+rpi_ad7606.egg-info/not-zip-safe
+rpi_ad7606.egg-info/requires.txt
+rpi_ad7606.egg-info/top_level.txt
