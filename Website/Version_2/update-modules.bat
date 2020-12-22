@@ -1,0 +1,2 @@
+ncu –u
+npm install
