@@ -1,1 +1,3 @@
 https://darryldias.me/2021/install-and-setup-net-5-on-raspberry-pi/
+
+https://docs.microsoft.com/en-us/dotnet/core/install/linux

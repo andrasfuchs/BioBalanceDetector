@@ -718,10 +718,10 @@ public class dwf
     [DllImport("dwf.dll", EntryPoint= "FDwfAnalogOutNodeFunctionInfo", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
     public static extern int FDwfAnalogOutNodeFunctionInfo(int hdwf, int idxChannel, int node, out int pfsfunc);
 
-    [DllImport("dwf.dll", EntryPoint="FDwfAnalogOutNodepublic static extern intSet", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+    [DllImport("dwf.dll", EntryPoint= "FDwfAnalogOutNodeFunctionSet", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
     public static extern int FDwfAnalogOutNodeFunctionSet(int hdwf, int idxChannel, int node, byte func);
 
-    [DllImport("dwf.dll", EntryPoint="FDwfAnalogOutNodepublic static extern intGet", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+    [DllImport("dwf.dll", EntryPoint= "FDwfAnalogOutNodeFunctionGet", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
     public static extern int FDwfAnalogOutNodeFunctionGet(int hdwf, int idxChannel, int node, out byte pfunc);
 
 

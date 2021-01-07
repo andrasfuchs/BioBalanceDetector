@@ -1,121 +1,150 @@
-﻿using System;
+﻿using NWaves.Audio;
+using NWaves.Signals;
+using NWaves.Transforms;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.Json;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace SleepLogger
 {
-    class Program
-    {
-        const int buffersize = 4096;			// samples / buffer
-        const int samplerate = 8000;			// samples / second
-        const int signalgenhz = 80;
+	class Program
+	{
+		/// <summary>
+		/// Number of samples per buffer
+		/// </summary>
+		static int bufferSize;
+		/// <summary>
+		/// Number of samples per second
+		/// </summary>
+		const int samplerate = 2048;
+		/// <summary>
+		/// Audio signal channel
+		/// </summary>
+		const int signalGeneratorChannel = 1;		//W2
+		/// <summary>
+		/// Default audio signal frequency
+		/// </summary>
+		const double signalGeneratorFrequency = 36;
+		/// <summary>
+		/// Audio signal amplitude
+		/// </summary>
+		const double signalGeneratorAmplitude = 0.95;					// W2 oscillated between -0.95V and +0.95V
 
-        static bool terminateAcquisition = false;
-        static double[] rgdSamples = new double[buffersize];
+		static float inputAmplification = short.MaxValue / 1.0f;		// WAV file ranges from -1000 mV to +1000 mV
+		
+		static bool terminateAcquisition = false;
 
-        static void Main(string[] args)
-        {
-            dwf.FDwfGetVersion(out string dwfVersion);
-            Console.WriteLine($"DWF Version: {dwfVersion}");
+		static List<float> samples = new List<float>();
+		static double[] voltData;
 
-            Console.WriteLine("Opening first device");
-            dwf.FDwfDeviceOpen(-1, out int hdwf);
+		static void Main(string[] args)
+		{
+			dwf.FDwfGetVersion(out string dwfVersion);
+			Console.WriteLine($"DWF Version: {dwfVersion}");
 
-            if (hdwf == dwf.hdwfNone)
-            {
-                dwf.FDwfGetLastErrorMsg(out string szerr);
-                Console.WriteLine(szerr);
-                Console.WriteLine("failed to open device");
-                return;
-            }
+			Console.WriteLine("Opening first device");
+			dwf.FDwfDeviceOpen(-1, out int dwfHandle);
 
-            dwf.FDwfAnalogInBufferSizeInfo(hdwf, out int cBufInt, out int cBufMax);
-            Console.WriteLine($"Device buffer size: {cBufMax} samples");
+			if (dwfHandle == dwf.hdwfNone)
+			{
+				dwf.FDwfGetLastErrorMsg(out string lastError);
+				Console.WriteLine($"Failed to open device: {lastError}");
+				return;
+			}
 
-            //set up acquisition
-            dwf.FDwfAnalogInFrequencySet(hdwf, samplerate);
-            dwf.FDwfAnalogInBufferSizeSet(hdwf, buffersize);
-            dwf.FDwfAnalogInChannelEnableSet(hdwf, 0, 1);
-            dwf.FDwfAnalogInChannelRangeSet(hdwf, 0, 5.0);
+			dwf.FDwfAnalogInBufferSizeInfo(dwfHandle, out int bufferSizeMinimum, out int bufferSizeMaximum);
+			bufferSize = Math.Min(bufferSizeMaximum, samplerate);
+			Console.WriteLine($"Device buffer size range: {bufferSizeMinimum} - {bufferSizeMaximum} samples, set to {bufferSize}.");
+			voltData = new double[bufferSize];
 
-            // set up signal generation
-            /*
-            dwf.FDwfAnalogOutNodeEnableSet(hdwf, channel, AnalogOutNodeCarrier, c_bool(True))
-            dwf.FDwfAnalogOutNodeFunctionSet(hdwf, channel, AnalogOutNodeCarrier, funcTriangle)					# ! this looks like a square wave
-            dwf.FDwfAnalogOutNodeFrequencySet(hdwf, channel, AnalogOutNodeCarrier, c_double(signalgenhz))
-            dwf.FDwfAnalogOutNodeAmplitudeSet(hdwf, channel, AnalogOutNodeCarrier, c_double(1.41))			# ! this doesn't really do anything
-            dwf.FDwfAnalogOutNodeOffsetSet(hdwf, channel, AnalogOutNodeCarrier, c_double(1.41))
+			//set up acquisition
+			dwf.FDwfAnalogInFrequencySet(dwfHandle, samplerate);
+			dwf.FDwfAnalogInBufferSizeSet(dwfHandle, bufferSize);
+			dwf.FDwfAnalogInChannelEnableSet(dwfHandle, 0, 1);
+			dwf.FDwfAnalogInChannelRangeSet(dwfHandle, 0, 5.0);
 
-            print("Generating sine wave @" + str(signalgenhz) + "Hz...")
-            dwf.FDwfAnalogOutConfigure(hdwf, channel, c_bool(True))
+			// set up signal generation
+			dwf.FDwfAnalogOutNodeEnableSet(dwfHandle, signalGeneratorChannel, dwf.AnalogOutNodeCarrier, 1);            
+			dwf.FDwfAnalogOutNodeFunctionSet(dwfHandle, signalGeneratorChannel, dwf.AnalogOutNodeCarrier, dwf.funcSine);
+			dwf.FDwfAnalogOutNodeFrequencySet(dwfHandle, signalGeneratorChannel, dwf.AnalogOutNodeCarrier, signalGeneratorFrequency);
+			dwf.FDwfAnalogOutNodeAmplitudeSet(dwfHandle, signalGeneratorChannel, dwf.AnalogOutNodeCarrier, signalGeneratorAmplitude);
 
-            #wait at least 2 seconds for the offset to stabilize
-            time.sleep(2)
+			Console.WriteLine($"Generating sine wave @{signalGeneratorFrequency}Hz...");
+			dwf.FDwfAnalogOutConfigure(dwfHandle, signalGeneratorChannel, 1);
 
-            */
+			//wait at least 2 seconds for the offset to stabilize
+			Thread.Sleep(2000);
 
-            //get the proper file name
-            DateTime starttime = DateTime.Now;
-            string startfilename = $"AD2_{starttime.ToString("yyyy-MM-dd_HHmmss")}.wav";
+			//start aquisition
+			Console.WriteLine("Starting oscilloscope");
+			dwf.FDwfAnalogInConfigure(dwfHandle, 0, 1);
 
-            //open WAV file
-            Console.WriteLine("Opening WAV file '" + startfilename + "'");
-            NWaves.Signals.DiscreteSignal signal = new NWaves.Signals.DiscreteSignal(samplerate, buffersize);
-            NWaves.Audio.WaveFile waveFile = new NWaves.Audio.WaveFile(signal, 32);
+			Console.WriteLine($"Recording data @{samplerate}Hz, press Ctrl+C to stop...");
 
-            //start aquisition
-            Console.WriteLine("Starting oscilloscope");
-            dwf.FDwfAnalogInConfigure(hdwf, 0, 1);
+			Console.CancelKeyPress += Console_CancelKeyPress;
 
-            Console.WriteLine($"Recording data @{samplerate}Hz, press Ctrl+C to stop...");
+			while (!terminateAcquisition)
+			{
+				while (true)
+				{
+					dwf.FDwfAnalogInStatus(dwfHandle, 1, out byte sts);
 
-            int bufferCounter = 0;
+					if (sts == dwf.DwfStateDone)
+						break;
 
-            Console.CancelKeyPress += Console_CancelKeyPress;
-
-            while (!terminateAcquisition)
-            {
-                while (!terminateAcquisition)
-                {
-                    dwf.FDwfAnalogInStatus(hdwf, 1, out byte sts);
-
-                    if (sts == dwf.DwfStateDone)
-                        break;
-
-                    Thread.Sleep(100);
-                }
-
-
-                dwf.FDwfAnalogInStatusData(hdwf, 0, rgdSamples, buffersize);    //get channel 1 data CH1 - ! it looks like 2 channels get read here and only the second is the data of CH1
-                dwf.FDwfAnalogInStatusData(hdwf, 1, rgdSamples, buffersize); 	//get channel 2 data CH2
-
-                //waveWrite.writeframes(rgdSamples);
-                //waveFile.SaveTo();
-                bufferCounter += 1;
-                Console.Write(".");
-            }
-
-            Console.WriteLine("Acquisition done");
-
-            Console.WriteLine("Closing WAV file");
-        //    waveWrite.close();
-
-            dwf.FDwfDeviceCloseAll();
-
-/*            
-//rename the file so that we know both the start and end times from the filename
-endtime = datetime.datetime.now();
-            endfilename = "AD2_" + "{:04d}".format(starttime.year) + "{:02d}".format(starttime.month) + "{:02d}".format(starttime.day) + "_" + "{:02d}".format(starttime.hour) + "{:02d}".format(starttime.minute) + "{:02d}".format(starttime.second) + "-" + "{:02d}".format(endtime.hour) + "{:02d}".format(endtime.minute) + "{:02d}".format(endtime.second) + ".wav";
-
-            print("Renaming file from '" + startfilename + "' to '" + endfilename + "'");
-            os.rename(startfilename, endfilename);
-*/
+					Thread.Sleep(100);
+				}
 
 
-        }
+				dwf.FDwfAnalogInStatusData(dwfHandle, 0, voltData, bufferSize);     //get channel 1 data CH1
+				samples.AddRange(voltData.Select(vd => (float)vd));
+				Console.Write(".");
 
-        private static void Console_CancelKeyPress(object sender, ConsoleCancelEventArgs e)
-        {
-            terminateAcquisition = true;
-        }
-    }
+				if (samples.Count >= samplerate * 5)
+				{
+					//generate a signal
+					var signal = new DiscreteSignal(samplerate, samples.ToArray(), true);
+					samples.Clear();
+
+					Task.Run(() =>
+					{
+						var fft = new RealFft(2048);
+						var powerSpectrum = fft.PowerSpectrum(signal, normalize: false);
+
+						
+						string filename = $"AD2_{DateTime.Now.ToString("yyyy-MM-dd_HHmmss")}";
+
+						//save it the FFT to a binary file
+						File.WriteAllTextAsync(filename + ".fft", JsonSerializer.Serialize(powerSpectrum));
+
+						//and save samples to a WAV file
+						FileStream waveFileStream = new FileStream(filename + ".wav", FileMode.Create);
+
+						signal.Amplify(inputAmplification);
+						WaveFile waveFile = new WaveFile(signal, 16);
+						waveFile.SaveTo(waveFileStream, false);
+
+						waveFileStream.Close();
+						Console.Write("|");
+					}
+					);
+				}
+			}
+
+			Console.WriteLine();
+			Console.WriteLine("Acquisition done");
+
+			dwf.FDwfDeviceCloseAll();
+		}
+
+		private static void Console_CancelKeyPress(object sender, ConsoleCancelEventArgs e)
+		{
+			terminateAcquisition = true;
+			e.Cancel = true;
+		}
+	}
 }
