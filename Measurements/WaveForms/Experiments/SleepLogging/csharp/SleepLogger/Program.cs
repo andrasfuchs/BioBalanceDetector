@@ -2,7 +2,6 @@
 using NWaves.Operations;
 using NWaves.Signals;
 using NWaves.Transforms;
-using NWaves.Utils;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -20,7 +19,7 @@ namespace SleepLogger
         /// <summary>
         /// FFT size
         /// </summary>
-        const int fftSize = 8192;
+        const int fftSize = 8192 * 8 * 8;
 
         /// <summary>
         /// Number of samples per buffer
@@ -29,7 +28,7 @@ namespace SleepLogger
         /// <summary>
         /// Number of samples per second
         /// </summary>
-        const int samplerate = fftSize * 8 * 8;
+        const int samplerate = fftSize;
         /// <summary>
         /// Audio signal channel
         /// </summary>
@@ -51,7 +50,7 @@ namespace SleepLogger
 
         static bool saveAsWav = false;
         static bool saveAsFft = true;
-        static bool saveAsPng = false;
+        static bool saveAsPng = true;
 
         static List<float> samples = new List<float>();
         static double[] voltData;
@@ -219,24 +218,20 @@ namespace SleepLogger
                             if (saveAsFft)
                             {
                                 sw.Restart();
-                                //save it the FFT to a binary file
+                                //save it the FFT to a JSON file
                                 File.WriteAllTextAsync($"{filename}.fft", JsonSerializer.Serialize(powerSpectrum));
                                 sw.Stop();
                                 Console.WriteLine($"#{bi.ToString("0000")} Save as FFT completed in {sw.ElapsedMilliseconds} ms.");
-
                             }
 
                             if (saveAsPng)
                             {
                                 sw.Restart();
                                 //save a PNG with the values
-                                SaveSignalAsPng($"{filename}.png", powerSpectrum);
+                                SaveSignalAsPng($"{filename}.png", powerSpectrum, 200000);
                                 sw.Stop();
                                 Console.WriteLine($"#{bi.ToString("0000")} Save as PNG completed in {sw.ElapsedMilliseconds} ms.");
-
                             }
-
-                            //Console.Write("|");
                         }
                         );
                     }
@@ -250,15 +245,17 @@ namespace SleepLogger
             dwf.FDwfDeviceCloseAll();
         }
 
-        private static void SaveSignalAsPng(string filename, DiscreteSignal signal, int height = 1080)
+        private static void SaveSignalAsPng(string filename, DiscreteSignal signal, int maxSamples, int height = 1080)
         {
-            const int maxPngWidth = 50000;
+            const int maxPngWidth = 20000;
+            const float resoltionScaleDownFactor = 15.0f;
+            Font font = new Font("Georgia", 150.0f);
 
             // convert samples into log scale (dBm)
             //var samples = signal.Samples.Select(s => Scale.ToDecibel(s)).ToArray();
-            var samples = signal.Samples.ToArray();
-            int width = Math.Min(maxPngWidth, signal.Samples.Length);
-            int dataRows = Math.Max(1, (signal.Samples.Length / maxPngWidth) + 1);
+            var samples = signal.Samples.Take(maxSamples).ToArray();
+            int width = Math.Min(maxPngWidth, samples.Length);
+            int dataRows = Math.Max(1, (int)Math.Ceiling((double)samples.Length / maxPngWidth));
 
             int originalSampleCount = samples.Length;
             int onePercentCount = originalSampleCount / 100;
@@ -272,17 +269,18 @@ namespace SleepLogger
             //double scale = height / (filteredSamples.Max() - filteredSamples.Min());
             //double scale = 4.0;             //this is good enough for the 2V peak-to-peak signal detection
             //double valueTreshold = -128;    //typical received signal power from a GPS satellite
-
-            double scale = 50.0;
+            
+            double scale = 100.0;          // for non-normalized
+            //double scale = 2500000.0;     // for normalized
             double valueTreshold = 0;
 
 
             Color bgColor = Color.LightGray;
             Brush lineColor = new SolidBrush(Color.DarkGray);
 
-            Bitmap bitmap = new Bitmap(width, height * dataRows, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            Bitmap spectrumBitmap = new Bitmap(width, height * dataRows, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
-            Graphics graphics = Graphics.FromImage(bitmap);
+            Graphics graphics = Graphics.FromImage(spectrumBitmap);
             graphics.FillRectangle(new SolidBrush(bgColor), new Rectangle(0, 0, width, height * dataRows));
 
             var pen = new Pen(lineColor, 1);
@@ -294,7 +292,7 @@ namespace SleepLogger
                 for (int i = 0; i < width; i++)
                 {
                     int dataPointIndex = (r - 1) * width + i;
-                    if (dataPointIndex >= samples.Length) continue;
+                    if ((dataPointIndex >= samples.Length) || (dataPointIndex >= maxSamples)) continue;
 
                     if (samples[dataPointIndex] - valueTreshold > 0)
                     {
@@ -303,10 +301,17 @@ namespace SleepLogger
                         graphics.DrawLine(pen, new Point(i, bottomLine), new Point(i, bottomLine - valueToShow));
                     }
                 }
+
+                graphics.DrawString($"{((r - 1) * width) / 1000} kHz", font, Brushes.White, new PointF(100.0f, bottomLine - (height * 0.75f)));
+                graphics.DrawString($"{(r * width) / 1000} kHz", font, Brushes.White, new PointF(width - 800.0f, bottomLine - (height * 0.75f)));
             }
 
+            graphics.DrawString($"{filename}", font, Brushes.White, new PointF(width - 4000.0f, 10.0f));
+
+            var scaledDownBitmap = new Bitmap(spectrumBitmap, new Size((int)(spectrumBitmap.Width / resoltionScaleDownFactor), (int)(spectrumBitmap.Height / resoltionScaleDownFactor)));
+
             FileStream pngFile = new FileStream(filename, FileMode.Create);
-            bitmap.Save(pngFile, System.Drawing.Imaging.ImageFormat.Png);
+            scaledDownBitmap.Save(pngFile, System.Drawing.Imaging.ImageFormat.Png);
             pngFile.Close();
         }
 
