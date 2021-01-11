@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-public class Dwf
+public class dwf
 {
     public const int hdwfNone = 0;
 

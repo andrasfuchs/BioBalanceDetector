@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <PackageReference Include="NWaves" Version="0.9.4" />
+    <PackageReference Include="System.Drawing.Common" Version="5.0.0" />
   </ItemGroup>
 
 </Project>
