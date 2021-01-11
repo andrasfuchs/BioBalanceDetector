@@ -19,7 +19,7 @@ namespace SleepLogger
         /// <summary>
         /// FFT size
         /// </summary>
-        const int fftSize = 8192 * 8 * 8;
+        const int fftSize = 512 * 1024;
 
         /// <summary>
         /// Number of samples per buffer
@@ -228,7 +228,8 @@ namespace SleepLogger
                             {
                                 sw.Restart();
                                 //save a PNG with the values
-                                SaveSignalAsPng($"{filename}.png", powerSpectrum, 200000);
+                                SaveSignalAsPng($"{filename}_200kHz.png", powerSpectrum, 200000, 100, 1080, 15);
+                                SaveSignalAsPng($"{filename}_1kHz.png", powerSpectrum, 1000, 1, 1080, 1);
                                 sw.Stop();
                                 Console.WriteLine($"#{bi.ToString("0000")} Save as PNG completed in {sw.ElapsedMilliseconds} ms.");
                             }
@@ -245,11 +246,10 @@ namespace SleepLogger
             dwf.FDwfDeviceCloseAll();
         }
 
-        private static void SaveSignalAsPng(string filename, DiscreteSignal signal, int maxSamples, int height = 1080)
+        private static void SaveSignalAsPng(string filename, DiscreteSignal signal, int maxSamples, double sampleAmplification = 100.0, int height = 1080, float resoltionScaleDownFactor = 15.0f)
         {
             const int maxPngWidth = 20000;
-            const float resoltionScaleDownFactor = 15.0f;
-            Font font = new Font("Georgia", 150.0f);
+            Font font = new Font("Georgia", 10.0f * resoltionScaleDownFactor);
 
             // convert samples into log scale (dBm)
             //var samples = signal.Samples.Select(s => Scale.ToDecibel(s)).ToArray();
@@ -270,7 +270,6 @@ namespace SleepLogger
             //double scale = 4.0;             //this is good enough for the 2V peak-to-peak signal detection
             //double valueTreshold = -128;    //typical received signal power from a GPS satellite
             
-            double scale = 100.0;          // for non-normalized
             //double scale = 2500000.0;     // for normalized
             double valueTreshold = 0;
 
@@ -296,17 +295,20 @@ namespace SleepLogger
 
                     if (samples[dataPointIndex] - valueTreshold > 0)
                     {
-                        int valueToShow = (int)Math.Min((samples[dataPointIndex] - valueTreshold) * scale, height);
+                        int valueToShow = (int)Math.Min((samples[dataPointIndex] - valueTreshold) * sampleAmplification, height);
 
                         graphics.DrawLine(pen, new Point(i, bottomLine), new Point(i, bottomLine - valueToShow));
                     }
                 }
 
-                graphics.DrawString($"{((r - 1) * width) / 1000} kHz", font, Brushes.White, new PointF(100.0f, bottomLine - (height * 0.75f)));
-                graphics.DrawString($"{(r * width) / 1000} kHz", font, Brushes.White, new PointF(width - 800.0f, bottomLine - (height * 0.75f)));
+                if (((r - 1) * width) / 1000 > 0)
+                {
+                    graphics.DrawString($"{((r - 1) * width) / 1000} kHz", font, Brushes.White, new PointF(100.0f, bottomLine - (height * 0.75f)));
+                }
+                graphics.DrawString($"{(r * width) / 1000} kHz", font, Brushes.White, new PointF(width - (75.0f * resoltionScaleDownFactor), bottomLine - (height * 0.75f)));
             }
 
-            graphics.DrawString($"{filename}", font, Brushes.White, new PointF(width - 4000.0f, 10.0f));
+            graphics.DrawString($"{filename}", font, Brushes.White, new PointF(width - (350.0f * resoltionScaleDownFactor), 10.0f));
 
             var scaledDownBitmap = new Bitmap(spectrumBitmap, new Size((int)(spectrumBitmap.Width / resoltionScaleDownFactor), (int)(spectrumBitmap.Height / resoltionScaleDownFactor)));
 
