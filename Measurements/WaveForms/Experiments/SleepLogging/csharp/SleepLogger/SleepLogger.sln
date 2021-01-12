@@ -3,7 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30804.86
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SleepLogger", "SleepLogger.csproj", "{07C36CE1-600C-49AC-8F38-F8E0D94A201E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SleepLogger", "SleepLogger.csproj", "{07C36CE1-600C-49AC-8F38-F8E0D94A201E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SleepBlazor.Server", "..\SleepBlazor\Server\SleepBlazor.Server.csproj", "{A7D7724D-7AF4-42FF-BCF9-8A6955C1F0D2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SleepBlazor.Client", "..\SleepBlazor\Client\SleepBlazor.Client.csproj", "{CF275FAF-38CF-43B8-8994-C60100E9E81C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SleepBlazor.Shared", "..\SleepBlazor\Shared\SleepBlazor.Shared.csproj", "{D22D9C62-8A82-4C33-88B9-E4DF6BDF3F56}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +21,18 @@ Global
 		{07C36CE1-600C-49AC-8F38-F8E0D94A201E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{07C36CE1-600C-49AC-8F38-F8E0D94A201E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{07C36CE1-600C-49AC-8F38-F8E0D94A201E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A7D7724D-7AF4-42FF-BCF9-8A6955C1F0D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7D7724D-7AF4-42FF-BCF9-8A6955C1F0D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7D7724D-7AF4-42FF-BCF9-8A6955C1F0D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7D7724D-7AF4-42FF-BCF9-8A6955C1F0D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF275FAF-38CF-43B8-8994-C60100E9E81C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF275FAF-38CF-43B8-8994-C60100E9E81C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF275FAF-38CF-43B8-8994-C60100E9E81C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF275FAF-38CF-43B8-8994-C60100E9E81C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D22D9C62-8A82-4C33-88B9-E4DF6BDF3F56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D22D9C62-8A82-4C33-88B9-E4DF6BDF3F56}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D22D9C62-8A82-4C33-88B9-E4DF6BDF3F56}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D22D9C62-8A82-4C33-88B9-E4DF6BDF3F56}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
