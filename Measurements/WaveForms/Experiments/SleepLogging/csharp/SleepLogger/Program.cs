@@ -168,7 +168,7 @@ namespace SleepLogger
                             };
 
                             Stopwatch sw = Stopwatch.StartNew();
-                            string filename = $"{fftData.CaptureTime.ToString("yyyy-MM-dd")}\\AD2_{fftData.CaptureTime.ToString("yyyy-MM-dd_HHmmss")}";
+                            string filename = Path.Combine($"{fftData.CaptureTime.ToString("yyyy-MM-dd")}",$"AD2_{fftData.CaptureTime.ToString("yyyy-MM-dd_HHmmss")}");
                             if (!Directory.Exists(fftData.CaptureTime.ToString("yyyy-MM-dd")))
                             {
                                 Directory.CreateDirectory(fftData.CaptureTime.ToString("yyyy-MM-dd"));
