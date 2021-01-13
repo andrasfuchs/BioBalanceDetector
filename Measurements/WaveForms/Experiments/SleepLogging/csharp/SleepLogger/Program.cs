@@ -133,9 +133,9 @@ namespace SleepLogger
                     Thread.Sleep(500);
                 }
 
-                //logger.LogTrace($"FDwfAnalogInStatusRecord begin: {dwfHandle}");
+                logger.LogTrace($"FDwfAnalogInStatusRecord begin: {dwfHandle}");
                 dwf.FDwfAnalogInStatusRecord(dwfHandle, out int cAvailable, out int cLost, out int cCorrupted);
-                //logger.LogTrace($"FDwfAnalogInStatusRecord end: {cAvailable}, {cLost}, {cCorrupted}");
+                logger.LogTrace($"FDwfAnalogInStatusRecord end | cAvailable:{cAvailable}, cLost:{cLost}, cCorrupted:{cCorrupted}");
 
                 if (cAvailable == 0)
                 {
@@ -149,26 +149,20 @@ namespace SleepLogger
                     skipBuffer = true;
                 }
 
-                lock (voltData)
-                {
-                    //logger.LogTrace($"FDwfAnalogInStatusData begin: {dwfHandle}, {cAvailable}");
-                    dwf.FDwfAnalogInStatusData(dwfHandle, 0, voltData, cAvailable);     // get channel 1 data chunk
-                    //logger.LogTrace($"FDwfAnalogInStatusData end: {voltData.Count()}");
-                    cSamples += cAvailable;
-                }
+                //logger.LogTrace($"FDwfAnalogInStatusData begin: {dwfHandle}, {cAvailable}");
+                dwf.FDwfAnalogInStatusData(dwfHandle, 0, voltData, cAvailable);     // get channel 1 data chunk
+                //logger.LogTrace($"FDwfAnalogInStatusData end: {voltData.Count()}");
+                cSamples += cAvailable;
 
                 if (config.Postprocessing.Enabled)
                 {
-                    lock (voltData)
-                    {
-                        samples.Clear();
-                        samples.AddRange(voltData.Take(cAvailable).Select(vd => (float)vd));
-                    }
+                    samples.AddRange(voltData.Take(cAvailable).Select(vd => (float)vd));
 
                     if (samples.Count >= config.AD2.Samplerate * config.Postprocessing.IntervalSeconds)
                     {
                         //generate a signal
                         var signal = new DiscreteSignal(config.AD2.Samplerate, samples.ToArray(), true);
+                        samples.Clear();
 
                         bufferIndex++;
                         if (!skipBuffer)
