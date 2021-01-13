@@ -236,7 +236,7 @@ namespace SleepLogger
                             fftData.MagnitudeData = powerSpectrum.Samples;
 
                             float averageMagnitude = powerSpectrum.Samples.Take(100).Average();
-                            if (averageMagnitude < 500.0)
+                            if (averageMagnitude < config.Postprocessing.MagnitudeThreshold)
                             {
                                 logger.LogWarning($"#{bi.ToString("0000")} Signal magnitude is too low: {averageMagnitude}");
                                 return;

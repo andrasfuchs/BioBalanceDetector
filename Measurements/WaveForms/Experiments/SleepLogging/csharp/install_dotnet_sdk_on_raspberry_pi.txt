@@ -1,3 +1,18 @@
-https://darryldias.me/2021/install-and-setup-net-5-on-raspberry-pi/
+# https://darryldias.me/2021/install-and-setup-net-5-on-raspberry-pi/
 
-https://docs.microsoft.com/en-us/dotnet/core/install/linux
+wget https://download.visualstudio.microsoft.com/download/pr/567a64a8-810b-4c3f-85e3-bc9f9e06311b/02664afe4f3992a4d558ed066d906745/dotnet-sdk-5.0.101-linux-arm.tar.gz
+wget https://download.visualstudio.microsoft.com/download/pr/11977d43-d937-4fdb-a1fb-a20d56f1877d/73aa09b745586ac657110fd8b11c0275/aspnetcore-runtime-5.0.1-linux-arm.tar.gz
+
+mkdir ~/.dotnet
+
+tar -xvf dotnet-sdk-5.0.101-linux-arm.tar.gz -C ~/.dotnet
+tar -xvf aspnetcore-runtime-5.0.1-linux-arm.tar.gz -C ~/.dotnet
+
+nano ~/.bashrc
+
+export DOTNET_ROOT=$HOME/.dotnet 
+export PATH=$PATH:$HOME/.dotnet
+
+dotnet --version
+
+# https://docs.microsoft.com/en-us/dotnet/core/install/linux-debian

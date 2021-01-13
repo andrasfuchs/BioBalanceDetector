@@ -27,6 +27,7 @@ namespace SleepLogger
                 SaveAsWAV = Boolean.Parse(config["Postprocessing:SaveAsWAV"]),
                 SaveAsFFT = Boolean.Parse(config["Postprocessing:SaveAsFFT"]),
                 SaveAsPNG = Boolean.Parse(config["Postprocessing:SaveAsPNG"]),
+                MagnitudeThreshold = Single.Parse(config["Postprocessing:MagnitudeThreshold"]),
             };
         }
     }
@@ -61,5 +62,6 @@ namespace SleepLogger
         public bool SaveAsWAV { get; set; }
         public bool SaveAsFFT { get; set; }
         public bool SaveAsPNG { get; set; }
+        public float MagnitudeThreshold { get; set; }
     }
 }
