@@ -53,7 +53,7 @@ namespace SleepLogger
             ILogger logger = loggerFactory.CreateLogger<Program>();
 
 
-            logger.LogInformation("Bio Balance Detector Sleep Logger v0.2 (2021-01-12)");
+            logger.LogInformation("Bio Balance Detector Sleep Logger v0.3 (2021-01-13)");
 
             try
             {
@@ -100,7 +100,7 @@ namespace SleepLogger
             dwf.FDwfAnalogOutNodeFrequencySet(dwfHandle, config.AD2.SignalGeneratorChannel, dwf.AnalogOutNodeCarrier, config.AD2.SignalGeneratorHz);
             dwf.FDwfAnalogOutNodeAmplitudeSet(dwfHandle, config.AD2.SignalGeneratorChannel, dwf.AnalogOutNodeCarrier, config.AD2.SignalGeneratorVolt);
 
-            logger.LogInformation($"Generating sine wave @{config.AD2.SignalGeneratorHz} Hz...");
+            logger.LogInformation($"Generating sine wave at {config.AD2.SignalGeneratorHz} Hz...");
             dwf.FDwfAnalogOutConfigure(dwfHandle, config.AD2.SignalGeneratorChannel, 1);
 
             //wait at least 2 seconds for the offset to stabilize
@@ -110,7 +110,7 @@ namespace SleepLogger
             logger.LogInformation("Starting oscilloscope");
             dwf.FDwfAnalogInConfigure(dwfHandle, 0, 1);
 
-            logger.LogInformation($"Recording data @{config.AD2.Samplerate} Hz, press Ctrl+C to stop...");
+            logger.LogInformation($"Recording data at {config.AD2.Samplerate} Hz, press Ctrl+C to stop...");
 
             Console.CancelKeyPress += Console_CancelKeyPress;
 
@@ -137,10 +137,15 @@ namespace SleepLogger
                 dwf.FDwfAnalogInStatusRecord(dwfHandle, out int cAvailable, out int cLost, out int cCorrupted);
                 //logger.LogTrace($"FDwfAnalogInStatusRecord end: {cAvailable}, {cLost}, {cCorrupted}");
 
-                if (cAvailable == 0) continue;
+                if (cAvailable == 0)
+                {
+                    logger.LogWarning($"Aqusition error! cAvailable: {cAvailable}");
+                    continue;
+                }
+
                 if ((cLost > 0) || (cCorrupted > 0))
                 {
-                    logger.LogInformation($"Data error! lost:{cLost}, corrupted:{cCorrupted}");
+                    logger.LogInformation($"Data error! cLost:{cLost}, cCorrupted:{cCorrupted}");
                     skipBuffer = true;
                 }
 
