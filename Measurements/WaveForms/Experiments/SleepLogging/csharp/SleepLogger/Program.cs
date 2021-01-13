@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text.Json;
 using System.Threading;
@@ -120,14 +121,16 @@ namespace SleepLogger
             {
                 while (true)
                 {
-                    logger.LogTrace($"FDwfAnalogInStatus begin: {dwfHandle}");
+                    //logger.LogTrace($"FDwfAnalogInStatus begin: {dwfHandle}");
                     dwf.FDwfAnalogInStatus(dwfHandle, 1, out byte sts);
-                    logger.LogTrace($"FDwfAnalogInStatus end: {sts}");
+                    //logger.LogTrace($"FDwfAnalogInStatus end: {sts}");
 
                     if (!((cSamples == 0) && ((sts == dwf.DwfStateConfig) || (sts == dwf.DwfStatePrefill) || (sts == dwf.DwfStateArmed))))
                         break;
 
-                    Thread.Sleep(50);
+                    logger.LogWarning($"We got into an unusual state! sts:{sts}");
+
+                    Thread.Sleep(500);
                 }
 
                 //logger.LogTrace($"FDwfAnalogInStatusRecord begin: {dwfHandle}");
@@ -173,7 +176,9 @@ namespace SleepLogger
                             };
 
                             Stopwatch sw = Stopwatch.StartNew();
-                            string filename = Path.Combine($"{fftData.CaptureTime.ToString("yyyy-MM-dd")}",$"AD2_{fftData.CaptureTime.ToString("yyyy-MM-dd_HHmmss")}");
+                            string foldername = $"{fftData.CaptureTime.ToString("yyyy-MM-dd")}";
+                            string filename = $"AD2_{fftData.CaptureTime.ToString("yyyy-MM-dd_HHmmss")}";
+                            string pathToFile = Path.Combine(foldername, filename);
                             if (!Directory.Exists(fftData.CaptureTime.ToString("yyyy-MM-dd")))
                             {
                                 Directory.CreateDirectory(fftData.CaptureTime.ToString("yyyy-MM-dd"));
@@ -183,7 +188,7 @@ namespace SleepLogger
                             {
                                 sw.Restart();
                                 //and save samples to a WAV file
-                                FileStream waveFileStream = new FileStream($"{filename}.wav", FileMode.Create);
+                                FileStream waveFileStream = new FileStream($"{pathToFile}.wav", FileMode.Create);
 
                                 signal.Amplify(inputAmplification);
                                 WaveFile waveFile = new WaveFile(signal, 16);
@@ -247,23 +252,62 @@ namespace SleepLogger
                                 return;
                             }
 
-                            if (config.Postprocessing.SaveAsFFT)
+                            if ((config.Postprocessing.SaveAsFFT) || (config.Postprocessing.SaveAsCompressedFFT))
                             {
-                                //save it the FFT to a JSON file
-                                sw.Restart();
-                                File.WriteAllTextAsync($"{filename}.fft", JsonSerializer.Serialize(fftData));
-                                sw.Stop();
-                                logger.LogInformation($"#{bi.ToString("0000")} Save as FFT completed in {sw.ElapsedMilliseconds} ms.");
+                                string fftDataJson = JsonSerializer.Serialize(fftData);
+
+                                if (config.Postprocessing.SaveAsFFT)
+                                {
+                                    Task.Run(() =>
+                                    {
+                                        Stopwatch sw = Stopwatch.StartNew();
+
+                                        //save it the FFT to a JSON file
+                                        sw.Restart();
+                                        File.WriteAllTextAsync($"{pathToFile}.fft", fftDataJson);
+                                        sw.Stop();
+                                        logger.LogInformation($"#{bi.ToString("0000")} Save as FFT completed in {sw.ElapsedMilliseconds} ms.");
+                                    });
+                                }
+
+                                if (config.Postprocessing.SaveAsCompressedFFT)
+                                {
+                                    Task.Run(() =>
+                                    {
+                                        Stopwatch sw = Stopwatch.StartNew();
+
+                                        //save it the FFT to a zipped JSON file
+                                        sw.Restart();
+                                        using (FileStream zipToOpen = new FileStream($"{pathToFile}.fft.zip", FileMode.Create))
+                                        {
+                                            using (ZipArchive archive = new ZipArchive(zipToOpen, ZipArchiveMode.Create))
+                                            {
+                                                ZipArchiveEntry fftFileEntry = archive.CreateEntry($"{filename}.fft");
+                                                using (StreamWriter writer = new StreamWriter(fftFileEntry.Open()))
+                                                {
+                                                    writer.Write(fftDataJson);
+                                                }
+                                            }
+                                        }
+                                        sw.Stop();
+                                        logger.LogInformation($"#{bi.ToString("0000")} Save as compressed FFT completed in {sw.ElapsedMilliseconds} ms.");
+                                    });
+                                }
                             }
 
                             if (config.Postprocessing.SaveAsPNG)
                             {
-                                //save a PNG with the values
-                                sw.Restart();
-                                SaveSignalAsPng($"{filename}_200kHz.png", fftData, 200000, 100, 1080, 15);
-                                //SaveSignalAsPng($"{filename}_1kHz.png", fftData, 1000, 1, 1080, 1);
-                                sw.Stop();
-                                logger.LogInformation($"#{bi.ToString("0000")} Save as PNG completed in {sw.ElapsedMilliseconds} ms.");
+                                Task.Run(() =>
+                                {
+                                    Stopwatch sw = Stopwatch.StartNew();
+
+                                    //save a PNG with the values
+                                    sw.Restart();
+                                    SaveSignalAsPng($"{pathToFile}_200kHz.png", fftData, 200000, 100, 1080, 15);
+                                    //SaveSignalAsPng($"{filename}_1kHz.png", fftData, 1000, 1, 1080, 1);
+                                    sw.Stop();
+                                    logger.LogInformation($"#{bi.ToString("0000")} Save as PNG completed in {sw.ElapsedMilliseconds} ms.");
+                                });
                             }
 
                             logger.LogTrace($"Postprocessing thread #{bi} end");

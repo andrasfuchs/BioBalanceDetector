@@ -26,6 +26,7 @@ namespace SleepLogger
                 FFTSize = config["Postprocessing:FFTSize"].EndsWith("k") ? Int32.Parse(config["Postprocessing:FFTSize"][0..^1]) * 1024 : Int32.Parse(config["Postprocessing:FFTSize"]),
                 SaveAsWAV = Boolean.Parse(config["Postprocessing:SaveAsWAV"]),
                 SaveAsFFT = Boolean.Parse(config["Postprocessing:SaveAsFFT"]),
+                SaveAsCompressedFFT = Boolean.Parse(config["Postprocessing:SaveAsCompressedFFT"]),
                 SaveAsPNG = Boolean.Parse(config["Postprocessing:SaveAsPNG"]),
                 MagnitudeThreshold = Single.Parse(config["Postprocessing:MagnitudeThreshold"]),
             };
@@ -61,6 +62,7 @@ namespace SleepLogger
         public int FFTSize { get; set; }
         public bool SaveAsWAV { get; set; }
         public bool SaveAsFFT { get; set; }
+        public bool SaveAsCompressedFFT { get; set; }
         public bool SaveAsPNG { get; set; }
         public float MagnitudeThreshold { get; set; }
     }
