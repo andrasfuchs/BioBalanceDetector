@@ -22,6 +22,7 @@ namespace SleepLogger
 
             Postprocessing = new PostprocessingConfig()
             {
+                Enabled = Boolean.Parse(config["Postprocessing:Enabled"]),
                 IntervalSeconds = Single.Parse(config["Postprocessing:IntervalSeconds"]),
                 FFTSize = config["Postprocessing:FFTSize"].EndsWith("k") ? Int32.Parse(config["Postprocessing:FFTSize"][0..^1]) * 1024 : Int32.Parse(config["Postprocessing:FFTSize"]),
                 SaveAsWAV = Boolean.Parse(config["Postprocessing:SaveAsWAV"]),
@@ -55,6 +56,7 @@ namespace SleepLogger
 
     public class PostprocessingConfig
     {
+        public bool Enabled { get; set; }
         public float IntervalSeconds { get; set; }
         /// <summary>
         /// FFT size

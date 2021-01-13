@@ -39,7 +39,7 @@ namespace SleepLogger
             var configuration = new ConfigurationBuilder()
                 .SetBasePath(AppContext.BaseDirectory)
                 .AddJsonFile("appsettings.json", false)
-                .Build();        
+                .Build();
 
             using var loggerFactory = LoggerFactory.Create(builder =>
             {
@@ -149,112 +149,110 @@ namespace SleepLogger
                 //logger.LogTrace($"FDwfAnalogInStatusData end: {voltData.Count()}");
                 cSamples += cAvailable;
 
-                samples.AddRange(voltData.Take(cAvailable).Select(vd => (float)vd));
-
-                if (samples.Count >= config.AD2.Samplerate * config.Postprocessing.IntervalSeconds)
+                if (config.Postprocessing.Enabled)
                 {
-                    //generate a signal
-                    var signal = new DiscreteSignal(config.AD2.Samplerate, samples.ToArray(), true);
-                    samples.Clear();
+                    samples.AddRange(voltData.Take(cAvailable).Select(vd => (float)vd));
 
-                    bufferIndex++;
-                    if (!skipBuffer)
+                    if (samples.Count >= config.AD2.Samplerate * config.Postprocessing.IntervalSeconds)
                     {
-                        Task.Run(() =>
+                        //generate a signal
+                        var signal = new DiscreteSignal(config.AD2.Samplerate, samples.ToArray(), true);
+                        samples.Clear();
+
+                        bufferIndex++;
+                        if (!skipBuffer)
                         {
-                            int bi = bufferIndex;
-
-                            logger.LogTrace($"Postprocessing thread #{bi} begin");
-
-                            var fftData = new FftData()
+                            Task.Run(() =>
                             {
-                                CaptureTime = DateTime.Now,
-                                Duration = config.Postprocessing.IntervalSeconds,
-                                FirstFrequency = 0,
-                                LastFrequency = config.AD2.Samplerate / 2,
-                                FftSize = config.Postprocessing.FFTSize,
-                            };
+                                int bi = bufferIndex;
 
-                            Stopwatch sw = Stopwatch.StartNew();
-                            string foldername = $"{fftData.CaptureTime.ToString("yyyy-MM-dd")}";
-                            string filename = $"AD2_{fftData.CaptureTime.ToString("yyyy-MM-dd_HHmmss")}";
-                            string pathToFile = Path.Combine(foldername, filename);
-                            if (!Directory.Exists(fftData.CaptureTime.ToString("yyyy-MM-dd")))
-                            {
-                                Directory.CreateDirectory(fftData.CaptureTime.ToString("yyyy-MM-dd"));
-                            }
+                                logger.LogTrace($"Postprocessing thread #{bi} begin");
 
-                            if (config.Postprocessing.SaveAsWAV)
-                            {
+                                var fftData = new FftData()
+                                {
+                                    CaptureTime = DateTime.Now,
+                                    Duration = config.Postprocessing.IntervalSeconds,
+                                    FirstFrequency = 0,
+                                    LastFrequency = config.AD2.Samplerate / 2,
+                                    FftSize = config.Postprocessing.FFTSize,
+                                };
+
+                                Stopwatch sw = Stopwatch.StartNew();
+                                string foldername = $"{fftData.CaptureTime.ToString("yyyy-MM-dd")}";
+                                string filename = $"AD2_{fftData.CaptureTime.ToString("yyyy-MM-dd_HHmmss")}";
+                                string pathToFile = Path.Combine(foldername, filename);
+                                if (!Directory.Exists(fftData.CaptureTime.ToString("yyyy-MM-dd")))
+                                {
+                                    Directory.CreateDirectory(fftData.CaptureTime.ToString("yyyy-MM-dd"));
+                                }
+
+                                if (config.Postprocessing.SaveAsWAV)
+                                {
+                                    sw.Restart();
+                                    //and save samples to a WAV file
+                                    FileStream waveFileStream = new FileStream($"{pathToFile}.wav", FileMode.Create);
+
+                                    signal.Amplify(inputAmplification);
+                                    WaveFile waveFile = new WaveFile(signal, 16);
+                                    waveFile.SaveTo(waveFileStream, false);
+
+                                    waveFileStream.Close();
+
+                                    sw.Stop();
+                                    logger.LogInformation($"#{bi.ToString("0000")} Save as WAV completed in {sw.ElapsedMilliseconds} ms.");
+                                }
+
                                 sw.Restart();
-                                //and save samples to a WAV file
-                                FileStream waveFileStream = new FileStream($"{pathToFile}.wav", FileMode.Create);
+                                int targetSamplerate = config.Postprocessing.FFTSize;
+                                int sampleRateMultiplier = 1;
 
-                                signal.Amplify(inputAmplification);
-                                WaveFile waveFile = new WaveFile(signal, 16);
-                                waveFile.SaveTo(waveFileStream, false);
-
-                                waveFileStream.Close();
-
-                                sw.Stop();
-                                logger.LogInformation($"#{bi.ToString("0000")} Save as WAV completed in {sw.ElapsedMilliseconds} ms.");
-                            }
-
-                            sw.Restart();
-                            int targetSamplerate = config.Postprocessing.FFTSize;
-                            int sampleRateMultiplier = 1;
-
-                            while (targetSamplerate < signal.SamplingRate)
-                            {
-                                targetSamplerate *= 2;
-                                sampleRateMultiplier *= 2;
-                            }
-                            float[] concatenatedPowerSpectrum = new float[targetSamplerate / 2 + 1];
-
-                            var resampler = new Resampler();
-                            if (targetSamplerate != signal.SamplingRate)
-                            {
-                                signal = resampler.Resample(signal, targetSamplerate);
-                            }
-
-                            while (signal.SamplingRate >= config.Postprocessing.FFTSize)
-                            {
-                                var fft = new RealFft(config.Postprocessing.FFTSize);
-                                var partialPowerSpectrum = fft.MagnitudeSpectrum(signal, normalize: false);
-
-                                if (concatenatedPowerSpectrum[0] == 0)
+                                while (targetSamplerate < signal.SamplingRate)
                                 {
-                                    concatenatedPowerSpectrum[0] = partialPowerSpectrum[0];
+                                    targetSamplerate *= 2;
+                                    sampleRateMultiplier *= 2;
+                                }
+                                float[] concatenatedPowerSpectrum = new float[targetSamplerate / 2 + 1];
+
+                                var resampler = new Resampler();
+                                if (targetSamplerate != signal.SamplingRate)
+                                {
+                                    signal = resampler.Resample(signal, targetSamplerate);
                                 }
 
-                                for (int i = 1; i < partialPowerSpectrum.Length; i++)
+                                while (signal.SamplingRate >= config.Postprocessing.FFTSize)
                                 {
-                                    for (int j = 0; j < sampleRateMultiplier; j++)
+                                    var fft = new RealFft(config.Postprocessing.FFTSize);
+                                    var partialPowerSpectrum = fft.MagnitudeSpectrum(signal, normalize: false);
+
+                                    if (concatenatedPowerSpectrum[0] == 0)
                                     {
-                                        concatenatedPowerSpectrum[(i - 1) * sampleRateMultiplier + j] = partialPowerSpectrum[i];
+                                        concatenatedPowerSpectrum[0] = partialPowerSpectrum[0];
                                     }
+
+                                    for (int i = 1; i < partialPowerSpectrum.Length; i++)
+                                    {
+                                        for (int j = 0; j < sampleRateMultiplier; j++)
+                                        {
+                                            concatenatedPowerSpectrum[(i - 1) * sampleRateMultiplier + j] = partialPowerSpectrum[i];
+                                        }
+                                    }
+
+                                    signal = new DiscreteSignal(signal.SamplingRate / 2, signal.Samples.Where((value, index) => index % 2 == 0).ToArray());
+                                    sampleRateMultiplier /= 2;
                                 }
+                                sw.Stop();
+                                logger.LogInformation($"#{bi.ToString("0000")} Signal processing completed in {sw.ElapsedMilliseconds} ms.");
 
-                                signal = new DiscreteSignal(signal.SamplingRate / 2, signal.Samples.Where((value, index) => index % 2 == 0).ToArray());
-                                sampleRateMultiplier /= 2;
-                            }
-                            sw.Stop();
-                            logger.LogInformation($"#{bi.ToString("0000")} Signal processing completed in {sw.ElapsedMilliseconds} ms.");
+                                var powerSpectrum = new DiscreteSignal((int)(targetSamplerate / 2 / config.Postprocessing.IntervalSeconds), concatenatedPowerSpectrum);
+                                fftData.FrequencyStep = ((float)config.AD2.Samplerate / 2) / (powerSpectrum.Samples.Length - 1);
+                                fftData.MagnitudeData = powerSpectrum.Samples;
 
-                            var powerSpectrum = new DiscreteSignal((int)(targetSamplerate / 2 / config.Postprocessing.IntervalSeconds), concatenatedPowerSpectrum);
-                            fftData.FrequencyStep = ((float)config.AD2.Samplerate / 2) / (powerSpectrum.Samples.Length - 1);
-                            fftData.MagnitudeData = powerSpectrum.Samples;
-
-                            float averageMagnitude = powerSpectrum.Samples.Take(100).Average();
-                            if (averageMagnitude < config.Postprocessing.MagnitudeThreshold)
-                            {
-                                logger.LogWarning($"#{bi.ToString("0000")} Signal magnitude is too low: {averageMagnitude}");
-                                return;
-                            }
-
-                            if ((config.Postprocessing.SaveAsFFT) || (config.Postprocessing.SaveAsCompressedFFT))
-                            {
-                                string fftDataJson = JsonSerializer.Serialize(fftData);
+                                float averageMagnitude = powerSpectrum.Samples.Take(100).Average();
+                                if (averageMagnitude < config.Postprocessing.MagnitudeThreshold)
+                                {
+                                    logger.LogWarning($"#{bi.ToString("0000")} Signal magnitude is too low: {averageMagnitude}");
+                                    return;
+                                }
 
                                 if (config.Postprocessing.SaveAsFFT)
                                 {
@@ -264,6 +262,7 @@ namespace SleepLogger
 
                                         //save it the FFT to a JSON file
                                         sw.Restart();
+                                        string fftDataJson = JsonSerializer.Serialize(fftData);
                                         File.WriteAllTextAsync($"{pathToFile}.fft", fftDataJson);
                                         sw.Stop();
                                         logger.LogInformation($"#{bi.ToString("0000")} Save as FFT completed in {sw.ElapsedMilliseconds} ms.");
@@ -278,6 +277,7 @@ namespace SleepLogger
 
                                         //save it the FFT to a zipped JSON file
                                         sw.Restart();
+                                        string fftDataJson = JsonSerializer.Serialize(fftData);
                                         using (FileStream zipToOpen = new FileStream($"{pathToFile}.fft.zip", FileMode.Create))
                                         {
                                             using (ZipArchive archive = new ZipArchive(zipToOpen, ZipArchiveMode.Create))
@@ -293,28 +293,28 @@ namespace SleepLogger
                                         logger.LogInformation($"#{bi.ToString("0000")} Save as compressed FFT completed in {sw.ElapsedMilliseconds} ms.");
                                     });
                                 }
-                            }
 
-                            if (config.Postprocessing.SaveAsPNG)
-                            {
-                                Task.Run(() =>
+                                if (config.Postprocessing.SaveAsPNG)
                                 {
-                                    Stopwatch sw = Stopwatch.StartNew();
+                                    Task.Run(() =>
+                                    {
+                                        Stopwatch sw = Stopwatch.StartNew();
 
-                                    //save a PNG with the values
-                                    sw.Restart();
-                                    SaveSignalAsPng($"{pathToFile}_200kHz.png", fftData, 200000, 100, 1080, 15);
-                                    //SaveSignalAsPng($"{filename}_1kHz.png", fftData, 1000, 1, 1080, 1);
-                                    sw.Stop();
-                                    logger.LogInformation($"#{bi.ToString("0000")} Save as PNG completed in {sw.ElapsedMilliseconds} ms.");
-                                });
+                                        //save a PNG with the values
+                                        sw.Restart();
+                                        SaveSignalAsPng($"{pathToFile}_200kHz.png", fftData, 200000, 100, 1080, 15);
+                                        //SaveSignalAsPng($"{filename}_1kHz.png", fftData, 1000, 1, 1080, 1);
+                                        sw.Stop();
+                                        logger.LogInformation($"#{bi.ToString("0000")} Save as PNG completed in {sw.ElapsedMilliseconds} ms.");
+                                    });
+                                }
+
+                                logger.LogTrace($"Postprocessing thread #{bi} end");
                             }
-
-                            logger.LogTrace($"Postprocessing thread #{bi} end");
+                            );
                         }
-                        );
+                        skipBuffer = false;
                     }
-                    skipBuffer = false;
                 }
             }
 
