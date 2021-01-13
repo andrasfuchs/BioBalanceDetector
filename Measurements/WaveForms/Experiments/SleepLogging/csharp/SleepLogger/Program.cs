@@ -65,81 +65,42 @@ namespace SleepLogger
                 return;
             }
 
+            Console.CancelKeyPress += Console_CancelKeyPress;
+
             dwf.FDwfGetVersion(out string dwfVersion);
             logger.LogInformation($"DWF Version: {dwfVersion}");
 
-            logger.LogInformation("Opening first device");
-            dwf.FDwfDeviceOpen(-1, out int dwfHandle);
-
-            while (dwfHandle == dwf.hdwfNone)
-            {
-                dwf.FDwfGetLastErrorMsg(out string lastError);
-                logger.LogInformation($"Failed to open device: {lastError.TrimEnd()}. Retrying in 30 seconds.");
-
-                Thread.Sleep(30000);
-
-                dwf.FDwfDeviceOpen(-1, out dwfHandle);
-            }
-
-            dwf.FDwfAnalogInBufferSizeInfo(dwfHandle, out int bufferSizeMinimum, out int bufferSizeMaximum);
-            bufferSize = Math.Min(bufferSizeMaximum, config.AD2.Samplerate);
-            logger.LogInformation($"Device buffer size range: {bufferSizeMinimum} - {bufferSizeMaximum} samples, set to {bufferSize}.");
-            voltData = new double[bufferSize];
-
-            //set up acquisition
-            dwf.FDwfAnalogInFrequencySet(dwfHandle, config.AD2.Samplerate);
-            dwf.FDwfAnalogInBufferSizeSet(dwfHandle, bufferSize);
-            dwf.FDwfAnalogInChannelEnableSet(dwfHandle, 0, 1);
-            dwf.FDwfAnalogInChannelRangeSet(dwfHandle, 0, 5.0);
-            dwf.FDwfAnalogInAcquisitionModeSet(dwfHandle, dwf.acqmodeRecord);
-            dwf.FDwfAnalogInRecordLengthSet(dwfHandle, -1);
-
-            // set up signal generation
-            dwf.FDwfAnalogOutNodeEnableSet(dwfHandle, config.AD2.SignalGeneratorChannel, dwf.AnalogOutNodeCarrier, 1);
-            dwf.FDwfAnalogOutNodeFunctionSet(dwfHandle, config.AD2.SignalGeneratorChannel, dwf.AnalogOutNodeCarrier, dwf.funcSine);
-            dwf.FDwfAnalogOutNodeFrequencySet(dwfHandle, config.AD2.SignalGeneratorChannel, dwf.AnalogOutNodeCarrier, config.AD2.SignalGeneratorHz);
-            dwf.FDwfAnalogOutNodeAmplitudeSet(dwfHandle, config.AD2.SignalGeneratorChannel, dwf.AnalogOutNodeCarrier, config.AD2.SignalGeneratorVolt);
-
-            logger.LogInformation($"Generating sine wave at {config.AD2.SignalGeneratorHz} Hz...");
-            dwf.FDwfAnalogOutConfigure(dwfHandle, config.AD2.SignalGeneratorChannel, 1);
-
-            //wait at least 2 seconds for the offset to stabilize
-            Thread.Sleep(2000);
-
-            //start aquisition
-            logger.LogInformation("Starting oscilloscope");
-            dwf.FDwfAnalogInConfigure(dwfHandle, 0, 1);
-
-            logger.LogInformation($"Recording data at {config.AD2.Samplerate} Hz, press Ctrl+C to stop...");
-
-            Console.CancelKeyPress += Console_CancelKeyPress;
+            int dwfHandle = InitializeAD2(logger, config);
 
             int cSamples = 0;
             int bufferIndex = 1;
             bool skipBuffer = false;
+
             while (!terminateAcquisition)
             {
                 while (true)
                 {
-                    //logger.LogTrace($"FDwfAnalogInStatus begin: {dwfHandle}");
+                    logger.LogTrace($"FDwfAnalogInStatus begin | dwfHandle:{dwfHandle}");
                     dwf.FDwfAnalogInStatus(dwfHandle, 1, out byte sts);
-                    //logger.LogTrace($"FDwfAnalogInStatus end: {sts}");
+                    logger.LogTrace($"FDwfAnalogInStatus end   | sts:{sts}");
 
                     if (!((cSamples == 0) && ((sts == dwf.DwfStateConfig) || (sts == dwf.DwfStatePrefill) || (sts == dwf.DwfStateArmed))))
                         break;
 
                     logger.LogWarning($"We got into an unusual state! sts:{sts}");
-
                     Thread.Sleep(500);
                 }
 
-                logger.LogTrace($"FDwfAnalogInStatusRecord begin: {dwfHandle}");
+                logger.LogTrace($"FDwfAnalogInStatusRecord begin | dwfHandle:{dwfHandle}");
                 dwf.FDwfAnalogInStatusRecord(dwfHandle, out int cAvailable, out int cLost, out int cCorrupted);
-                logger.LogTrace($"FDwfAnalogInStatusRecord end | cAvailable:{cAvailable}, cLost:{cLost}, cCorrupted:{cCorrupted}");
+                logger.LogTrace($"FDwfAnalogInStatusRecord end   | cAvailable:{cAvailable}, cLost:{cLost}, cCorrupted:{cCorrupted}");
 
                 if (cAvailable == 0)
                 {
                     logger.LogWarning($"Aqusition error! cAvailable: {cAvailable}");
+                    Thread.Sleep(500);
+                    logger.LogInformation($"Reseting device...");
+                    dwfHandle = InitializeAD2(logger, config);
                     continue;
                 }
 
@@ -149,9 +110,10 @@ namespace SleepLogger
                     skipBuffer = true;
                 }
 
-                //logger.LogTrace($"FDwfAnalogInStatusData begin: {dwfHandle}, {cAvailable}");
+                logger.LogTrace($"FDwfAnalogInStatusData begin | dwfHandle:{dwfHandle}, cAvailable:{cAvailable}");
                 dwf.FDwfAnalogInStatusData(dwfHandle, 0, voltData, cAvailable);     // get channel 1 data chunk
-                //logger.LogTrace($"FDwfAnalogInStatusData end: {voltData.Count()}");
+                logger.LogTrace($"FDwfAnalogInStatusData end   | voltData.Count:{voltData.Count()}");
+                
                 cSamples += cAvailable;
 
                 if (config.Postprocessing.Enabled)
@@ -326,6 +288,55 @@ namespace SleepLogger
             logger.LogInformation("Acquisition done");
 
             dwf.FDwfDeviceCloseAll();
+        }
+
+        private static int InitializeAD2(ILogger logger, SleepLoggerConfig config)
+        {            
+            logger.LogInformation("Opening first device");
+            dwf.FDwfDeviceOpen(-1, out int dwfHandle);
+
+            while ((dwfHandle == dwf.hdwfNone) && (!terminateAcquisition))
+            {
+                dwf.FDwfGetLastErrorMsg(out string lastError);
+                logger.LogInformation($"Failed to open device: {lastError.TrimEnd()}. Retrying in 10 seconds.");
+
+                Thread.Sleep(10000);
+
+                dwf.FDwfDeviceOpen(-1, out dwfHandle);
+            }
+
+            dwf.FDwfAnalogInBufferSizeInfo(dwfHandle, out int bufferSizeMinimum, out int bufferSizeMaximum);
+            bufferSize = Math.Min(bufferSizeMaximum, config.AD2.Samplerate);
+            logger.LogInformation($"Device buffer size range: {bufferSizeMinimum} - {bufferSizeMaximum} samples, set to {bufferSize}.");
+            voltData = new double[bufferSize];
+
+            //set up acquisition
+            dwf.FDwfAnalogInFrequencySet(dwfHandle, config.AD2.Samplerate);
+            dwf.FDwfAnalogInBufferSizeSet(dwfHandle, bufferSize);
+            dwf.FDwfAnalogInChannelEnableSet(dwfHandle, 0, 1);
+            dwf.FDwfAnalogInChannelRangeSet(dwfHandle, 0, 5.0);
+            dwf.FDwfAnalogInAcquisitionModeSet(dwfHandle, dwf.acqmodeRecord);
+            dwf.FDwfAnalogInRecordLengthSet(dwfHandle, -1);
+
+            // set up signal generation
+            dwf.FDwfAnalogOutNodeEnableSet(dwfHandle, config.AD2.SignalGeneratorChannel, dwf.AnalogOutNodeCarrier, 1);
+            dwf.FDwfAnalogOutNodeFunctionSet(dwfHandle, config.AD2.SignalGeneratorChannel, dwf.AnalogOutNodeCarrier, dwf.funcSine);
+            dwf.FDwfAnalogOutNodeFrequencySet(dwfHandle, config.AD2.SignalGeneratorChannel, dwf.AnalogOutNodeCarrier, config.AD2.SignalGeneratorHz);
+            dwf.FDwfAnalogOutNodeAmplitudeSet(dwfHandle, config.AD2.SignalGeneratorChannel, dwf.AnalogOutNodeCarrier, config.AD2.SignalGeneratorVolt);
+
+            logger.LogInformation($"Generating sine wave at {config.AD2.SignalGeneratorHz} Hz...");
+            dwf.FDwfAnalogOutConfigure(dwfHandle, config.AD2.SignalGeneratorChannel, 1);
+
+            //wait at least 2 seconds for the offset to stabilize
+            Thread.Sleep(2000);
+
+            //start aquisition
+            logger.LogInformation("Starting oscilloscope");
+            dwf.FDwfAnalogInConfigure(dwfHandle, 0, 1);
+
+            logger.LogInformation($"Recording data at {config.AD2.Samplerate} Hz, press Ctrl+C to stop...");
+
+            return dwfHandle;
         }
 
         private static void SaveSignalAsPng(string filename, FftData fftData, int maxSamples, double sampleAmplification = 100.0, int height = 1080, float resoltionScaleDownFactor = 15.0f)
