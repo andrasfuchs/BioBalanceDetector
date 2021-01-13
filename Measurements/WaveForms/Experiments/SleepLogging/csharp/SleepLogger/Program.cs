@@ -54,6 +54,10 @@ namespace SleepLogger
 
 
             logger.LogInformation("Bio Balance Detector Sleep Logger v0.3 (2021-01-13)");
+            logger.LogInformation("");
+            logger.LogInformation("Options:");
+            logger.LogInformation("--generatepng <FFT data file>        Generates a PNG image from FFT data");
+            logger.LogInformation("");
 
             try
             {
@@ -66,6 +70,18 @@ namespace SleepLogger
             }
 
             Console.CancelKeyPress += Console_CancelKeyPress;
+
+            if (args.Length > 1)
+            {
+                if (args[0] == "--generatepng")
+                {
+                    FftData fftData = JsonSerializer.Deserialize<FftData>(File.ReadAllText(args[1]));
+
+                    string filename = Path.GetFileNameWithoutExtension(args[1]);
+                    SaveSignalAsPng($"{filename}_200kHz.png", fftData, 200000, 100, 1080, 15);
+                    return;
+                }
+            }
 
             dwf.FDwfGetVersion(out string dwfVersion);
             logger.LogInformation($"DWF Version: {dwfVersion}");
