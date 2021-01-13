@@ -144,20 +144,26 @@ namespace SleepLogger
                     skipBuffer = true;
                 }
 
-                //logger.LogTrace($"FDwfAnalogInStatusData begin: {dwfHandle}, {cAvailable}");
-                dwf.FDwfAnalogInStatusData(dwfHandle, 0, voltData, cAvailable);     //get channel 1 data chunk
-                //logger.LogTrace($"FDwfAnalogInStatusData end: {voltData.Count()}");
-                cSamples += cAvailable;
+                lock (voltData)
+                {
+                    //logger.LogTrace($"FDwfAnalogInStatusData begin: {dwfHandle}, {cAvailable}");
+                    dwf.FDwfAnalogInStatusData(dwfHandle, 0, voltData, cAvailable);     // get channel 1 data chunk
+                    //logger.LogTrace($"FDwfAnalogInStatusData end: {voltData.Count()}");
+                    cSamples += cAvailable;
+                }
 
                 if (config.Postprocessing.Enabled)
                 {
-                    samples.AddRange(voltData.Take(cAvailable).Select(vd => (float)vd));
+                    lock (voltData)
+                    {
+                        samples.Clear();
+                        samples.AddRange(voltData.Take(cAvailable).Select(vd => (float)vd));
+                    }
 
                     if (samples.Count >= config.AD2.Samplerate * config.Postprocessing.IntervalSeconds)
                     {
                         //generate a signal
                         var signal = new DiscreteSignal(config.AD2.Samplerate, samples.ToArray(), true);
-                        samples.Clear();
 
                         bufferIndex++;
                         if (!skipBuffer)
