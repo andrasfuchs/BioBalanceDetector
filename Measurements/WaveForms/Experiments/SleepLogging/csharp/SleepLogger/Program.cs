@@ -130,9 +130,9 @@ namespace SleepLogger
                     Thread.Sleep(50);
                 }
 
-                logger.LogTrace($"FDwfAnalogInStatusRecord begin: {dwfHandle}");
+                //logger.LogTrace($"FDwfAnalogInStatusRecord begin: {dwfHandle}");
                 dwf.FDwfAnalogInStatusRecord(dwfHandle, out int cAvailable, out int cLost, out int cCorrupted);
-                logger.LogTrace($"FDwfAnalogInStatusRecord end: {cAvailable}, {cLost}, {cCorrupted}");
+                //logger.LogTrace($"FDwfAnalogInStatusRecord end: {cAvailable}, {cLost}, {cCorrupted}");
 
                 if (cAvailable == 0) continue;
                 if ((cLost > 0) || (cCorrupted > 0))
@@ -141,9 +141,9 @@ namespace SleepLogger
                     skipBuffer = true;
                 }
 
-                logger.LogTrace($"FDwfAnalogInStatusData begin: {dwfHandle}, {cAvailable}");
+                //logger.LogTrace($"FDwfAnalogInStatusData begin: {dwfHandle}, {cAvailable}");
                 dwf.FDwfAnalogInStatusData(dwfHandle, 0, voltData, cAvailable);     //get channel 1 data chunk
-                logger.LogTrace($"FDwfAnalogInStatusData end: {voltData.Count()}");
+                //logger.LogTrace($"FDwfAnalogInStatusData end: {voltData.Count()}");
                 cSamples += cAvailable;
 
                 samples.AddRange(voltData.Take(cAvailable).Select(vd => (float)vd));
