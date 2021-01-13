@@ -43,9 +43,10 @@ namespace SleepLogger
             using var loggerFactory = LoggerFactory.Create(builder =>
             {
                 builder
-                    .AddFilter("Microsoft", LogLevel.Warning)
-                    .AddFilter("System", LogLevel.Warning)
-                    .AddFilter("SleepLogger.Program", LogLevel.Debug)
+                    .AddFilter("Microsoft", Enum.Parse<LogLevel>(configuration["Logging:LogLevel:Default"]))
+                    .AddFilter("System", Enum.Parse<LogLevel>(configuration["Logging:LogLevel:Default"]))
+                    .AddFilter("SleepLogger.Program", Enum.Parse<LogLevel>(configuration["Logging:LogLevel:SleepLogger.Program"]))
+                    .AddConfiguration(configuration)
                     .AddConsole();
             });
             ILogger logger = loggerFactory.CreateLogger<Program>();
@@ -119,7 +120,9 @@ namespace SleepLogger
             {
                 while (true)
                 {
+                    logger.LogTrace($"FDwfAnalogInStatus begin: {dwfHandle}");
                     dwf.FDwfAnalogInStatus(dwfHandle, 1, out byte sts);
+                    logger.LogTrace($"FDwfAnalogInStatus end: {sts}");
 
                     if (!((cSamples == 0) && ((sts == dwf.DwfStateConfig) || (sts == dwf.DwfStatePrefill) || (sts == dwf.DwfStateArmed))))
                         break;
@@ -127,7 +130,10 @@ namespace SleepLogger
                     Thread.Sleep(50);
                 }
 
+                logger.LogTrace($"FDwfAnalogInStatusRecord begin: {dwfHandle}");
                 dwf.FDwfAnalogInStatusRecord(dwfHandle, out int cAvailable, out int cLost, out int cCorrupted);
+                logger.LogTrace($"FDwfAnalogInStatusRecord end: {cAvailable}, {cLost}, {cCorrupted}");
+
                 if (cAvailable == 0) continue;
                 if ((cLost > 0) || (cCorrupted > 0))
                 {
@@ -135,15 +141,12 @@ namespace SleepLogger
                     skipBuffer = true;
                 }
 
+                logger.LogTrace($"FDwfAnalogInStatusData begin: {dwfHandle}, {cAvailable}");
                 dwf.FDwfAnalogInStatusData(dwfHandle, 0, voltData, cAvailable);     //get channel 1 data chunk
+                logger.LogTrace($"FDwfAnalogInStatusData end: {voltData.Count()}");
                 cSamples += cAvailable;
 
                 samples.AddRange(voltData.Take(cAvailable).Select(vd => (float)vd));
-
-                if (samples.Count % (config.AD2.Samplerate / cAvailable) == 0)
-                {
-                    //Console.Write(".");
-                }
 
                 if (samples.Count >= config.AD2.Samplerate * config.Postprocessing.IntervalSeconds)
                 {
@@ -157,6 +160,8 @@ namespace SleepLogger
                         Task.Run(() =>
                         {
                             int bi = bufferIndex;
+
+                            logger.LogTrace($"Postprocessing thread #{bi} begin");
 
                             var fftData = new FftData()
                             {
@@ -260,6 +265,8 @@ namespace SleepLogger
                                 sw.Stop();
                                 logger.LogInformation($"#{bi.ToString("0000")} Save as PNG completed in {sw.ElapsedMilliseconds} ms.");
                             }
+
+                            logger.LogTrace($"Postprocessing thread #{bi} end");
                         }
                         );
                     }
