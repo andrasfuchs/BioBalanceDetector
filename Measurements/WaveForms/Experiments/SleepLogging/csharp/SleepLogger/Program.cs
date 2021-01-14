@@ -11,9 +11,11 @@ using System.Drawing;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Xabe.FFmpeg;
 
 namespace SleepLogger
 {
@@ -56,7 +58,7 @@ namespace SleepLogger
             logger.LogInformation("Bio Balance Detector Sleep Logger v0.3 (2021-01-13)");
             logger.LogInformation("");
             logger.LogInformation("Options:");
-            logger.LogInformation("--generatepng <FFT data file>        Generates a PNG image from FFT data");
+            logger.LogInformation("--generatepng <FFT data directory>        Generates a PNG images from FFT data");
             logger.LogInformation("");
 
             try
@@ -75,10 +77,58 @@ namespace SleepLogger
             {
                 if (args[0] == "--generatepng")
                 {
-                    FftData fftData = JsonSerializer.Deserialize<FftData>(File.ReadAllText(args[1]));
+                    string foldername = args[1];
 
-                    string filename = Path.GetFileNameWithoutExtension(args[1]);
-                    SaveSignalAsPng($"{filename}_200kHz.png", fftData, 200000, 100, 1080, 15);
+                    if (Directory.Exists(foldername))
+                    {
+                        foreach (string filename in Directory.GetFiles(args[1]))
+                        {
+                            string pathToFile = Path.GetFullPath(filename);
+
+                            if ((Path.GetExtension(filename) != ".fft") && (Path.GetExtension(filename) != ".zip"))
+                            {
+                                continue;
+                            }
+
+                            try
+                            {
+                                FftData fftData = FftData.LoadFrom($"{pathToFile}");
+
+                                string filenameWithoutExtension = Path.Combine(foldername, Path.GetFileNameWithoutExtension(pathToFile));
+
+                                if (File.Exists($"{filenameWithoutExtension}_200kHz.png"))
+                                {
+                                    logger.LogWarning($"{filenameWithoutExtension}_200kHz.png already exists.");
+                                    continue;
+                                }
+
+                                SaveSignalAsPng($"{filenameWithoutExtension}_200kHz.png", fftData, 60000, 1000);
+                                logger.LogInformation($"{filenameWithoutExtension}_200kHz.png was generated successfully.");
+                            }
+                            catch (Exception ex)
+                            {
+                                logger.LogWarning($"There was an error while generating PNG for '{Path.GetFileName(pathToFile)}': {ex.Message}");
+                            }
+                        }
+
+                        string mp4Filename = $"{Path.GetDirectoryName(foldername)}.mp4";
+                        logger.LogInformation($"Generating MP4 video file '{mp4Filename}'");
+                        try
+                        {
+                            FFmpeg.Conversions.New()
+                                .SetInputFrameRate(12)
+                                .BuildVideoFromImages(Directory.GetFiles(args[1], "*.png").OrderBy(fn => fn))
+                                .SetFrameRate(12)
+                                .SetPixelFormat(PixelFormat.yuv420p)
+                                .SetOutput(mp4Filename)
+                                .Start()
+                                .Wait();
+                        }
+                        catch (Exception ex)
+                        {
+                            logger.LogError($"There was an error while generating MP4 video file '{mp4Filename}': {ex.Message}");
+                        }
+                    }
                     return;
                 }
             }
@@ -129,7 +179,7 @@ namespace SleepLogger
                 logger.LogTrace($"FDwfAnalogInStatusData begin | dwfHandle:{dwfHandle}, cAvailable:{cAvailable}");
                 dwf.FDwfAnalogInStatusData(dwfHandle, 0, voltData, cAvailable);     // get channel 1 data chunk
                 logger.LogTrace($"FDwfAnalogInStatusData end   | voltData.Count:{voltData.Count()}");
-                
+
                 cSamples += cAvailable;
 
                 if (config.Postprocessing.Enabled)
@@ -245,8 +295,7 @@ namespace SleepLogger
 
                                         //save it the FFT to a JSON file
                                         sw.Restart();
-                                        string fftDataJson = JsonSerializer.Serialize(fftData);
-                                        File.WriteAllTextAsync($"{pathToFile}.fft", fftDataJson);
+                                        FftData.SaveAs(fftData, $"{pathToFile}.fft.zip", false);
                                         sw.Stop();
                                         logger.LogInformation($"#{bi.ToString("0000")} Save as FFT completed in {sw.ElapsedMilliseconds} ms.");
                                     });
@@ -260,18 +309,7 @@ namespace SleepLogger
 
                                         //save it the FFT to a zipped JSON file
                                         sw.Restart();
-                                        string fftDataJson = JsonSerializer.Serialize(fftData);
-                                        using (FileStream zipToOpen = new FileStream($"{pathToFile}.fft.zip", FileMode.Create))
-                                        {
-                                            using (ZipArchive archive = new ZipArchive(zipToOpen, ZipArchiveMode.Create))
-                                            {
-                                                ZipArchiveEntry fftFileEntry = archive.CreateEntry($"{filename}.fft");
-                                                using (StreamWriter writer = new StreamWriter(fftFileEntry.Open()))
-                                                {
-                                                    writer.Write(fftDataJson);
-                                                }
-                                            }
-                                        }
+                                        FftData.SaveAs(fftData, $"{pathToFile}.fft.zip", true);
                                         sw.Stop();
                                         logger.LogInformation($"#{bi.ToString("0000")} Save as compressed FFT completed in {sw.ElapsedMilliseconds} ms.");
                                     });
@@ -285,7 +323,7 @@ namespace SleepLogger
 
                                         //save a PNG with the values
                                         sw.Restart();
-                                        SaveSignalAsPng($"{pathToFile}_200kHz.png", fftData, 200000, 100, 1080, 15);
+                                        SaveSignalAsPng($"{pathToFile}_200kHz.png", fftData, 200000, 100);
                                         //SaveSignalAsPng($"{filename}_1kHz.png", fftData, 1000, 1, 1080, 1);
                                         sw.Stop();
                                         logger.LogInformation($"#{bi.ToString("0000")} Save as PNG completed in {sw.ElapsedMilliseconds} ms.");
@@ -307,7 +345,7 @@ namespace SleepLogger
         }
 
         private static int InitializeAD2(ILogger logger, SleepLoggerConfig config)
-        {            
+        {
             logger.LogInformation("Opening first device");
             dwf.FDwfDeviceOpen(-1, out int dwfHandle);
 
@@ -355,16 +393,30 @@ namespace SleepLogger
             return dwfHandle;
         }
 
-        private static void SaveSignalAsPng(string filename, FftData fftData, int maxSamples, double sampleAmplification = 100.0, int height = 1080, float resoltionScaleDownFactor = 15.0f)
+        private static void SaveSignalAsPng(string filename, FftData fftData, int maxSamples, double sampleAmplification)
         {
-            const int maxPngWidth = 20000;
-            Font font = new Font("Georgia", 10.0f * resoltionScaleDownFactor);
+            int rowHeight = 900;
+            int widthSteps = 5000;
+
+            Size targetResolution = new Size(1920, 1080);
+            float idealAspectRatio = (float)targetResolution.Width / (float)targetResolution.Height;
 
             // convert samples into log scale (dBm)
             //var samples = signal.Samples.Select(s => Scale.ToDecibel(s)).ToArray();
             var samples = fftData.MagnitudeData.Take(maxSamples).ToArray();
-            int width = Math.Min(maxPngWidth, samples.Length);
-            int dataRows = Math.Max(1, (int)Math.Ceiling((double)samples.Length / maxPngWidth));
+            
+            int width = 0;
+            float currentAspectRatio;
+            int rowCount;
+            do
+            {
+                width = Math.Min(width + widthSteps, samples.Length);
+                rowCount = Math.Max(1, (int)Math.Ceiling((double)samples.Length / width));
+                currentAspectRatio = (float)width / (rowCount * rowHeight);
+            } while (currentAspectRatio < idealAspectRatio);
+
+            float resoltionScaleDownFactor = Math.Max((float)width / targetResolution.Width, (float)(rowHeight * rowCount) / targetResolution.Height);
+            Font font = new Font("Georgia", 10.0f * resoltionScaleDownFactor);
 
             int originalSampleCount = samples.Length;
             int onePercentCount = originalSampleCount / 100;
@@ -386,16 +438,16 @@ namespace SleepLogger
             Color bgColor = Color.LightGray;
             Brush lineColor = new SolidBrush(Color.DarkGray);
 
-            Bitmap spectrumBitmap = new Bitmap(width, height * dataRows, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            Bitmap spectrumBitmap = new Bitmap(width, rowHeight * rowCount, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
             Graphics graphics = Graphics.FromImage(spectrumBitmap);
-            graphics.FillRectangle(new SolidBrush(bgColor), new Rectangle(0, 0, width, height * dataRows));
+            graphics.FillRectangle(new SolidBrush(bgColor), new Rectangle(0, 0, width, rowHeight * rowCount));
 
             var pen = new Pen(lineColor, 1);
 
-            for (int r = 1; r <= dataRows; r++)
+            for (int r = 1; r <= rowCount; r++)
             {
-                int bottomLine = r * height;
+                int bottomLine = r * rowHeight;
 
                 for (int i = 0; i < width; i++)
                 {
@@ -404,7 +456,7 @@ namespace SleepLogger
 
                     if (samples[dataPointIndex] - valueTreshold > 0)
                     {
-                        int valueToShow = (int)Math.Min((samples[dataPointIndex] - valueTreshold) * sampleAmplification, height);
+                        int valueToShow = (int)Math.Min((samples[dataPointIndex] - valueTreshold) * sampleAmplification, rowHeight);
 
                         graphics.DrawLine(pen, new Point(i, bottomLine), new Point(i, bottomLine - valueToShow));
                     }
@@ -412,14 +464,17 @@ namespace SleepLogger
 
                 if (((r - 1) * width) / 1000 > 0)
                 {
-                    graphics.DrawString($"{((r - 1) * width) / 1000} kHz", font, Brushes.White, new PointF(100.0f, bottomLine - (height * 0.75f)));
+                    graphics.DrawString($"{((r - 1) * width) / 1000} kHz", font, Brushes.White, new PointF(100.0f, bottomLine - (rowHeight * 0.75f)));
                 }
-                graphics.DrawString($"{(r * width) / 1000} kHz", font, Brushes.White, new PointF(width - (75.0f * resoltionScaleDownFactor), bottomLine - (height * 0.75f)));
+                graphics.DrawString($"{(r * width) / 1000} kHz", font, Brushes.White, new PointF(width - (75.0f * resoltionScaleDownFactor), bottomLine - (rowHeight * 0.75f)));
             }
 
             graphics.DrawString($"{filename}", font, Brushes.White, new PointF(width - (350.0f * resoltionScaleDownFactor), 10.0f));
 
-            var scaledDownBitmap = new Bitmap(spectrumBitmap, new Size((int)(spectrumBitmap.Width / resoltionScaleDownFactor), (int)(spectrumBitmap.Height / resoltionScaleDownFactor)));
+
+            int scaledDownWidth = (((int)(spectrumBitmap.Width / resoltionScaleDownFactor)) / 2) * 2;
+            int scaledDownHeight = (((int)(spectrumBitmap.Height / resoltionScaleDownFactor)) / 2) * 2;
+            var scaledDownBitmap = new Bitmap(spectrumBitmap, new Size(scaledDownWidth, scaledDownHeight));
 
             FileStream pngFile = new FileStream(filename, FileMode.Create);
             scaledDownBitmap.Save(pngFile, System.Drawing.Imaging.ImageFormat.Png);
