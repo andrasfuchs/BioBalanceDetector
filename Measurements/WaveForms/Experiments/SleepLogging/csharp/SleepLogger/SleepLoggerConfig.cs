@@ -28,7 +28,15 @@ namespace SleepLogger
                 SaveAsWAV = Boolean.Parse(config["Postprocessing:SaveAsWAV"]),
                 SaveAsFFT = Boolean.Parse(config["Postprocessing:SaveAsFFT"]),
                 SaveAsCompressedFFT = Boolean.Parse(config["Postprocessing:SaveAsCompressedFFT"]),
-                SaveAsPNG = Boolean.Parse(config["Postprocessing:SaveAsPNG"]),
+                SaveAsPng = new SaveAsPngConfig()
+                {
+                    Enabled = Boolean.Parse(config["Postprocessing:SaveAsPNG:Enabled"]),
+                    TargetWidth = Int32.Parse(config["Postprocessing:SaveAsPNG:TargetWidth"]),
+                    TargetHeight = Int32.Parse(config["Postprocessing:SaveAsPNG:TargetHeight"]),
+                    RangeVolt = Single.Parse(config["Postprocessing:SaveAsPNG:RangeVolt"]),
+                    RowWidthStepsSamples = Int32.Parse(config["Postprocessing:SaveAsPNG:RowWidthStepsSamples"]),
+                    RowHeightPixels = Int32.Parse(config["Postprocessing:SaveAsPNG:RowHeightPixels"]),
+                },
                 MagnitudeThreshold = Single.Parse(config["Postprocessing:MagnitudeThreshold"]),
             };
         }
@@ -62,10 +70,21 @@ namespace SleepLogger
         /// FFT size
         /// </summary>
         public int FFTSize { get; set; }
+        public float MagnitudeThreshold { get; set; }
         public bool SaveAsWAV { get; set; }
         public bool SaveAsFFT { get; set; }
         public bool SaveAsCompressedFFT { get; set; }
-        public bool SaveAsPNG { get; set; }
-        public float MagnitudeThreshold { get; set; }
+        public SaveAsPngConfig SaveAsPng { get; set; }
     }
+
+    public class SaveAsPngConfig
+    {
+        public bool Enabled { get; set; }
+        public int TargetWidth { get; set; }
+        public int TargetHeight { get; set; }
+        public float RangeVolt { get; set; }
+        public int RowWidthStepsSamples { get; set; }
+        public int RowHeightPixels { get; set; }      
+    }
+
 }

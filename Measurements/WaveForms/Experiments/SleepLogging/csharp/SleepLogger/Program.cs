@@ -33,6 +33,9 @@ namespace SleepLogger
         static List<float> samples = new List<float>();
         static double[] voltData;
 
+        static List<float> minValues = new List<float>();
+        static List<float> maxValues = new List<float>();
+
         static SleepLoggerConfig config;
 
         static void Main(string[] args)
@@ -102,7 +105,7 @@ namespace SleepLogger
                                     continue;
                                 }
 
-                                SaveSignalAsPng($"{filenameWithoutExtension}_200kHz.png", fftData, 60000, 1000);
+                                SaveSignalAsPng($"{filenameWithoutExtension}_200kHz.png", fftData, config.Postprocessing.SaveAsPng, 60000);
                                 logger.LogInformation($"{filenameWithoutExtension}_200kHz.png was generated successfully.");
                             }
                             catch (Exception ex)
@@ -276,14 +279,15 @@ namespace SleepLogger
                                 sw.Stop();
                                 logger.LogInformation($"#{bi.ToString("0000")} Signal processing completed in {sw.ElapsedMilliseconds} ms.");
 
-                                var powerSpectrum = new DiscreteSignal((int)(targetSamplerate / 2 / config.Postprocessing.IntervalSeconds), concatenatedPowerSpectrum);
-                                fftData.FrequencyStep = ((float)config.AD2.Samplerate / 2) / (powerSpectrum.Samples.Length - 1);
-                                fftData.MagnitudeData = powerSpectrum.Samples;
+                                var magnitudes = new DiscreteSignal((int)(targetSamplerate / 2 / config.Postprocessing.IntervalSeconds), concatenatedPowerSpectrum);
+                                fftData.FrequencyStep = ((float)config.AD2.Samplerate / 2) / (magnitudes.Samples.Length - 1);
+                                // normalize the data so that 1.0 means 1.0 V of peak to peak amplitude
+                                fftData.MagnitudeData = magnitudes.Samples.Select(md => md / 130750.0f).ToArray();
 
-                                float averageMagnitude = powerSpectrum.Samples.Take(100).Average();
+                                float averageMagnitude = fftData.MagnitudeData.Take(1000).Average();
                                 if (averageMagnitude < config.Postprocessing.MagnitudeThreshold)
                                 {
-                                    logger.LogWarning($"#{bi.ToString("0000")} Signal magnitude is too low: {averageMagnitude}");
+                                    logger.LogWarning($"#{bi.ToString("0000")} The average magnitude for the first 1000 values is too low: {averageMagnitude * 1000 * 1000} µV");
                                     return;
                                 }
 
@@ -295,7 +299,7 @@ namespace SleepLogger
 
                                         //save it the FFT to a JSON file
                                         sw.Restart();
-                                        FftData.SaveAs(fftData, $"{pathToFile}.fft.zip", false);
+                                        FftData.SaveAs(fftData, $"{pathToFile}.fft", false);
                                         sw.Stop();
                                         logger.LogInformation($"#{bi.ToString("0000")} Save as FFT completed in {sw.ElapsedMilliseconds} ms.");
                                     });
@@ -309,13 +313,13 @@ namespace SleepLogger
 
                                         //save it the FFT to a zipped JSON file
                                         sw.Restart();
-                                        FftData.SaveAs(fftData, $"{pathToFile}.fft.zip", true);
+                                        FftData.SaveAs(fftData, $"{pathToFile}.zip", true);
                                         sw.Stop();
                                         logger.LogInformation($"#{bi.ToString("0000")} Save as compressed FFT completed in {sw.ElapsedMilliseconds} ms.");
                                     });
                                 }
 
-                                if (config.Postprocessing.SaveAsPNG)
+                                if (config.Postprocessing.SaveAsPng.Enabled)
                                 {
                                     Task.Run(() =>
                                     {
@@ -323,7 +327,7 @@ namespace SleepLogger
 
                                         //save a PNG with the values
                                         sw.Restart();
-                                        SaveSignalAsPng($"{pathToFile}_200kHz.png", fftData, 200000, 100);
+                                        SaveSignalAsPng($"{pathToFile}_200kHz.png", fftData, config.Postprocessing.SaveAsPng, 200000);
                                         //SaveSignalAsPng($"{filename}_1kHz.png", fftData, 1000, 1, 1080, 1);
                                         sw.Stop();
                                         logger.LogInformation($"#{bi.ToString("0000")} Save as PNG completed in {sw.ElapsedMilliseconds} ms.");
@@ -393,13 +397,13 @@ namespace SleepLogger
             return dwfHandle;
         }
 
-        private static void SaveSignalAsPng(string filename, FftData fftData, int maxSamples, double sampleAmplification)
+        private static void SaveSignalAsPng(string filename, FftData fftData, SaveAsPngConfig config, int maxSamples)
         {
-            int rowHeight = 900;
-            int widthSteps = 5000;
-
-            Size targetResolution = new Size(1920, 1080);
+            Size targetResolution = new Size(config.TargetWidth, config.TargetHeight);
             float idealAspectRatio = (float)targetResolution.Width / (float)targetResolution.Height;
+
+            maxValues.Add(fftData.MagnitudeData.Max());
+            int index = Array.FindIndex(fftData.MagnitudeData, d => d == maxValues[maxValues.Count-1]);
 
             // convert samples into log scale (dBm)
             //var samples = signal.Samples.Select(s => Scale.ToDecibel(s)).ToArray();
@@ -410,53 +414,46 @@ namespace SleepLogger
             int rowCount;
             do
             {
-                width = Math.Min(width + widthSteps, samples.Length);
+                width = Math.Min(width + config.RowWidthStepsSamples, samples.Length);
                 rowCount = Math.Max(1, (int)Math.Ceiling((double)samples.Length / width));
-                currentAspectRatio = (float)width / (rowCount * rowHeight);
+                currentAspectRatio = (float)width / (rowCount * config.RowHeightPixels);
             } while (currentAspectRatio < idealAspectRatio);
 
-            float resoltionScaleDownFactor = Math.Max((float)width / targetResolution.Width, (float)(rowHeight * rowCount) / targetResolution.Height);
+            float resoltionScaleDownFactor = Math.Max((float)width / targetResolution.Width, (float)(config.RowHeightPixels * rowCount) / targetResolution.Height);
             Font font = new Font("Georgia", 10.0f * resoltionScaleDownFactor);
 
             int originalSampleCount = samples.Length;
             int onePercentCount = originalSampleCount / 100;
-            double[] filteredSamples = new double[originalSampleCount - 1];
+            //double[] filteredSamples = new double[originalSampleCount - 1];
             //skip the first value, its the total power
-            Array.Copy(samples, 1, filteredSamples, 0, originalSampleCount - 1);
-            Array.Sort(filteredSamples);
+            //Array.Copy(samples, 1, filteredSamples, 0, originalSampleCount - 1);
+            //Array.Sort(filteredSamples);
             //discard the top 1% and bottom 1% to calculate the scale
             //filteredSamples = filteredSamples.Take(originalSampleCount - onePercentCount).TakeLast(originalSampleCount - onePercentCount - onePercentCount).ToArray();
-
-            //double scale = height / (filteredSamples.Max() - filteredSamples.Min());
-            //double scale = 4.0;             //this is good enough for the 2V peak-to-peak signal detection
-            //double valueTreshold = -128;    //typical received signal power from a GPS satellite
-
-            //double scale = 2500000.0;     // for normalized
-            double valueTreshold = 0;
-
 
             Color bgColor = Color.LightGray;
             Brush lineColor = new SolidBrush(Color.DarkGray);
 
-            Bitmap spectrumBitmap = new Bitmap(width, rowHeight * rowCount, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            Bitmap spectrumBitmap = new Bitmap(width, config.RowHeightPixels * rowCount, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
             Graphics graphics = Graphics.FromImage(spectrumBitmap);
-            graphics.FillRectangle(new SolidBrush(bgColor), new Rectangle(0, 0, width, rowHeight * rowCount));
+            graphics.FillRectangle(new SolidBrush(bgColor), new Rectangle(0, 0, width, config.RowHeightPixels * rowCount));
 
             var pen = new Pen(lineColor, 1);
+            float sampleAmplification = (1.0f / config.RangeVolt) * config.RowHeightPixels;
 
             for (int r = 1; r <= rowCount; r++)
             {
-                int bottomLine = r * rowHeight;
+                int bottomLine = r * config.RowHeightPixels;
 
                 for (int i = 0; i < width; i++)
                 {
                     int dataPointIndex = (r - 1) * width + i;
                     if ((dataPointIndex >= samples.Length) || (dataPointIndex >= maxSamples)) continue;
 
-                    if (samples[dataPointIndex] - valueTreshold > 0)
+                    if (samples[dataPointIndex] > 0)
                     {
-                        int valueToShow = (int)Math.Min((samples[dataPointIndex] - valueTreshold) * sampleAmplification, rowHeight);
+                        int valueToShow = (int)Math.Min(samples[dataPointIndex] * sampleAmplification, config.RowHeightPixels);
 
                         graphics.DrawLine(pen, new Point(i, bottomLine), new Point(i, bottomLine - valueToShow));
                     }
@@ -464,12 +461,13 @@ namespace SleepLogger
 
                 if (((r - 1) * width) / 1000 > 0)
                 {
-                    graphics.DrawString($"{((r - 1) * width) / 1000} kHz", font, Brushes.White, new PointF(100.0f, bottomLine - (rowHeight * 0.75f)));
+                    graphics.DrawString($"{((r - 1) * width) / 1000} kHz", font, Brushes.White, new PointF(100.0f, bottomLine - (config.RowHeightPixels * 0.75f)));
                 }
-                graphics.DrawString($"{(r * width) / 1000} kHz", font, Brushes.White, new PointF(width - (75.0f * resoltionScaleDownFactor), bottomLine - (rowHeight * 0.75f)));
+                graphics.DrawString($"{(r * width) / 1000} kHz", font, Brushes.White, new PointF(width - (75.0f * resoltionScaleDownFactor), bottomLine - (config.RowHeightPixels * 0.75f)));
             }
 
             graphics.DrawString($"{filename}", font, Brushes.White, new PointF(width - (350.0f * resoltionScaleDownFactor), 10.0f));
+            graphics.DrawString($"Y range: {Math.Round(config.RangeVolt * 1000 * 1000)} µV", font, Brushes.White, new PointF(width - (350.0f * resoltionScaleDownFactor), 30.0f + font.Height));
 
 
             int scaledDownWidth = (((int)(spectrumBitmap.Width / resoltionScaleDownFactor)) / 2) * 2;
