@@ -36,12 +36,13 @@ namespace SleepLogger
         static List<float> minValues = new List<float>();
         static List<float> maxValues = new List<float>();
 
+        static IConfigurationRoot configuration;
         static SleepLoggerConfig config;
 
         static void Main(string[] args)
         {
             // Build configuration
-            var configuration = new ConfigurationBuilder()
+            configuration = new ConfigurationBuilder()
                 .SetBasePath(AppContext.BaseDirectory)
                 .AddJsonFile("appsettings.json", false)
                 .Build();
@@ -66,6 +67,7 @@ namespace SleepLogger
 
             try
             {
+                configuration.Reload();
                 config = new SleepLoggerConfig(configuration);
             }
             catch (Exception ex)
@@ -162,11 +164,11 @@ namespace SleepLogger
 
                 logger.LogTrace($"FDwfAnalogInStatusRecord begin | dwfHandle:{dwfHandle}");
                 dwf.FDwfAnalogInStatusRecord(dwfHandle, out int cAvailable, out int cLost, out int cCorrupted);
-                logger.LogTrace($"FDwfAnalogInStatusRecord end   | cAvailable:{cAvailable}, cLost:{cLost}, cCorrupted:{cCorrupted}");
+                logger.LogTrace($"FDwfAnalogInStatusRecord end   | cAvailable:{cAvailable:N0}, cLost:{cLost:N0}, cCorrupted:{cCorrupted:N0}");
 
                 if (cAvailable == 0)
                 {
-                    logger.LogWarning($"Aqusition error! cAvailable: {cAvailable}");
+                    logger.LogWarning($"Aqusition error! cAvailable: {cAvailable:N0}");
                     Thread.Sleep(500);
                     logger.LogInformation($"Reseting device...");
                     dwfHandle = InitializeAD2(logger, config);
@@ -175,13 +177,13 @@ namespace SleepLogger
 
                 if ((cLost > 0) || (cCorrupted > 0))
                 {
-                    logger.LogInformation($"Data error! cLost:{cLost}, cCorrupted:{cCorrupted}");
+                    logger.LogInformation($"Data error! cLost:{cLost:N0}, cCorrupted:{cCorrupted:N0}");
                     skipBuffer = true;
                 }
 
-                logger.LogTrace($"FDwfAnalogInStatusData begin | dwfHandle:{dwfHandle}, cAvailable:{cAvailable}");
+                logger.LogTrace($"FDwfAnalogInStatusData begin | dwfHandle:{dwfHandle}, cAvailable:{cAvailable:N0}");
                 dwf.FDwfAnalogInStatusData(dwfHandle, 0, voltData, cAvailable);     // get channel 1 data chunk
-                logger.LogTrace($"FDwfAnalogInStatusData end   | voltData.Count:{voltData.Count()}");
+                logger.LogTrace($"FDwfAnalogInStatusData end   | voltData.Count:{voltData.Count():N0}");
 
                 cSamples += cAvailable;
 
@@ -202,7 +204,7 @@ namespace SleepLogger
                             {
                                 int bi = bufferIndex;
 
-                                logger.LogTrace($"Postprocessing thread #{bi} begin");
+                                logger.LogTrace($"Postprocessing thread #{bi:N0} begin");
 
                                 var fftData = new FftData()
                                 {
@@ -235,54 +237,25 @@ namespace SleepLogger
                                     waveFileStream.Close();
 
                                     sw.Stop();
-                                    logger.LogInformation($"#{bi.ToString("0000")} Save as WAV completed in {sw.ElapsedMilliseconds} ms.");
+                                    logger.LogInformation($"#{bi.ToString("0000")} Save as WAV completed in {sw.ElapsedMilliseconds:N0} ms.");
                                 }
 
                                 sw.Restart();
-                                int targetSamplerate = config.Postprocessing.FFTSize;
-                                int sampleRateMultiplier = 1;
-
-                                while (targetSamplerate < signal.SamplingRate)
-                                {
-                                    targetSamplerate *= 2;
-                                    sampleRateMultiplier *= 2;
-                                }
-                                float[] concatenatedPowerSpectrum = new float[targetSamplerate / 2 + 1];
-
-                                var resampler = new Resampler();
-                                if (targetSamplerate != signal.SamplingRate)
-                                {
-                                    signal = resampler.Resample(signal, targetSamplerate);
-                                }
-
-                                while (signal.SamplingRate >= config.Postprocessing.FFTSize)
-                                {
-                                    var fft = new RealFft(config.Postprocessing.FFTSize);
-                                    var partialPowerSpectrum = fft.MagnitudeSpectrum(signal, normalize: false);
-
-                                    if (concatenatedPowerSpectrum[0] == 0)
-                                    {
-                                        concatenatedPowerSpectrum[0] = partialPowerSpectrum[0];
-                                    }
-
-                                    for (int i = 1; i < partialPowerSpectrum.Length; i++)
-                                    {
-                                        for (int j = 0; j < sampleRateMultiplier; j++)
-                                        {
-                                            concatenatedPowerSpectrum[(i - 1) * sampleRateMultiplier + j] = partialPowerSpectrum[i];
-                                        }
-                                    }
-
-                                    signal = new DiscreteSignal(signal.SamplingRate / 2, signal.Samples.Where((value, index) => index % 2 == 0).ToArray());
-                                    sampleRateMultiplier /= 2;
-                                }
+                                var fft = new RealFft(config.Postprocessing.FFTSize);
+                                var magnitudes = fft.MagnitudeSpectrum(signal, normalize: false);
+                                // clear the 0th coefficient (DC component)
+                                magnitudes.Samples[0] = 0;
                                 sw.Stop();
-                                logger.LogInformation($"#{bi.ToString("0000")} Signal processing completed in {sw.ElapsedMilliseconds} ms.");
+                                logger.LogInformation($"#{bi.ToString("0000")} Signal processing completed in {sw.ElapsedMilliseconds:N0} ms.");
 
-                                var magnitudes = new DiscreteSignal((int)(targetSamplerate / 2 / config.Postprocessing.IntervalSeconds), concatenatedPowerSpectrum);
+                                //var magnitudes = new DiscreteSignal((int)(targetSamplerate / 2 / config.Postprocessing.IntervalSeconds), concatenatedPowerSpectrum);
                                 fftData.FrequencyStep = ((float)config.AD2.Samplerate / 2) / (magnitudes.Samples.Length - 1);
                                 // normalize the data so that 1.0 means 1.0 V of peak to peak amplitude
                                 fftData.MagnitudeData = magnitudes.Samples.Select(md => md / 130750.0f).ToArray();
+
+                                maxValues.Add(fftData.MagnitudeData.Max());
+                                int maxIndex = Array.FindIndex(fftData.MagnitudeData, d => d == maxValues[maxValues.Count - 1]);
+                                logger.LogInformation($"#{bi.ToString("0000")} The maximum magnitude is {maxValues[maxValues.Count - 1] * 1000 * 1000:N} µV at the index of #{maxIndex:N0} ({maxIndex * fftData.FrequencyStep:N} Hz).");
 
                                 float averageMagnitude = fftData.MagnitudeData.Take(1000).Average();
                                 if (averageMagnitude < config.Postprocessing.MagnitudeThreshold)
@@ -301,7 +274,7 @@ namespace SleepLogger
                                         sw.Restart();
                                         FftData.SaveAs(fftData, $"{pathToFile}.fft", false);
                                         sw.Stop();
-                                        logger.LogInformation($"#{bi.ToString("0000")} Save as FFT completed in {sw.ElapsedMilliseconds} ms.");
+                                        logger.LogInformation($"#{bi.ToString("0000")} Save as FFT completed in {sw.ElapsedMilliseconds:N0} ms.");
                                     });
                                 }
 
@@ -315,7 +288,7 @@ namespace SleepLogger
                                         sw.Restart();
                                         FftData.SaveAs(fftData, $"{pathToFile}.zip", true);
                                         sw.Stop();
-                                        logger.LogInformation($"#{bi.ToString("0000")} Save as compressed FFT completed in {sw.ElapsedMilliseconds} ms.");
+                                        logger.LogInformation($"#{bi.ToString("0000")} Save as compressed FFT completed in {sw.ElapsedMilliseconds:N0} ms.");
                                     });
                                 }
 
@@ -330,11 +303,11 @@ namespace SleepLogger
                                         SaveSignalAsPng($"{pathToFile}_200kHz.png", fftData, config.Postprocessing.SaveAsPng, 200000);
                                         //SaveSignalAsPng($"{filename}_1kHz.png", fftData, 1000, 1, 1080, 1);
                                         sw.Stop();
-                                        logger.LogInformation($"#{bi.ToString("0000")} Save as PNG completed in {sw.ElapsedMilliseconds} ms.");
+                                        logger.LogInformation($"#{bi.ToString("0000")} Save as PNG completed in {sw.ElapsedMilliseconds:N0} ms.");
                                     });
                                 }
 
-                                logger.LogTrace($"Postprocessing thread #{bi} end");
+                                logger.LogTrace($"Postprocessing thread #{bi:N0} end");
                             }
                             );
                         }
@@ -365,11 +338,18 @@ namespace SleepLogger
 
             dwf.FDwfAnalogInBufferSizeInfo(dwfHandle, out int bufferSizeMinimum, out int bufferSizeMaximum);
             bufferSize = Math.Min(bufferSizeMaximum, config.AD2.Samplerate);
-            logger.LogInformation($"Device buffer size range: {bufferSizeMinimum} - {bufferSizeMaximum} samples, set to {bufferSize}.");
+            logger.LogInformation($"Device buffer size range: {bufferSizeMinimum:N0} - {bufferSizeMaximum:N0} samples, set to {bufferSize:N0}.");
             voltData = new double[bufferSize];
 
             //set up acquisition
             dwf.FDwfAnalogInFrequencySet(dwfHandle, config.AD2.Samplerate);
+            dwf.FDwfAnalogInFrequencyGet(dwfHandle, out double realSamplerate);
+
+            if (config.AD2.Samplerate != realSamplerate)
+            {
+                logger.LogWarning($"The sampling rate of {config.AD2.Samplerate:N} Hz is not supported, so the effective sampling rate was set to {realSamplerate:N} Hz. Native sampling rates for AD2 are the following: 1, 2, 4, 5, 8, 10, 16, 20, 25, 32, 40, 50, 64, 80, 100, 125, 128, 160, 200, 250, 256, 320, 400, 500, 625, 640, 800 Hz, 1, 1.25, 1.28, 1.6, 2, 2.5, 3.125, 3.2, 4, 5, 6.25, 6.4, 8, 10, 12.5, 15.625, 16, 20, 25, 31.250, 32, 40, 50, 62.5, 78.125, 80, 100, 125, 156.25, 160, 200, 250, 312.5, 390.625, 400, 500, 625, 781.25, 800 kHz, 1, 1.25, 1.5625, 2, 2.5, 3.125, 4, 5, 6.25, 10, 12.5, 20, 25, 50 and 100 MHz.");
+            }
+
             dwf.FDwfAnalogInBufferSizeSet(dwfHandle, bufferSize);
             dwf.FDwfAnalogInChannelEnableSet(dwfHandle, 0, 1);
             dwf.FDwfAnalogInChannelRangeSet(dwfHandle, 0, 5.0);
@@ -382,7 +362,7 @@ namespace SleepLogger
             dwf.FDwfAnalogOutNodeFrequencySet(dwfHandle, config.AD2.SignalGeneratorChannel, dwf.AnalogOutNodeCarrier, config.AD2.SignalGeneratorHz);
             dwf.FDwfAnalogOutNodeAmplitudeSet(dwfHandle, config.AD2.SignalGeneratorChannel, dwf.AnalogOutNodeCarrier, config.AD2.SignalGeneratorVolt);
 
-            logger.LogInformation($"Generating sine wave at {config.AD2.SignalGeneratorHz} Hz...");
+            logger.LogInformation($"Generating sine wave at {config.AD2.SignalGeneratorHz:N} Hz...");
             dwf.FDwfAnalogOutConfigure(dwfHandle, config.AD2.SignalGeneratorChannel, 1);
 
             //wait at least 2 seconds for the offset to stabilize
@@ -392,7 +372,7 @@ namespace SleepLogger
             logger.LogInformation("Starting oscilloscope");
             dwf.FDwfAnalogInConfigure(dwfHandle, 0, 1);
 
-            logger.LogInformation($"Recording data at {config.AD2.Samplerate} Hz, press Ctrl+C to stop...");
+            logger.LogInformation($"Recording data at {config.AD2.Samplerate:N} Hz, press Ctrl+C to stop...");
 
             return dwfHandle;
         }
@@ -401,9 +381,6 @@ namespace SleepLogger
         {
             Size targetResolution = new Size(config.TargetWidth, config.TargetHeight);
             float idealAspectRatio = (float)targetResolution.Width / (float)targetResolution.Height;
-
-            maxValues.Add(fftData.MagnitudeData.Max());
-            int index = Array.FindIndex(fftData.MagnitudeData, d => d == maxValues[maxValues.Count-1]);
 
             // convert samples into log scale (dBm)
             //var samples = signal.Samples.Select(s => Scale.ToDecibel(s)).ToArray();

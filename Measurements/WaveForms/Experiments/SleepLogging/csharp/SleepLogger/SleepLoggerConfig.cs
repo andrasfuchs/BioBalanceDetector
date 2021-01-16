@@ -14,17 +14,18 @@ namespace SleepLogger
         {
             AD2 = new AD2Config()
             {
-                Samplerate = config["AD2:Samplerate"].EndsWith("k") ? Int32.Parse(config["AD2:Samplerate"][0..^1]) * 1024 : Int32.Parse(config["AD2:Samplerate"]),
+                Samplerate = (int)ParseNumber(config["AD2:Samplerate"]),
                 SignalGeneratorChannel = config["AD2:SignalGeneratorChannel"] == "W1" ? 0 : config["AD2:SignalGeneratorChannel"] == "W2" ? 1 : 255,
-                SignalGeneratorHz = Single.Parse(config["AD2:SignalGeneratorHz"]),
-                SignalGeneratorVolt = Single.Parse(config["AD2:SignalGeneratorVolt"]),
+                SignalGeneratorHz = ParseNumber(config["AD2:SignalGeneratorHz"]),
+                SignalGeneratorVolt = ParseNumber(config["AD2:SignalGeneratorVolt"]),
             };
 
             Postprocessing = new PostprocessingConfig()
             {
                 Enabled = Boolean.Parse(config["Postprocessing:Enabled"]),
-                IntervalSeconds = Single.Parse(config["Postprocessing:IntervalSeconds"]),
-                FFTSize = config["Postprocessing:FFTSize"].EndsWith("k") ? Int32.Parse(config["Postprocessing:FFTSize"][0..^1]) * 1024 : Int32.Parse(config["Postprocessing:FFTSize"]),
+                IntervalSeconds = ParseNumber(config["Postprocessing:IntervalSeconds"]),
+                FFTSize = (int)ParseNumber(config["Postprocessing:FFTSize"], true),
+                MagnitudeThreshold = ParseNumber(config["Postprocessing:MagnitudeThreshold"]),
                 SaveAsWAV = Boolean.Parse(config["Postprocessing:SaveAsWAV"]),
                 SaveAsFFT = Boolean.Parse(config["Postprocessing:SaveAsFFT"]),
                 SaveAsCompressedFFT = Boolean.Parse(config["Postprocessing:SaveAsCompressedFFT"]),
@@ -33,12 +34,16 @@ namespace SleepLogger
                     Enabled = Boolean.Parse(config["Postprocessing:SaveAsPNG:Enabled"]),
                     TargetWidth = Int32.Parse(config["Postprocessing:SaveAsPNG:TargetWidth"]),
                     TargetHeight = Int32.Parse(config["Postprocessing:SaveAsPNG:TargetHeight"]),
-                    RangeVolt = Single.Parse(config["Postprocessing:SaveAsPNG:RangeVolt"]),
+                    RangeVolt = ParseNumber(config["Postprocessing:SaveAsPNG:RangeVolt"]),
                     RowWidthStepsSamples = Int32.Parse(config["Postprocessing:SaveAsPNG:RowWidthStepsSamples"]),
                     RowHeightPixels = Int32.Parse(config["Postprocessing:SaveAsPNG:RowHeightPixels"]),
                 },
-                MagnitudeThreshold = Single.Parse(config["Postprocessing:MagnitudeThreshold"]),
             };
+        }
+
+        private float ParseNumber(string str, bool mode = false)
+        {
+            return str.EndsWith("k") ? Single.Parse(str[0..^1]) * (mode ? 1024 : 1000) : Single.Parse(str);
         }
     }
 
