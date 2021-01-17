@@ -229,9 +229,9 @@ namespace SleepLogger
                                     sw.Restart();
                                     //and save samples to a WAV file
                                     FileStream waveFileStream = new FileStream($"{pathToFile}.wav", FileMode.Create);
-
-                                    signal.Amplify(inputAmplification);
-                                    WaveFile waveFile = new WaveFile(signal, 16);
+                                    DiscreteSignal signalToSave = new DiscreteSignal(signal.SamplingRate, signal.Samples, true);
+                                    signalToSave.Amplify(inputAmplification);
+                                    WaveFile waveFile = new WaveFile(signalToSave, 16);
                                     waveFile.SaveTo(waveFileStream, false);
 
                                     waveFileStream.Close();
@@ -260,7 +260,7 @@ namespace SleepLogger
                                 float averageMagnitude = fftData.MagnitudeData.Take(1000).Average();
                                 if (averageMagnitude < config.Postprocessing.MagnitudeThreshold)
                                 {
-                                    logger.LogWarning($"#{bi.ToString("0000")} The average magnitude for the first 1000 values is too low: {averageMagnitude * 1000 * 1000} µV");
+                                    logger.LogWarning($"#{bi.ToString("0000")} The average magnitude for the first 1000 values is too low: {averageMagnitude * 1000 * 1000:N0} µV. The threashold is {config.Postprocessing.MagnitudeThreshold * 1000 * 1000:N0} µV.");
                                     return;
                                 }
 

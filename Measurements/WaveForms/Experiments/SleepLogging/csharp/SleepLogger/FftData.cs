@@ -34,7 +34,7 @@ namespace SleepLogger
 
         internal static void SaveAs(FftData fftData, string pathToFile, bool compress)
         {
-            pathToFile = pathToFile.Substring(0, pathToFile.Length - Path.GetExtension(pathToFile).Length == 0 ? 0 : Path.GetExtension(pathToFile).Length + 1);
+            pathToFile = pathToFile.Substring(0, pathToFile.Length - Path.GetExtension(pathToFile).Length);
             string filename = Path.GetFileNameWithoutExtension(pathToFile);
             string fftDataJson = JsonSerializer.Serialize(fftData);
 
