@@ -33,7 +33,6 @@ namespace SleepLogger
         static List<float> samples = new List<float>();
         static double[] voltData;
 
-        static List<float> minValues = new List<float>();
         static List<float> maxValues = new List<float>();
 
         static IConfigurationRoot configuration;
@@ -60,10 +59,12 @@ namespace SleepLogger
 
 
             logger.LogInformation("Bio Balance Detector Sleep Logger v0.3 (2021-01-13)");
-            logger.LogInformation("");
-            logger.LogInformation("Options:");
-            logger.LogInformation("--generatepng <FFT data directory>        Generates a PNG images from FFT data");
-            logger.LogInformation("");
+
+            Console.WriteLine("Bio Balance Detector Sleep Logger v0.3 (2021-01-13)");
+            Console.WriteLine();
+            Console.WriteLine("Options:");
+            Console.WriteLine("--video <FFT data directory>        Generates a PNG images and an MP4 video from FFT data");
+            Console.WriteLine();
 
             try
             {
@@ -80,14 +81,15 @@ namespace SleepLogger
 
             if (args.Length > 1)
             {
-                if (args[0] == "--generatepng")
+                if (args[0] == "--video")
                 {
                     string foldername = args[1];
 
                     if (Directory.Exists(foldername))
                     {
-                        foreach (string filename in Directory.GetFiles(args[1]))
+                        foreach (string filename in Directory.GetFiles(foldername))
                         {
+                            //foldername = Path.GetFullPath(filename).Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)[^2];
                             string pathToFile = Path.GetFullPath(filename);
 
                             if ((Path.GetExtension(filename) != ".fft") && (Path.GetExtension(filename) != ".zip"))
@@ -101,14 +103,14 @@ namespace SleepLogger
 
                                 string filenameWithoutExtension = Path.Combine(foldername, Path.GetFileNameWithoutExtension(pathToFile));
 
-                                if (File.Exists($"{filenameWithoutExtension}_200kHz.png"))
+                                if (File.Exists($"{filenameWithoutExtension}_{config.Postprocessing.SaveAsPNG.RangeHz}Hz.png"))
                                 {
-                                    logger.LogWarning($"{filenameWithoutExtension}_200kHz.png already exists.");
+                                    logger.LogWarning($"{filenameWithoutExtension}_{config.Postprocessing.SaveAsPNG.RangeHz}Hz.png already exists.");
                                     continue;
                                 }
 
-                                SaveSignalAsPng($"{filenameWithoutExtension}_200kHz.png", fftData, config.Postprocessing.SaveAsPng, 60000);
-                                logger.LogInformation($"{filenameWithoutExtension}_200kHz.png was generated successfully.");
+                                SaveSignalAsPng($"{filenameWithoutExtension}_{config.Postprocessing.SaveAsPNG.RangeHz}Hz.png", fftData, config.Postprocessing.SaveAsPNG, config.Postprocessing.SaveAsPNG.RangeHz);
+                                logger.LogInformation($"{filenameWithoutExtension}_{config.Postprocessing.SaveAsPNG.RangeHz}Hz.png was generated successfully.");
                             }
                             catch (Exception ex)
                             {
@@ -116,13 +118,13 @@ namespace SleepLogger
                             }
                         }
 
-                        string mp4Filename = $"{Path.GetDirectoryName(foldername)}.mp4";
+                        string mp4Filename = $"{foldername}.mp4";
                         logger.LogInformation($"Generating MP4 video file '{mp4Filename}'");
                         try
                         {
                             FFmpeg.Conversions.New()
                                 .SetInputFrameRate(12)
-                                .BuildVideoFromImages(Directory.GetFiles(args[1], "*.png").OrderBy(fn => fn))
+                                .BuildVideoFromImages(Directory.GetFiles(foldername, "*.png").OrderBy(fn => fn))
                                 .SetFrameRate(12)
                                 .SetPixelFormat(PixelFormat.yuv420p)
                                 .SetOutput(mp4Filename)
@@ -292,7 +294,7 @@ namespace SleepLogger
                                     });
                                 }
 
-                                if (config.Postprocessing.SaveAsPng.Enabled)
+                                if (config.Postprocessing.SaveAsPNG.Enabled)
                                 {
                                     Task.Run(() =>
                                     {
@@ -300,7 +302,7 @@ namespace SleepLogger
 
                                         //save a PNG with the values
                                         sw.Restart();
-                                        SaveSignalAsPng($"{pathToFile}_200kHz.png", fftData, config.Postprocessing.SaveAsPng, 200000);
+                                        SaveSignalAsPng($"{pathToFile}_{config.Postprocessing.SaveAsPNG.RangeHz}Hz.png", fftData, config.Postprocessing.SaveAsPNG, config.Postprocessing.SaveAsPNG.RangeHz);
                                         //SaveSignalAsPng($"{filename}_1kHz.png", fftData, 1000, 1, 1080, 1);
                                         sw.Stop();
                                         logger.LogInformation($"#{bi.ToString("0000")} Save as PNG completed in {sw.ElapsedMilliseconds:N0} ms.");
@@ -377,30 +379,32 @@ namespace SleepLogger
             return dwfHandle;
         }
 
-        private static void SaveSignalAsPng(string filename, FftData fftData, SaveAsPngConfig config, int maxSamples)
+        private static void SaveSignalAsPng(string filename, FftData fftData, SaveAsPngConfig config, int maxFrequency)
         {
             Size targetResolution = new Size(config.TargetWidth, config.TargetHeight);
             float idealAspectRatio = (float)targetResolution.Width / (float)targetResolution.Height;
 
+            float maxValue = fftData.MagnitudesPerHz.Max();
+            int maxValueAtIndex = Array.IndexOf(fftData.MagnitudesPerHz, maxValue);
+
             // convert samples into log scale (dBm)
             //var samples = signal.Samples.Select(s => Scale.ToDecibel(s)).ToArray();
-            var samples = fftData.MagnitudeData.Take(maxSamples).ToArray();
+            var samples = fftData.MagnitudesPerHz.Take(maxFrequency).ToArray();
             
             int width = 0;
             float currentAspectRatio;
             int rowCount;
             do
             {
-                width = Math.Min(width + config.RowWidthStepsSamples, samples.Length);
-                rowCount = Math.Max(1, (int)Math.Ceiling((double)samples.Length / width));
+                width = Math.Min(width + config.RowWidthStepsSamples, maxFrequency);
+                rowCount = Math.Max(1, (int)Math.Ceiling((double)maxFrequency / width));
                 currentAspectRatio = (float)width / (rowCount * config.RowHeightPixels);
             } while (currentAspectRatio < idealAspectRatio);
 
             float resoltionScaleDownFactor = Math.Max((float)width / targetResolution.Width, (float)(config.RowHeightPixels * rowCount) / targetResolution.Height);
-            Font font = new Font("Georgia", 10.0f * resoltionScaleDownFactor);
 
-            int originalSampleCount = samples.Length;
-            int onePercentCount = originalSampleCount / 100;
+            //int originalSampleCount = samples.Length;
+            //int onePercentCount = originalSampleCount / 100;
             //double[] filteredSamples = new double[originalSampleCount - 1];
             //skip the first value, its the total power
             //Array.Copy(samples, 1, filteredSamples, 0, originalSampleCount - 1);
@@ -426,7 +430,7 @@ namespace SleepLogger
                 for (int i = 0; i < width; i++)
                 {
                     int dataPointIndex = (r - 1) * width + i;
-                    if ((dataPointIndex >= samples.Length) || (dataPointIndex >= maxSamples)) continue;
+                    if (dataPointIndex >= samples.Length) continue;
 
                     if (samples[dataPointIndex] > 0)
                     {
@@ -435,21 +439,31 @@ namespace SleepLogger
                         graphics.DrawLine(pen, new Point(i, bottomLine), new Point(i, bottomLine - valueToShow));
                     }
                 }
-
-                if (((r - 1) * width) / 1000 > 0)
-                {
-                    graphics.DrawString($"{((r - 1) * width) / 1000} kHz", font, Brushes.White, new PointF(100.0f, bottomLine - (config.RowHeightPixels * 0.75f)));
-                }
-                graphics.DrawString($"{(r * width) / 1000} kHz", font, Brushes.White, new PointF(width - (75.0f * resoltionScaleDownFactor), bottomLine - (config.RowHeightPixels * 0.75f)));
             }
-
-            graphics.DrawString($"{filename}", font, Brushes.White, new PointF(width - (350.0f * resoltionScaleDownFactor), 10.0f));
-            graphics.DrawString($"Y range: {Math.Round(config.RangeVolt * 1000 * 1000)} µV", font, Brushes.White, new PointF(width - (350.0f * resoltionScaleDownFactor), 30.0f + font.Height));
-
 
             int scaledDownWidth = (((int)(spectrumBitmap.Width / resoltionScaleDownFactor)) / 2) * 2;
             int scaledDownHeight = (((int)(spectrumBitmap.Height / resoltionScaleDownFactor)) / 2) * 2;
             var scaledDownBitmap = new Bitmap(spectrumBitmap, new Size(scaledDownWidth, scaledDownHeight));
+
+            // TODO: add all DrawStrings here
+            Font font = new Font("Georgia", 10.0f);
+            graphics = Graphics.FromImage(scaledDownBitmap);
+            graphics.DrawString($"{filename}", font, Brushes.White, new PointF(scaledDownWidth * 0.75f, 10.0f + font.Height * 0));
+            graphics.DrawString($"Y range: {Math.Round(config.RangeVolt * 1000 * 1000):N0} µV", font, Brushes.White, new PointF(scaledDownWidth * 0.75f, 10.0f + font.Height * 1.1f));
+            graphics.DrawString($"Max value: {Math.Round(maxValue * 1000 * 1000):N0} µV @ {maxValueAtIndex:N} Hz", font, Brushes.White, new PointF(scaledDownWidth * 0.75f, 10.0f + font.Height * 2.2f));
+            for (int r = 1; r <= rowCount; r++)
+            {
+                int fromKHz = (r - 1) * width / 1000;
+                int toKHz = r * width / 1000;
+                int rowHeight = (scaledDownHeight / rowCount);
+                int bottomLine = r * rowHeight;
+
+                if (fromKHz > 0)
+                {
+                    graphics.DrawString($"{fromKHz:N} kHz", font, Brushes.White, new PointF(10.0f, bottomLine - (rowHeight * 0.25f)));
+                }
+                graphics.DrawString($"{toKHz:N} kHz", font, Brushes.White, new PointF(scaledDownWidth - 75.0f, bottomLine - (rowHeight * 0.25f)));
+            }
 
             FileStream pngFile = new FileStream(filename, FileMode.Create);
             scaledDownBitmap.Save(pngFile, System.Drawing.Imaging.ImageFormat.Png);

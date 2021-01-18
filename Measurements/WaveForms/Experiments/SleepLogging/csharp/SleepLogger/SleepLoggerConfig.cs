@@ -29,12 +29,13 @@ namespace SleepLogger
                 SaveAsWAV = Boolean.Parse(config["Postprocessing:SaveAsWAV"]),
                 SaveAsFFT = Boolean.Parse(config["Postprocessing:SaveAsFFT"]),
                 SaveAsCompressedFFT = Boolean.Parse(config["Postprocessing:SaveAsCompressedFFT"]),
-                SaveAsPng = new SaveAsPngConfig()
+                SaveAsPNG = new SaveAsPngConfig()
                 {
                     Enabled = Boolean.Parse(config["Postprocessing:SaveAsPNG:Enabled"]),
                     TargetWidth = Int32.Parse(config["Postprocessing:SaveAsPNG:TargetWidth"]),
                     TargetHeight = Int32.Parse(config["Postprocessing:SaveAsPNG:TargetHeight"]),
                     RangeVolt = ParseNumber(config["Postprocessing:SaveAsPNG:RangeVolt"]),
+                    RangeHz = (int)ParseNumber(config["Postprocessing:SaveAsPNG:RangeHz"]),
                     RowWidthStepsSamples = Int32.Parse(config["Postprocessing:SaveAsPNG:RowWidthStepsSamples"]),
                     RowHeightPixels = Int32.Parse(config["Postprocessing:SaveAsPNG:RowHeightPixels"]),
                 },
@@ -79,7 +80,7 @@ namespace SleepLogger
         public bool SaveAsWAV { get; set; }
         public bool SaveAsFFT { get; set; }
         public bool SaveAsCompressedFFT { get; set; }
-        public SaveAsPngConfig SaveAsPng { get; set; }
+        public SaveAsPngConfig SaveAsPNG { get; set; }
     }
 
     public class SaveAsPngConfig
@@ -88,6 +89,7 @@ namespace SleepLogger
         public int TargetWidth { get; set; }
         public int TargetHeight { get; set; }
         public float RangeVolt { get; set; }
+        public int RangeHz { get; set; }
         public int RowWidthStepsSamples { get; set; }
         public int RowHeightPixels { get; set; }      
     }
