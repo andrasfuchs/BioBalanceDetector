@@ -244,26 +244,36 @@ namespace SleepLogger
 
                                 sw.Restart();
                                 var fft = new RealFft(config.Postprocessing.FFTSize);
-                                var magnitudes = fft.MagnitudeSpectrum(signal, normalize: false);
+                                try
+                                {
+                                    fftData.MagnitudeData = fft.MagnitudeSpectrum(signal, normalize: true).Samples;
+                                }
+                                catch (IndexOutOfRangeException)
+                                {
+                                    logger.LogError($"The FFT size of {config.Postprocessing.FFTSize:N0} is too high for the sample rate of {config.AD2.Samplerate:N0}. Decrease the FFT size or increase the sampling rate.");
+                                    terminateAcquisition = true;
+                                    return;
+                                }
                                 // clear the 0th coefficient (DC component)
-                                magnitudes.Samples[0] = 0;
+                                fftData.MagnitudeData[0] = 0;
                                 sw.Stop();
                                 logger.LogInformation($"#{bi.ToString("0000")} Signal processing completed in {sw.ElapsedMilliseconds:N0} ms.");
 
-                                //var magnitudes = new DiscreteSignal((int)(targetSamplerate / 2 / config.Postprocessing.IntervalSeconds), concatenatedPowerSpectrum);
-                                fftData.FrequencyStep = ((float)config.AD2.Samplerate / 2) / (magnitudes.Samples.Length - 1);
-                                // normalize the data so that 1.0 means 1.0 V of peak to peak amplitude
-                                fftData.MagnitudeData = magnitudes.Samples.Select(md => md / 130750.0f).ToArray();
+                                fftData.FrequencyStep = ((float)config.AD2.Samplerate / 2) / (fftData.MagnitudeData.Length - 1);
 
                                 maxValues.Add(fftData.MagnitudeData.Max());
                                 int maxIndex = Array.FindIndex(fftData.MagnitudeData, d => d == maxValues[maxValues.Count - 1]);
                                 logger.LogInformation($"#{bi.ToString("0000")} The maximum magnitude is {maxValues[maxValues.Count - 1] * 1000 * 1000:N} µV at the index of #{maxIndex:N0} ({maxIndex * fftData.FrequencyStep:N} Hz).");
+                                logger.LogInformation($"#{bi.ToString("0000")} The magnitude at {config.AD2.SignalGeneratorHz} Hz is {fftData.MagnitudesPerHz[(int)config.AD2.SignalGeneratorHz] * 1000 * 1000:N} µV.");
 
-                                float averageMagnitude = fftData.MagnitudeData.Take(1000).Average();
-                                if (averageMagnitude < config.Postprocessing.MagnitudeThreshold)
+                                if (config.Postprocessing.MagnitudeThreshold > 0)
                                 {
-                                    logger.LogWarning($"#{bi.ToString("0000")} The average magnitude for the first 1000 values is too low: {averageMagnitude * 1000 * 1000:N0} µV. The threashold is {config.Postprocessing.MagnitudeThreshold * 1000 * 1000:N0} µV.");
-                                    return;
+                                    float averageMagnitude = fftData.MagnitudesPerHz[100..1000].Average();
+                                    if (averageMagnitude < config.Postprocessing.MagnitudeThreshold)
+                                    {
+                                        logger.LogWarning($"#{bi.ToString("0000")} The average magnitude in the 100-1000 Hz range is too low: {averageMagnitude * 1000 * 1000:N0} µV. The threashold is {config.Postprocessing.MagnitudeThreshold * 1000 * 1000:N0} µV.");
+                                        return;
+                                    }
                                 }
 
                                 if (config.Postprocessing.SaveAsFFT)
