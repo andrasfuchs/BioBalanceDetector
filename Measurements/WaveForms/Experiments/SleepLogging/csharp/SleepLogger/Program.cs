@@ -102,15 +102,16 @@ namespace SleepLogger
                                 FftData fftData = FftData.LoadFrom($"{pathToFile}");
 
                                 string filenameWithoutExtension = Path.Combine(foldername, Path.GetFileNameWithoutExtension(pathToFile));
+                                string filenameComplete = $"{filenameWithoutExtension}_{SimplifyNumber(config.Postprocessing.SaveAsPNG.RangeHz)}Hz_{SimplifyNumber(config.Postprocessing.SaveAsPNG.RangeVolt)}V.png";
 
-                                if (File.Exists($"{filenameWithoutExtension}_{config.Postprocessing.SaveAsPNG.RangeHz}Hz.png"))
+                                if (File.Exists(filenameComplete))
                                 {
-                                    logger.LogWarning($"{filenameWithoutExtension}_{config.Postprocessing.SaveAsPNG.RangeHz}Hz.png already exists.");
+                                    logger.LogWarning($"{filenameComplete} already exists.");
                                     continue;
                                 }
 
-                                SaveSignalAsPng($"{filenameWithoutExtension}_{config.Postprocessing.SaveAsPNG.RangeHz}Hz.png", fftData, config.Postprocessing.SaveAsPNG, config.Postprocessing.SaveAsPNG.RangeHz);
-                                logger.LogInformation($"{filenameWithoutExtension}_{config.Postprocessing.SaveAsPNG.RangeHz}Hz.png was generated successfully.");
+                                SaveSignalAsPng(filenameComplete, fftData, config.Postprocessing.SaveAsPNG);
+                                logger.LogInformation($"{filenameComplete} was generated successfully.");
                             }
                             catch (Exception ex)
                             {
@@ -312,7 +313,8 @@ namespace SleepLogger
 
                                         //save a PNG with the values
                                         sw.Restart();
-                                        SaveSignalAsPng($"{pathToFile}_{config.Postprocessing.SaveAsPNG.RangeHz}Hz.png", fftData, config.Postprocessing.SaveAsPNG, config.Postprocessing.SaveAsPNG.RangeHz);
+                                        string filenameComplete = $"{pathToFile}_{SimplifyNumber(config.Postprocessing.SaveAsPNG.RangeHz)}Hz_{SimplifyNumber(config.Postprocessing.SaveAsPNG.RangeVolt)}V.png";
+                                        SaveSignalAsPng(filenameComplete, fftData, config.Postprocessing.SaveAsPNG);
                                         //SaveSignalAsPng($"{filename}_1kHz.png", fftData, 1000, 1, 1080, 1);
                                         sw.Stop();
                                         logger.LogInformation($"#{bi.ToString("0000")} Save as PNG completed in {sw.ElapsedMilliseconds:N0} ms.");
@@ -389,7 +391,7 @@ namespace SleepLogger
             return dwfHandle;
         }
 
-        private static void SaveSignalAsPng(string filename, FftData fftData, SaveAsPngConfig config, int maxFrequency)
+        private static void SaveSignalAsPng(string filename, FftData fftData, SaveAsPngConfig config)
         {
             Size targetResolution = new Size(config.TargetWidth, config.TargetHeight);
             float idealAspectRatio = (float)targetResolution.Width / (float)targetResolution.Height;
@@ -399,17 +401,17 @@ namespace SleepLogger
 
             // convert samples into log scale (dBm)
             //var samples = signal.Samples.Select(s => Scale.ToDecibel(s)).ToArray();
-            var samples = fftData.MagnitudesPerHz.Take(maxFrequency).ToArray();
+            var samples = fftData.MagnitudesPerHz.Take(config.RangeHz).ToArray();
             
             int width = 0;
             float currentAspectRatio;
             int rowCount;
             do
             {
-                width = Math.Min(width + config.RowWidthStepsSamples, maxFrequency);
-                rowCount = Math.Max(1, (int)Math.Ceiling((double)maxFrequency / width));
+                width = Math.Min(width + config.RowWidthStepsSamples, config.RangeHz);
+                rowCount = Math.Max(1, (int)Math.Ceiling((double)config.RangeHz / width));
                 currentAspectRatio = (float)width / (rowCount * config.RowHeightPixels);
-            } while (currentAspectRatio < idealAspectRatio);
+            } while ((currentAspectRatio < idealAspectRatio) && (width != config.RangeHz));
 
             float resoltionScaleDownFactor = Math.Max((float)width / targetResolution.Width, (float)(config.RowHeightPixels * rowCount) / targetResolution.Height);
 
@@ -485,5 +487,28 @@ namespace SleepLogger
             terminateAcquisition = true;
             e.Cancel = true;
         }
+
+        private static string SimplifyNumber(double n, string format = "0.###")
+        {
+            string[] postfixes = { "p", "n", "u", "m", "", "k", "M", "T", "P" };
+            int postfixIndex = 4;
+
+            double absValue = Math.Abs(n);
+
+            while ((absValue > 1) && (absValue % 1000 == 0))
+            {
+                postfixIndex++;
+                absValue /= 1000;
+            }
+
+            while (absValue < 1)
+            {
+                postfixIndex--;
+                absValue *= 1000;
+            }
+
+            return absValue.ToString(format) + postfixes[postfixIndex];
+        }
+
     }
 }
