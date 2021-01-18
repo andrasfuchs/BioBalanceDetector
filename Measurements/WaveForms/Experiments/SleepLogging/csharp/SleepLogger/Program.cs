@@ -21,6 +21,8 @@ namespace SleepLogger
 {
     class Program
     {
+        static string versionString = "v0.4 (2021-01-18)";
+
         /// <summary>
         /// Number of samples per buffer
         /// </summary>
@@ -57,15 +59,13 @@ namespace SleepLogger
             });
             ILogger logger = loggerFactory.CreateLogger<Program>();
 
-
-            logger.LogInformation("Bio Balance Detector Sleep Logger v0.3 (2021-01-13)");
-
-            Console.WriteLine("Bio Balance Detector Sleep Logger v0.3 (2021-01-13)");
+            Console.WriteLine($"Bio Balance Detector Sleep Logger {versionString}");
             Console.WriteLine();
             Console.WriteLine("Options:");
             Console.WriteLine("--video <FFT data directory>        Generates a PNG images and an MP4 video from FFT data");
             Console.WriteLine();
 
+            logger.LogInformation($"Bio Balance Detector Sleep Logger {versionString}");
             try
             {
                 configuration.Reload();
