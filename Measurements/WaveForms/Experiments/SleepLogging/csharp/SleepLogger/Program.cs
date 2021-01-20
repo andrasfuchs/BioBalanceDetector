@@ -351,7 +351,7 @@ namespace SleepLogger
 
                 Thread.Sleep(10000);
 
-                dwf.FDwfDeviceOpen(-1, out dwfHandle);
+                dwf.FDwfDeviceConfigOpen(-1, 1, out dwfHandle);
             }
 
             dwf.FDwfAnalogInBufferSizeInfo(dwfHandle, out int bufferSizeMinimum, out int bufferSizeMaximum);
@@ -393,7 +393,7 @@ namespace SleepLogger
             logger.LogInformation("Starting oscilloscope");
             dwf.FDwfAnalogInConfigure(dwfHandle, 0, 1);
 
-            logger.LogInformation($"Recording data at {SimplifyNumber(config.AD2.Samplerate)} Hz, press Ctrl+C to stop...");
+            logger.LogInformation($"Recording data at {SimplifyNumber(config.AD2.Samplerate)}Hz, press Ctrl+C to stop...");
 
             return dwfHandle;
         }
