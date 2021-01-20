@@ -338,7 +338,8 @@ namespace SleepLogger
         private static int InitializeAD2(ILogger logger, SleepLoggerConfig config)
         {
             logger.LogInformation("Opening first device");
-            dwf.FDwfDeviceOpen(-1, out int dwfHandle);
+            // Open the AD2 with the 2nd configuration with 16k analog-in buffer
+            dwf.FDwfDeviceConfigOpen(-1, 1, out int dwfHandle);
 
             while ((dwfHandle == dwf.hdwfNone) && (!terminateAcquisition))
             {
