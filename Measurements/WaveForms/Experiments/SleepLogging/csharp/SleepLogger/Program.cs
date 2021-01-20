@@ -73,7 +73,7 @@ namespace SleepLogger
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.Message);
+                logger.LogError($"There was a problem with the configuration file. {ex.Message}");
                 return;
             }
 
@@ -102,7 +102,7 @@ namespace SleepLogger
                                 FftData fftData = FftData.LoadFrom($"{pathToFile}");
 
                                 string filenameWithoutExtension = Path.Combine(foldername, Path.GetFileNameWithoutExtension(pathToFile));
-                                string filenameComplete = $"{filenameWithoutExtension}_{SimplifyNumber(config.Postprocessing.SaveAsPNG.RangeHz)}Hz_{SimplifyNumber(config.Postprocessing.SaveAsPNG.RangeVolt)}V.png";
+                                string filenameComplete = $"{filenameWithoutExtension}_{SimplifyNumber(config.Postprocessing.SaveAsPNG.RangeX)}Hz_{SimplifyNumber(config.Postprocessing.SaveAsPNG.RangeY)}V.png";
 
                                 if (File.Exists(filenameComplete))
                                 {
@@ -265,7 +265,10 @@ namespace SleepLogger
                                 maxValues.Add(fftData.MagnitudeData.Max());
                                 int maxIndex = Array.FindIndex(fftData.MagnitudeData, d => d == maxValues[maxValues.Count - 1]);
                                 logger.LogInformation($"#{bi.ToString("0000")} The maximum magnitude is {maxValues[maxValues.Count - 1] * 1000 * 1000:N} µV at the index of #{maxIndex:N0} ({maxIndex * fftData.FrequencyStep:N} Hz).");
-                                logger.LogInformation($"#{bi.ToString("0000")} The magnitude at {config.AD2.SignalGeneratorHz} Hz is {fftData.MagnitudesPerHz[(int)config.AD2.SignalGeneratorHz] * 1000 * 1000:N} µV.");
+                                if (config.AD2.SignalGenerator.Enabled)
+                                {
+                                    logger.LogInformation($"#{bi.ToString("0000")} The magnitude at {config.AD2.SignalGenerator.Frequency} Hz is {fftData.MagnitudesPerHz[(int)config.AD2.SignalGenerator.Frequency] * 1000 * 1000:N} µV.");
+                                }
 
                                 if (config.Postprocessing.MagnitudeThreshold > 0)
                                 {
@@ -313,7 +316,7 @@ namespace SleepLogger
 
                                         //save a PNG with the values
                                         sw.Restart();
-                                        string filenameComplete = $"{pathToFile}_{SimplifyNumber(config.Postprocessing.SaveAsPNG.RangeHz)}Hz_{SimplifyNumber(config.Postprocessing.SaveAsPNG.RangeVolt)}V.png";
+                                        string filenameComplete = $"{pathToFile}_{SimplifyNumber(config.Postprocessing.SaveAsPNG.RangeX)}Hz_{SimplifyNumber(config.Postprocessing.SaveAsPNG.RangeY)}V.png";
                                         SaveSignalAsPng(filenameComplete, fftData, config.Postprocessing.SaveAsPNG);
                                         //SaveSignalAsPng($"{filename}_1kHz.png", fftData, 1000, 1, 1080, 1);
                                         sw.Stop();
@@ -371,14 +374,17 @@ namespace SleepLogger
             dwf.FDwfAnalogInAcquisitionModeSet(dwfHandle, dwf.acqmodeRecord);
             dwf.FDwfAnalogInRecordLengthSet(dwfHandle, -1);
 
-            // set up signal generation
-            dwf.FDwfAnalogOutNodeEnableSet(dwfHandle, config.AD2.SignalGeneratorChannel, dwf.AnalogOutNodeCarrier, 1);
-            dwf.FDwfAnalogOutNodeFunctionSet(dwfHandle, config.AD2.SignalGeneratorChannel, dwf.AnalogOutNodeCarrier, dwf.funcSine);
-            dwf.FDwfAnalogOutNodeFrequencySet(dwfHandle, config.AD2.SignalGeneratorChannel, dwf.AnalogOutNodeCarrier, config.AD2.SignalGeneratorHz);
-            dwf.FDwfAnalogOutNodeAmplitudeSet(dwfHandle, config.AD2.SignalGeneratorChannel, dwf.AnalogOutNodeCarrier, config.AD2.SignalGeneratorVolt);
+            if (config.AD2.SignalGenerator.Enabled)
+            {
+                // set up signal generation
+                dwf.FDwfAnalogOutNodeEnableSet(dwfHandle, config.AD2.SignalGenerator.Channel, dwf.AnalogOutNodeCarrier, 1);
+                dwf.FDwfAnalogOutNodeFunctionSet(dwfHandle, config.AD2.SignalGenerator.Channel, dwf.AnalogOutNodeCarrier, dwf.funcSine);
+                dwf.FDwfAnalogOutNodeFrequencySet(dwfHandle, config.AD2.SignalGenerator.Channel, dwf.AnalogOutNodeCarrier, config.AD2.SignalGenerator.Frequency);
+                dwf.FDwfAnalogOutNodeAmplitudeSet(dwfHandle, config.AD2.SignalGenerator.Channel, dwf.AnalogOutNodeCarrier, config.AD2.SignalGenerator.Voltage);
 
-            logger.LogInformation($"Generating sine wave at {config.AD2.SignalGeneratorHz:N} Hz...");
-            dwf.FDwfAnalogOutConfigure(dwfHandle, config.AD2.SignalGeneratorChannel, 1);
+                logger.LogInformation($"Generating sine wave at {config.AD2.SignalGenerator.Frequency:N} Hz...");
+                dwf.FDwfAnalogOutConfigure(dwfHandle, config.AD2.SignalGenerator.Channel, 1);
+            }
 
             //wait at least 2 seconds for the offset to stabilize
             Thread.Sleep(2000);
@@ -402,17 +408,17 @@ namespace SleepLogger
 
             // convert samples into log scale (dBm)
             //var samples = signal.Samples.Select(s => Scale.ToDecibel(s)).ToArray();
-            var samples = fftData.MagnitudesPerHz.Take(config.RangeHz).ToArray();
+            var samples = fftData.MagnitudesPerHz.Take(config.RangeX).ToArray();
             
             int width = 0;
             float currentAspectRatio;
             int rowCount;
             do
             {
-                width = Math.Min(width + config.RowWidthStepsSamples, config.RangeHz);
-                rowCount = Math.Max(1, (int)Math.Ceiling((double)config.RangeHz / width));
+                width = Math.Min(width + config.RowWidthStepsSamples, config.RangeX);
+                rowCount = Math.Max(1, (int)Math.Ceiling((double)config.RangeX / width));
                 currentAspectRatio = (float)width / (rowCount * config.RowHeightPixels);
-            } while ((currentAspectRatio < idealAspectRatio) && (width != config.RangeHz));
+            } while ((currentAspectRatio < idealAspectRatio) && (width != config.RangeX));
 
             float resoltionScaleDownFactor = Math.Max((float)width / targetResolution.Width, (float)(config.RowHeightPixels * rowCount) / targetResolution.Height);
 
@@ -434,7 +440,7 @@ namespace SleepLogger
             graphics.FillRectangle(new SolidBrush(bgColor), new Rectangle(0, 0, width, config.RowHeightPixels * rowCount));
 
             var pen = new Pen(lineColor, 1);
-            float sampleAmplification = (1.0f / config.RangeVolt) * config.RowHeightPixels;
+            float sampleAmplification = (1.0f / config.RangeY) * config.RowHeightPixels;
 
             for (int r = 1; r <= rowCount; r++)
             {
@@ -462,7 +468,7 @@ namespace SleepLogger
             Font font = new Font("Georgia", 10.0f);
             graphics = Graphics.FromImage(scaledDownBitmap);
             graphics.DrawString($"{filename}", font, Brushes.White, new PointF(scaledDownWidth * 0.75f, 10.0f + font.Height * 0));
-            graphics.DrawString($"Y range: {Math.Round(config.RangeVolt * 1000 * 1000):N0} µV", font, Brushes.White, new PointF(scaledDownWidth * 0.75f, 10.0f + font.Height * 1.1f));
+            graphics.DrawString($"Y range: {Math.Round(config.RangeY * 1000 * 1000):N0} µV", font, Brushes.White, new PointF(scaledDownWidth * 0.75f, 10.0f + font.Height * 1.1f));
             graphics.DrawString($"Max value: {Math.Round(maxValue * 1000 * 1000):N0} µV @ {maxValueAtIndex:N} Hz", font, Brushes.White, new PointF(scaledDownWidth * 0.75f, 10.0f + font.Height * 2.2f));
             for (int r = 1; r <= rowCount; r++)
             {

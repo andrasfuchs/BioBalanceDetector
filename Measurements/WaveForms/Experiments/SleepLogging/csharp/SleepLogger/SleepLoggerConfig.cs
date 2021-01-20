@@ -15,9 +15,13 @@ namespace SleepLogger
             AD2 = new AD2Config()
             {
                 Samplerate = (int)ParseNumber(config["AD2:Samplerate"]),
-                SignalGeneratorChannel = config["AD2:SignalGeneratorChannel"] == "W1" ? 0 : config["AD2:SignalGeneratorChannel"] == "W2" ? 1 : 255,
-                SignalGeneratorHz = ParseNumber(config["AD2:SignalGeneratorHz"]),
-                SignalGeneratorVolt = ParseNumber(config["AD2:SignalGeneratorVolt"]),
+                SignalGenerator = new SignalGeneratorConfig()
+                {
+                    Enabled = Boolean.Parse(config["AD2:SignalGenerator:Enabled"]),
+                    Channel = config["AD2:SignalGenerator:Channel"] == "W1" ? 0 : config["AD2:SignalGenerator:Channel"] == "W2" ? 1 : 255,
+                    Frequency = ParseNumber(config["AD2:SignalGenerator:Frequency"]),
+                    Voltage = ParseNumber(config["AD2:SignalGenerator:Voltage"]),
+                }
             };
 
             Postprocessing = new PostprocessingConfig()
@@ -34,9 +38,9 @@ namespace SleepLogger
                     Enabled = Boolean.Parse(config["Postprocessing:SaveAsPNG:Enabled"]),
                     TargetWidth = Int32.Parse(config["Postprocessing:SaveAsPNG:TargetWidth"]),
                     TargetHeight = Int32.Parse(config["Postprocessing:SaveAsPNG:TargetHeight"]),
-                    RangeVolt = ParseNumber(config["Postprocessing:SaveAsPNG:RangeVolt"]),
-                    RangeHz = (int)ParseNumber(config["Postprocessing:SaveAsPNG:RangeHz"]),
-                    RowWidthStepsSamples = Int32.Parse(config["Postprocessing:SaveAsPNG:RowWidthStepsSamples"]),
+                    RangeX = (int)ParseNumber(config["Postprocessing:SaveAsPNG:RangeX"]),
+                    RangeY = ParseNumber(config["Postprocessing:SaveAsPNG:RangeY"]),
+                    RowWidthStepsSamples = (int)ParseNumber(config["Postprocessing:SaveAsPNG:RowWidthStepsSamples"]),
                     RowHeightPixels = Int32.Parse(config["Postprocessing:SaveAsPNG:RowHeightPixels"]),
                 },
             };
@@ -44,7 +48,41 @@ namespace SleepLogger
 
         private float ParseNumber(string str, bool mode = false)
         {
-            return str.EndsWith("k") ? Single.Parse(str[0..^1]) * (mode ? 1024 : 1000) : Single.Parse(str);
+            string[] postfixes = { "p", "n", "u", "m", "", "k", "M", "T", "P" };
+
+            int numberIndex = 1;
+            float numberPart = 0;
+            while ((numberIndex <= str.Length) && (Single.TryParse(str.Substring(0, numberIndex), out float parsedNumberPart)))
+            {
+                numberIndex++;
+                numberPart = parsedNumberPart;
+            }
+
+            string textPart = str.Substring(numberIndex - 1).Trim();
+
+            int postfixIndex = 4;
+            for (int i = 0; i < postfixes.Length; i++)
+            {
+                if ((postfixes[i] != "") && (textPart.StartsWith(postfixes[i])))
+                {
+                    postfixIndex = i;
+                    break;
+                }
+            }
+
+            while (postfixIndex < 4)
+            {
+                numberPart /= (mode ? 1024 : 1000);
+                postfixIndex++;
+            }
+
+            while (postfixIndex > 4)
+            {
+                numberPart *= (mode ? 1024 : 1000);
+                postfixIndex--;
+            }
+
+            return numberPart;
         }
     }
 
@@ -54,18 +92,24 @@ namespace SleepLogger
         /// Number of samples per second
         /// </summary>
         public int Samplerate { get; set; }
+        public SignalGeneratorConfig SignalGenerator { get; set; }
+    }
+
+    public class SignalGeneratorConfig
+    {
+        public bool Enabled { get; set; }
         /// <summary>
         /// Signal generation channel (W1 or W2)
         /// </summary>
-        public byte SignalGeneratorChannel { get; set; }
+        public byte Channel { get; set; }
         /// <summary>
         /// Generated signal frequency
         /// </summary>
-        public float SignalGeneratorHz { get; set; }
+        public float Frequency { get; set; }
         /// <summary>
         /// Peak amplitude of the generated signal
         /// </summary>
-        public float SignalGeneratorVolt { get; set; }
+        public float Voltage { get; set; }
     }
 
     public class PostprocessingConfig
@@ -88,8 +132,8 @@ namespace SleepLogger
         public bool Enabled { get; set; }
         public int TargetWidth { get; set; }
         public int TargetHeight { get; set; }
-        public float RangeVolt { get; set; }
-        public int RangeHz { get; set; }
+        public float RangeY { get; set; }
+        public int RangeX { get; set; }
         public int RowWidthStepsSamples { get; set; }
         public int RowHeightPixels { get; set; }      
     }
