@@ -21,7 +21,7 @@ namespace SleepLogger
 {
     class Program
     {
-        static string versionString = "v0.4 (2021-01-18)";
+        static string versionString = "v0.4 (2021-01-20)";
 
         /// <summary>
         /// Number of samples per buffer
@@ -393,7 +393,7 @@ namespace SleepLogger
             logger.LogInformation("Starting oscilloscope");
             dwf.FDwfAnalogInConfigure(dwfHandle, 0, 1);
 
-            logger.LogInformation($"Recording data at {config.AD2.Samplerate:N} Hz, press Ctrl+C to stop...");
+            logger.LogInformation($"Recording data at {SimplifyNumber(config.AD2.Samplerate)} Hz, press Ctrl+C to stop...");
 
             return dwfHandle;
         }
