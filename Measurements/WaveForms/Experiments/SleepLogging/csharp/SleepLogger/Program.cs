@@ -85,9 +85,9 @@ namespace SleepLogger
                 {
                     string foldername = args[1];
 
-                    if (Directory.Exists(foldername))
+                    if (Directory.Exists(AppendDataDir(foldername)))
                     {
-                        foreach (string filename in Directory.GetFiles(foldername))
+                        foreach (string filename in Directory.GetFiles(AppendDataDir(foldername)))
                         {
                             //foldername = Path.GetFullPath(filename).Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)[^2];
                             string pathToFile = Path.GetFullPath(filename);
@@ -104,13 +104,13 @@ namespace SleepLogger
                                 string filenameWithoutExtension = Path.Combine(foldername, Path.GetFileNameWithoutExtension(pathToFile));
                                 string filenameComplete = $"{filenameWithoutExtension}_{SimplifyNumber(config.Postprocessing.SaveAsPNG.RangeX)}Hz_{SimplifyNumber(config.Postprocessing.SaveAsPNG.RangeY)}V.png";
 
-                                if (File.Exists(filenameComplete))
+                                if (File.Exists(AppendDataDir(filenameComplete)))
                                 {
                                     logger.LogWarning($"{filenameComplete} already exists.");
                                     continue;
                                 }
 
-                                SaveSignalAsPng(filenameComplete, fftData, config.Postprocessing.SaveAsPNG);
+                                SaveSignalAsPng(AppendDataDir(filenameComplete), fftData, config.Postprocessing.SaveAsPNG);
                                 logger.LogInformation($"{filenameComplete} was generated successfully.");
                             }
                             catch (Exception ex)
@@ -222,16 +222,16 @@ namespace SleepLogger
                                 string foldername = $"{fftData.CaptureTime.ToString("yyyy-MM-dd")}";
                                 string filename = $"AD2_{fftData.CaptureTime.ToString("yyyyMMdd_HHmmss")}";
                                 string pathToFile = Path.Combine(foldername, filename);
-                                if (!Directory.Exists(fftData.CaptureTime.ToString("yyyy-MM-dd")))
+                                if (!Directory.Exists(AppendDataDir(fftData.CaptureTime.ToString("yyyy-MM-dd"))))
                                 {
-                                    Directory.CreateDirectory(fftData.CaptureTime.ToString("yyyy-MM-dd"));
+                                    Directory.CreateDirectory(AppendDataDir(fftData.CaptureTime.ToString("yyyy-MM-dd")));
                                 }
 
                                 if (config.Postprocessing.SaveAsWAV)
                                 {
                                     sw.Restart();
                                     //and save samples to a WAV file
-                                    FileStream waveFileStream = new FileStream($"{pathToFile}.wav", FileMode.Create);
+                                    FileStream waveFileStream = new FileStream(AppendDataDir($"{pathToFile}.wav"), FileMode.Create);
                                     DiscreteSignal signalToSave = new DiscreteSignal(signal.SamplingRate, signal.Samples, true);
                                     signalToSave.Amplify(inputAmplification);
                                     WaveFile waveFile = new WaveFile(signalToSave, 16);
@@ -288,7 +288,7 @@ namespace SleepLogger
 
                                         //save it the FFT to a JSON file
                                         sw.Restart();
-                                        FftData.SaveAs(fftData, $"{pathToFile}.fft", false);
+                                        FftData.SaveAs(fftData, AppendDataDir($"{pathToFile}.fft"), false);
                                         sw.Stop();
                                         logger.LogInformation($"#{bi.ToString("0000")} Save as FFT completed in {sw.ElapsedMilliseconds:N0} ms.");
                                     });
@@ -302,7 +302,7 @@ namespace SleepLogger
 
                                         //save it the FFT to a zipped JSON file
                                         sw.Restart();
-                                        FftData.SaveAs(fftData, $"{pathToFile}.zip", true);
+                                        FftData.SaveAs(fftData, AppendDataDir($"{pathToFile}.zip"), true);
                                         sw.Stop();
                                         logger.LogInformation($"#{bi.ToString("0000")} Save as compressed FFT completed in {sw.ElapsedMilliseconds:N0} ms.");
                                     });
@@ -317,7 +317,7 @@ namespace SleepLogger
                                         //save a PNG with the values
                                         sw.Restart();
                                         string filenameComplete = $"{pathToFile}_{SimplifyNumber(config.Postprocessing.SaveAsPNG.RangeX)}Hz_{SimplifyNumber(config.Postprocessing.SaveAsPNG.RangeY)}V.png";
-                                        SaveSignalAsPng(filenameComplete, fftData, config.Postprocessing.SaveAsPNG);
+                                        SaveSignalAsPng(AppendDataDir(filenameComplete), fftData, config.Postprocessing.SaveAsPNG);
                                         //SaveSignalAsPng($"{filename}_1kHz.png", fftData, 1000, 1, 1080, 1);
                                         sw.Stop();
                                         logger.LogInformation($"#{bi.ToString("0000")} Save as PNG completed in {sw.ElapsedMilliseconds:N0} ms.");
@@ -336,6 +336,18 @@ namespace SleepLogger
             logger.LogInformation("Acquisition done");
 
             dwf.FDwfDeviceCloseAll();
+        }
+
+        private static string AppendDataDir(string filename)
+        {
+            if (!String.IsNullOrWhiteSpace(config.DataDirectory))
+            {
+                return Path.Combine(config.DataDirectory, filename);
+            }
+            else
+            {
+                return filename;
+            }
         }
 
         private static int InitializeAD2(ILogger logger, SleepLoggerConfig config)

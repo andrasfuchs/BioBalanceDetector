@@ -7,11 +7,14 @@ namespace SleepLogger
 {
     public class SleepLoggerConfig
     {
+        public string DataDirectory { get; }
         public AD2Config AD2 { get; }
         public PostprocessingConfig Postprocessing { get; }
 
         public SleepLoggerConfig(IConfigurationRoot config)
         {
+            DataDirectory = config["DataDirectory"];
+
             AD2 = new AD2Config()
             {
                 Samplerate = (int)ParseNumber(config["AD2:Samplerate"]),
