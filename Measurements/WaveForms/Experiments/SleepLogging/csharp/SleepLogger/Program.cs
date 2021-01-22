@@ -21,7 +21,7 @@ namespace SleepLogger
 {
     class Program
     {
-        static string versionString = "v0.4 (2021-01-20)";
+        static string versionString = "v0.5 (2021-01-22)";
 
         /// <summary>
         /// Number of samples per buffer
@@ -63,7 +63,8 @@ namespace SleepLogger
             Console.WriteLine($"Bio Balance Detector Sleep Logger {versionString}");
             Console.WriteLine();
             Console.WriteLine("Options:");
-            Console.WriteLine("--video <FFT data directory>        Generates a PNG images and an MP4 video from FFT data");
+            Console.WriteLine("--video <FFT data directory>        Generate PNG images and an MP4 video from FFT data");
+            Console.WriteLine("--mlcsv <FFT data directory>        Generate CSV file for machine learning from FFT data");
             Console.WriteLine();
 
             logger.LogInformation($"Bio Balance Detector Sleep Logger {versionString}");
