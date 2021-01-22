@@ -39,7 +39,7 @@ namespace SleepLogger
 
         static IConfigurationRoot configuration;
         static SleepLoggerConfig config;
-        static Pen[] chartPens = new Pen[11];
+        static Pen[] chartPens;
 
         static void Main(string[] args)
         {
@@ -80,11 +80,6 @@ namespace SleepLogger
             }
 
             Console.CancelKeyPress += Console_CancelKeyPress;
-
-            for (int i = 0; i <= 10; i++)
-            {
-                chartPens[i] = new Pen(new SolidBrush(ColorInterpolator.InterpolateBetween(Color.DarkGray, Color.DarkRed, ((double)i / 10.0) / 2.0)), 1.0f);
-            }
 
             if (args.Length > 1)
             {
@@ -464,6 +459,15 @@ namespace SleepLogger
 
             Graphics graphics = Graphics.FromImage(spectrumBitmap);
             graphics.FillRectangle(new SolidBrush(bgColor), new Rectangle(0, 0, width, config.RowHeightPixels * rowCount));
+
+            if (chartPens == null)
+            {
+                chartPens = new Pen[11];
+                for (int i = 0; i <= 10; i++)
+                {
+                    chartPens[i] = new Pen(new SolidBrush(ColorInterpolator.InterpolateBetween(Color.DarkGray, Color.DarkRed, ((double)i / 10.0) / 2.0)), 1.0f);
+                }
+            }
 
             float sampleAmplification = (1.0f / config.RangeY) * config.RowHeightPixels;
 
