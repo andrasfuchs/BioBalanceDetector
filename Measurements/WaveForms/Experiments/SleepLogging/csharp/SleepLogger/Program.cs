@@ -39,6 +39,7 @@ namespace SleepLogger
 
         static IConfigurationRoot configuration;
         static SleepLoggerConfig config;
+        static Pen[] chartPens = new Pen[11];
 
         static void Main(string[] args)
         {
@@ -78,6 +79,11 @@ namespace SleepLogger
             }
 
             Console.CancelKeyPress += Console_CancelKeyPress;
+
+            for (int i = 0; i <= 10; i++)
+            {
+                chartPens[i] = new Pen(new SolidBrush(ColorInterpolator.InterpolateBetween(Color.DarkGray, Color.DarkRed, ((double)i / 10.0) / 2.0)), 1.0f);
+            }
 
             if (args.Length > 1)
             {
@@ -125,10 +131,10 @@ namespace SleepLogger
                         {
                             FFmpeg.Conversions.New()
                                 .SetInputFrameRate(12)
-                                .BuildVideoFromImages(Directory.GetFiles(foldername, "*.png").OrderBy(fn => fn))
+                                .BuildVideoFromImages(Directory.GetFiles(AppendDataDir(foldername), "*.png").OrderBy(fn => fn))
                                 .SetFrameRate(12)
                                 .SetPixelFormat(PixelFormat.yuv420p)
-                                .SetOutput(mp4Filename)
+                                .SetOutput(AppendDataDir(mp4Filename))
                                 .Start()
                                 .Wait();
                         }
@@ -197,6 +203,11 @@ namespace SleepLogger
                     if (samples.Count >= config.AD2.Samplerate * config.Postprocessing.IntervalSeconds)
                     {
                         //generate a signal
+                        int sampleCount = samples.Count;
+                        if (sampleCount < config.Postprocessing.FFTSize)
+                        {
+                            samples.AddRange(Enumerable.Repeat(0.0f, config.Postprocessing.FFTSize - sampleCount));
+                        }                 
                         var signal = new DiscreteSignal(config.AD2.Samplerate, samples.ToArray(), true);
                         samples.Clear();
 
@@ -232,7 +243,7 @@ namespace SleepLogger
                                     sw.Restart();
                                     //and save samples to a WAV file
                                     FileStream waveFileStream = new FileStream(AppendDataDir($"{pathToFile}.wav"), FileMode.Create);
-                                    DiscreteSignal signalToSave = new DiscreteSignal(signal.SamplingRate, signal.Samples, true);
+                                    DiscreteSignal signalToSave = new DiscreteSignal(signal.SamplingRate, signal.Samples.Take(sampleCount).ToArray(), true);
                                     signalToSave.Amplify(inputAmplification);
                                     WaveFile waveFile = new WaveFile(signalToSave, 16);
                                     waveFile.SaveTo(waveFileStream, false);
@@ -247,6 +258,7 @@ namespace SleepLogger
                                 var fft = new RealFft(config.Postprocessing.FFTSize);
                                 try
                                 {
+                                    logger.LogInformation($"#{bi.ToString("0000")} signal.Samples.Length: {sampleCount:N0} | FFT size: {config.Postprocessing.FFTSize:N0}");
                                     fftData.MagnitudeData = fft.MagnitudeSpectrum(signal, normalize: true).Samples;
                                 }
                                 catch (IndexOutOfRangeException)
@@ -260,25 +272,25 @@ namespace SleepLogger
                                 sw.Stop();
                                 logger.LogInformation($"#{bi.ToString("0000")} Signal processing completed in {sw.ElapsedMilliseconds:N0} ms.");
 
-                                fftData.FrequencyStep = ((float)config.AD2.Samplerate / 2) / (fftData.MagnitudeData.Length - 1);
+                                fftData.FrequencyStep = ((float)fftData.LastFrequency) / (fftData.MagnitudeData.Length - 1);
 
                                 maxValues.Add(fftData.MagnitudeData.Max());
                                 int maxIndex = Array.FindIndex(fftData.MagnitudeData, d => d == maxValues[maxValues.Count - 1]);
                                 logger.LogInformation($"#{bi.ToString("0000")} The maximum magnitude is {maxValues[maxValues.Count - 1] * 1000 * 1000:N} µV at the index of #{maxIndex:N0} ({maxIndex * fftData.FrequencyStep:N} Hz).");
-                                if (config.AD2.SignalGenerator.Enabled)
-                                {
-                                    logger.LogInformation($"#{bi.ToString("0000")} The magnitude at {config.AD2.SignalGenerator.Frequency} Hz is {fftData.MagnitudesPerHz[(int)config.AD2.SignalGenerator.Frequency] * 1000 * 1000:N} µV.");
-                                }
+                                //if (config.AD2.SignalGenerator.Enabled)
+                                //{
+                                //    logger.LogInformation($"#{bi.ToString("0000")} The magnitude at {config.AD2.SignalGenerator.Frequency} Hz is {fftData.MagnitudesPer1p0Hz[(int)config.AD2.SignalGenerator.Frequency] * 1000 * 1000:N} µV.");
+                                //}
 
-                                if (config.Postprocessing.MagnitudeThreshold > 0)
-                                {
-                                    float averageMagnitude = fftData.MagnitudesPerHz[100..1000].Average();
-                                    if (averageMagnitude < config.Postprocessing.MagnitudeThreshold)
-                                    {
-                                        logger.LogWarning($"#{bi.ToString("0000")} The average magnitude in the 100-1000 Hz range is too low: {averageMagnitude * 1000 * 1000:N0} µV. The threashold is {config.Postprocessing.MagnitudeThreshold * 1000 * 1000:N0} µV.");
-                                        return;
-                                    }
-                                }
+                                //if (config.Postprocessing.MagnitudeThreshold > 0)
+                                //{
+                                //    float averageMagnitude = fftData.MagnitudesPer1p0Hz[100..1000].Average();
+                                //    if (averageMagnitude < config.Postprocessing.MagnitudeThreshold)
+                                //    {
+                                //        logger.LogWarning($"#{bi.ToString("0000")} The average magnitude in the 100-1000 Hz range is too low: {averageMagnitude * 1000 * 1000:N0} µV. The threashold is {config.Postprocessing.MagnitudeThreshold * 1000 * 1000:N0} µV.");
+                                //        return;
+                                //    }
+                                //}
 
                                 if (config.Postprocessing.SaveAsFFT)
                                 {
@@ -288,7 +300,7 @@ namespace SleepLogger
 
                                         //save it the FFT to a JSON file
                                         sw.Restart();
-                                        FftData.SaveAs(fftData, AppendDataDir($"{pathToFile}.fft"), false);
+                                        FftData.SaveAs(fftData.Resample(0.1f), AppendDataDir($"{pathToFile}.fft"), false);
                                         sw.Stop();
                                         logger.LogInformation($"#{bi.ToString("0000")} Save as FFT completed in {sw.ElapsedMilliseconds:N0} ms.");
                                     });
@@ -302,7 +314,7 @@ namespace SleepLogger
 
                                         //save it the FFT to a zipped JSON file
                                         sw.Restart();
-                                        FftData.SaveAs(fftData, AppendDataDir($"{pathToFile}.zip"), true);
+                                        FftData.SaveAs(fftData.Resample(0.1f), AppendDataDir($"{pathToFile}.zip"), true);
                                         sw.Stop();
                                         logger.LogInformation($"#{bi.ToString("0000")} Save as compressed FFT completed in {sw.ElapsedMilliseconds:N0} ms.");
                                     });
@@ -415,12 +427,14 @@ namespace SleepLogger
             Size targetResolution = new Size(config.TargetWidth, config.TargetHeight);
             float idealAspectRatio = (float)targetResolution.Width / (float)targetResolution.Height;
 
-            float maxValue = fftData.MagnitudesPerHz.Max();
-            int maxValueAtIndex = Array.IndexOf(fftData.MagnitudesPerHz, maxValue);
+            fftData = fftData.Resample(1.0f);
+
+            float maxValue = fftData.MagnitudeData.Max();
+            int maxValueAtIndex = Array.IndexOf(fftData.MagnitudeData, maxValue);
 
             // convert samples into log scale (dBm)
             //var samples = signal.Samples.Select(s => Scale.ToDecibel(s)).ToArray();
-            var samples = fftData.MagnitudesPerHz.Take(config.RangeX).ToArray();
+            var samples = fftData.MagnitudeData.Take(config.RangeX).ToArray();
             
             int width = 0;
             float currentAspectRatio;
@@ -444,14 +458,12 @@ namespace SleepLogger
             //filteredSamples = filteredSamples.Take(originalSampleCount - onePercentCount).TakeLast(originalSampleCount - onePercentCount - onePercentCount).ToArray();
 
             Color bgColor = Color.LightGray;
-            Brush lineColor = new SolidBrush(Color.DarkGray);
 
             Bitmap spectrumBitmap = new Bitmap(width, config.RowHeightPixels * rowCount, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
             Graphics graphics = Graphics.FromImage(spectrumBitmap);
             graphics.FillRectangle(new SolidBrush(bgColor), new Rectangle(0, 0, width, config.RowHeightPixels * rowCount));
 
-            var pen = new Pen(lineColor, 1);
             float sampleAmplification = (1.0f / config.RangeY) * config.RowHeightPixels;
 
             for (int r = 1; r <= rowCount; r++)
@@ -466,8 +478,9 @@ namespace SleepLogger
                     if (samples[dataPointIndex] > 0)
                     {
                         int valueToShow = (int)Math.Min(samples[dataPointIndex] * sampleAmplification, config.RowHeightPixels);
+                        int penIndex = (int)Math.Min(chartPens.Length - 1, (((samples[dataPointIndex] * sampleAmplification) / (float)valueToShow) - 1.0f) * 0.5);
 
-                        graphics.DrawLine(pen, new Point(i, bottomLine), new Point(i, bottomLine - valueToShow));
+                        graphics.DrawLine(chartPens[penIndex], new Point(i, bottomLine), new Point(i, bottomLine - valueToShow));
                     }
                 }
             }

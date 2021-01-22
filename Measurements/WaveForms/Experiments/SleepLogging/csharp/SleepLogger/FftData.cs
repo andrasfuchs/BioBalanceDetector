@@ -1,4 +1,5 @@
-﻿using NWaves.Signals;
+﻿using NWaves.Operations;
+using NWaves.Signals;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -6,6 +7,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace SleepLogger
@@ -33,42 +35,46 @@ namespace SleepLogger
 
                 _magnitudeData = value;
             }
-        }
+        }        
 
-        private float[] _magnitudesPerHz;
-        public float[] MagnitudesPerHz 
-        { 
-            get
+        public FftData Resample(float frequencyStep)
+        {
+            if (this.FirstFrequency > 0)
             {
-                if (this.FirstFrequency > 0)
-                {
-                    throw new Exception("The FirstFrequency must be 0 if you want to use the MagnitudesPerHz property.");
-                }
-
-                if (_magnitudesPerHz == null)
-                {
-                    int maxFrequency = (int)Math.Ceiling(this.LastFrequency);
-
-                    _magnitudesPerHz = new float[maxFrequency + 1];
-
-                    _magnitudesPerHz[0] = MagnitudeData[0];
-                    _magnitudesPerHz[^1] = MagnitudeData[^1];
-                    int nextDataIndex = 1;
-                    for (int i = 1; i < maxFrequency; i++)
-                    {
-                        while (this.FrequencyStep * nextDataIndex < i)
-                        {
-                            nextDataIndex++;
-                        }
-
-                        float distanceFromPrevious = i - (this.FrequencyStep * (nextDataIndex - 1));
-                        float distanceFromNext = (this.FrequencyStep * nextDataIndex) - i;
-                        _magnitudesPerHz[i] = (distanceFromNext * this.MagnitudeData[nextDataIndex - 1] + distanceFromPrevious * this.MagnitudeData[nextDataIndex]) / (distanceFromPrevious + distanceFromNext);
-                    }
-                }
-
-                return _magnitudesPerHz;
+                throw new Exception("The FirstFrequency must be 0 if you want to use the MagnitudesPerHz property.");
             }
+
+            if (this.FrequencyStep > frequencyStep)
+            {
+                throw new Exception("The FrequencyStep of the FFT dataset must be smallar then the frequency step that we resample to.");
+            }
+
+            int maxFrequency = (int)Math.Ceiling(this.LastFrequency);
+
+            var recalculatedValues = new List<float>();
+
+            int i = 0;
+            while (this.FrequencyStep * i < this.LastFrequency)
+            {
+                i++;
+                if (frequencyStep * recalculatedValues.Count < i * this.FrequencyStep)
+                {
+                    recalculatedValues.Add(0);
+                }
+
+                recalculatedValues[^1] += _magnitudeData[i];
+            }
+
+            return new FftData()
+            {
+                CaptureTime = this.CaptureTime,
+                Duration = this.Duration,
+                FirstFrequency = this.FirstFrequency,
+                LastFrequency = frequencyStep * recalculatedValues.Count,
+                FrequencyStep = frequencyStep,
+                FftSize = recalculatedValues.Count,
+                MagnitudeData = recalculatedValues.ToArray()
+            };
         }
 
         public FftData() { }
@@ -77,7 +83,7 @@ namespace SleepLogger
         {
             pathToFile = pathToFile.Substring(0, pathToFile.Length - Path.GetExtension(pathToFile).Length);
             string filename = Path.GetFileNameWithoutExtension(pathToFile);
-            string fftDataJson = JsonSerializer.Serialize(fftData);
+            string fftDataJson = JsonSerializer.Serialize(fftData, new JsonSerializerOptions() { WriteIndented = true });
 
             if (compress)
             {
