@@ -85,60 +85,13 @@ namespace SleepLogger
             {
                 if (args[0] == "--video")
                 {
-                    string foldername = args[1];
+                    GenerateVideo(args[1], logger);
+                    return;
+                }
 
-                    if (Directory.Exists(AppendDataDir(foldername)))
-                    {
-                        foreach (string filename in Directory.GetFiles(AppendDataDir(foldername)))
-                        {
-                            //foldername = Path.GetFullPath(filename).Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)[^2];
-                            string pathToFile = Path.GetFullPath(filename);
-
-                            if ((Path.GetExtension(filename) != ".fft") && (Path.GetExtension(filename) != ".zip"))
-                            {
-                                continue;
-                            }
-
-                            try
-                            {
-                                FftData fftData = FftData.LoadFrom($"{pathToFile}");
-
-                                string filenameWithoutExtension = Path.Combine(foldername, Path.GetFileNameWithoutExtension(pathToFile));
-                                string filenameComplete = $"{filenameWithoutExtension}_{SimplifyNumber(config.Postprocessing.SaveAsPNG.RangeX)}Hz_{SimplifyNumber(config.Postprocessing.SaveAsPNG.RangeY)}V.png";
-
-                                if (File.Exists(AppendDataDir(filenameComplete)))
-                                {
-                                    logger.LogWarning($"{filenameComplete} already exists.");
-                                    continue;
-                                }
-
-                                SaveSignalAsPng(AppendDataDir(filenameComplete), fftData, config.Postprocessing.SaveAsPNG);
-                                logger.LogInformation($"{filenameComplete} was generated successfully.");
-                            }
-                            catch (Exception ex)
-                            {
-                                logger.LogWarning($"There was an error while generating PNG for '{Path.GetFileName(pathToFile)}': {ex.Message}");
-                            }
-                        }
-
-                        string mp4Filename = $"{foldername}.mp4";
-                        logger.LogInformation($"Generating MP4 video file '{mp4Filename}'");
-                        try
-                        {
-                            FFmpeg.Conversions.New()
-                                .SetInputFrameRate(12)
-                                .BuildVideoFromImages(Directory.GetFiles(AppendDataDir(foldername), "*.png").OrderBy(fn => fn))
-                                .SetFrameRate(12)
-                                .SetPixelFormat(PixelFormat.yuv420p)
-                                .SetOutput(AppendDataDir(mp4Filename))
-                                .Start()
-                                .Wait();
-                        }
-                        catch (Exception ex)
-                        {
-                            logger.LogError($"There was an error while generating MP4 video file '{mp4Filename}': {ex.Message}");
-                        }
-                    }
+                if (args[0] == "--mlcsv")
+                {
+                    GenerateMLCSV(args[1], 1.0f, 45, logger);
                     return;
                 }
             }
@@ -254,7 +207,7 @@ namespace SleepLogger
                                 var fft = new RealFft(config.Postprocessing.FFTSize);
                                 try
                                 {
-                                    logger.LogInformation($"#{bi.ToString("0000")} signal.Samples.Length: {sampleCount:N0} | FFT size: {config.Postprocessing.FFTSize:N0}");
+                                    //logger.LogInformation($"#{bi.ToString("0000")} signal.Samples.Length: {sampleCount:N0} | FFT size: {config.Postprocessing.FFTSize:N0}");
                                     fftData.MagnitudeData = fft.MagnitudeSpectrum(signal, normalize: true).Samples;
                                 }
                                 catch (IndexOutOfRangeException)
@@ -346,6 +299,113 @@ namespace SleepLogger
             dwf.FDwfDeviceCloseAll();
         }
 
+        private static void GenerateVideo(string foldername, ILogger logger)
+        {
+            foreach (FftData fftData in EnumerateFFTDataInFolder(foldername))
+            {
+                try 
+                { 
+                    string filenameComplete = Path.Combine(foldername, $"{fftData.Filename}_{SimplifyNumber(config.Postprocessing.SaveAsPNG.RangeX)}Hz_{SimplifyNumber(config.Postprocessing.SaveAsPNG.RangeY)}V.png");
+
+                    if (File.Exists(AppendDataDir(filenameComplete)))
+                    {
+                        logger.LogWarning($"{filenameComplete} already exists.");
+                        continue;
+                    }
+
+                    SaveSignalAsPng(AppendDataDir(filenameComplete), fftData, config.Postprocessing.SaveAsPNG);
+                    logger.LogInformation($"{filenameComplete} was generated successfully.");
+                }
+                catch (Exception ex)
+                {
+                    logger.LogWarning($"There was an error while generating PNG for '{fftData.Filename}': {ex.Message}");
+                }
+            }
+
+            string mp4Filename = $"{foldername}.mp4";
+            logger.LogInformation($"Generating MP4 video file '{mp4Filename}'");
+            try
+            {
+                FFmpeg.Conversions.New()
+                    .SetInputFrameRate(12)
+                    .BuildVideoFromImages(Directory.GetFiles(AppendDataDir(foldername), "*.png").OrderBy(fn => fn))
+                    .SetFrameRate(12)
+                    .SetPixelFormat(PixelFormat.yuv420p)
+                    .SetOutput(AppendDataDir(mp4Filename))
+                    .Start()
+                    .Wait();
+            }
+            catch (Exception ex)
+            {
+                logger.LogError($"There was an error while generating MP4 video file '{mp4Filename}': {ex.Message}");
+            }
+        }
+
+        private static void GenerateMLCSV(string foldername, float fftStep, int fftCount, ILogger logger)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            if (Directory.Exists(AppendDataDir(foldername)))
+            {
+                foreach (FftData fftData in EnumerateFFTDataInFolder(foldername))
+                {
+                    logger.LogInformation($"Adding {fftData.Filename} to the machine learning CSV file.");
+                    sb.Append(String.Join(",", fftData.Resample(fftStep).MagnitudeData.Take(fftCount)));
+                    sb.AppendLine("," + String.Join("+", fftData.Tags));
+                }
+
+                string csvFilename = $"{foldername}.csv";
+                logger.LogInformation($"Generating machine learning CSV file '{csvFilename}'");
+                try
+                {
+                    File.WriteAllText(AppendDataDir(csvFilename), sb.ToString());
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError($"There was an error while generating CSV file '{csvFilename}': {ex.Message}");
+                }
+            }
+        }
+
+        static private IEnumerable<FftData> EnumerateFFTDataInFolder(string foldername, string[] applyTags = null)
+        {
+            if (applyTags == null) applyTags = Array.Empty<string>();
+
+            if (Directory.Exists(AppendDataDir(foldername)))
+            {
+                foreach (string filename in Directory.GetFiles(AppendDataDir(foldername)).OrderBy(n => n))
+                {
+                    string pathToFile = Path.GetFullPath(filename);
+
+                    if ((Path.GetExtension(filename) != ".fft") && (Path.GetExtension(filename) != ".zip"))
+                    {
+                        continue;
+                    }
+
+                    var fftData = FftData.LoadFrom($"{pathToFile}");
+                    fftData.Filename = Path.GetFileNameWithoutExtension(pathToFile);
+                    fftData.Tags = applyTags;
+
+                    yield return fftData;
+                }
+
+                foreach (string directoryName in Directory.GetDirectories(AppendDataDir(foldername)).OrderBy(n => n))
+                {
+                    var tags = new List<string>(applyTags);
+                    string newTag = Path.GetFileName(directoryName);
+                    if (newTag.StartsWith("#"))
+                    {
+                        tags.Add(newTag[1..]);
+                    }
+
+                    foreach (var fftData in EnumerateFFTDataInFolder(directoryName, tags.ToArray()))
+                    {
+                        yield return fftData;
+                    }
+                }
+            }
+        }
+
         private static string AppendDataDir(string filename)
         {
             if (!String.IsNullOrWhiteSpace(config.DataDirectory))
@@ -424,6 +484,7 @@ namespace SleepLogger
             float idealAspectRatio = (float)targetResolution.Width / (float)targetResolution.Height;
 
             fftData = fftData.Resample(1.0f);
+            string tags = String.Join(", ", fftData.Tags ?? Array.Empty<string>());
 
             float maxValue = fftData.MagnitudeData.Max();
             int maxValueAtIndex = Array.IndexOf(fftData.MagnitudeData, maxValue);
@@ -494,12 +555,12 @@ namespace SleepLogger
             int scaledDownHeight = (((int)(spectrumBitmap.Height / resoltionScaleDownFactor)) / 2) * 2;
             var scaledDownBitmap = new Bitmap(spectrumBitmap, new Size(scaledDownWidth, scaledDownHeight));
 
-            // TODO: add all DrawStrings here
             Font font = new Font("Georgia", 10.0f);
             graphics = Graphics.FromImage(scaledDownBitmap);
             graphics.DrawString($"{filename}", font, Brushes.White, new PointF(scaledDownWidth * 0.75f, 10.0f + font.Height * 0));
-            graphics.DrawString($"Y range: {Math.Round(config.RangeY * 1000 * 1000):N0} µV", font, Brushes.White, new PointF(scaledDownWidth * 0.75f, 10.0f + font.Height * 1.1f));
-            graphics.DrawString($"Max value: {Math.Round(maxValue * 1000 * 1000):N0} µV @ {maxValueAtIndex:N} Hz", font, Brushes.White, new PointF(scaledDownWidth * 0.75f, 10.0f + font.Height * 2.2f));
+            graphics.DrawString($"{tags}", font, Brushes.White, new PointF(scaledDownWidth * 0.75f, 10.0f + font.Height * 1.1f));
+            graphics.DrawString($"Y range: {Math.Round(config.RangeY * 1000 * 1000):N0} µV", font, Brushes.White, new PointF(scaledDownWidth * 0.75f, 10.0f + font.Height * 2.2f));
+            graphics.DrawString($"Max value: {Math.Round(maxValue * 1000 * 1000):N0} µV @ {maxValueAtIndex:N} Hz", font, Brushes.White, new PointF(scaledDownWidth * 0.75f, 10.0f + font.Height * 3.3f));
             for (int r = 1; r <= rowCount; r++)
             {
                 int fromKHz = (r - 1) * width / 1000;

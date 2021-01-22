@@ -35,7 +35,10 @@ namespace SleepLogger
 
                 _magnitudeData = value;
             }
-        }        
+        }
+
+        public string Filename { get; internal set; }
+        public string[] Tags { get; internal set; }
 
         public FftData Resample(float frequencyStep)
         {
@@ -53,8 +56,7 @@ namespace SleepLogger
 
             var recalculatedValues = new List<float>();
 
-            int i = 0;
-            while (this.FrequencyStep * i < this.LastFrequency)
+            for (int i = 0; ((this.FrequencyStep * i < this.LastFrequency) && (i < _magnitudeData.Length)); i++)
             {
                 i++;
                 if (frequencyStep * recalculatedValues.Count < i * this.FrequencyStep)
@@ -73,7 +75,9 @@ namespace SleepLogger
                 LastFrequency = frequencyStep * recalculatedValues.Count,
                 FrequencyStep = frequencyStep,
                 FftSize = recalculatedValues.Count,
-                MagnitudeData = recalculatedValues.ToArray()
+                MagnitudeData = recalculatedValues.ToArray(),
+                Filename = this.Filename,
+                Tags = this.Tags
             };
         }
 
@@ -83,6 +87,7 @@ namespace SleepLogger
         {
             pathToFile = pathToFile.Substring(0, pathToFile.Length - Path.GetExtension(pathToFile).Length);
             string filename = Path.GetFileNameWithoutExtension(pathToFile);
+            fftData.Filename = filename;
             string fftDataJson = JsonSerializer.Serialize(fftData, new JsonSerializerOptions() { WriteIndented = true });
 
             if (compress)
