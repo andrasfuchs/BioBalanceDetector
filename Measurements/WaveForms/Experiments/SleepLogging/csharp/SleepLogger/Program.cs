@@ -23,6 +23,8 @@ namespace SleepLogger
     {
         static string versionString = "v0.5 (2021-01-22)";
 
+        static Mutex mutex = new Mutex(true, "{79bb7f72-37bc-41ff-9014-ed8662659b52}");
+
         /// <summary>
         /// Number of samples per buffer
         /// </summary>
@@ -44,7 +46,7 @@ namespace SleepLogger
         static void Main(string[] args)
         {
             // Build configuration
-            configuration = new ConfigurationBuilder()
+                configuration = new ConfigurationBuilder()
                 .SetBasePath(AppContext.BaseDirectory)
                 .AddJsonFile("appsettings.json", false)
                 .Build();
@@ -76,6 +78,12 @@ namespace SleepLogger
             catch (Exception ex)
             {
                 logger.LogError($"There was a problem with the configuration file. {ex.Message}");
+                return;
+            }
+
+            if (!mutex.WaitOne(TimeSpan.Zero, true))
+            {
+                logger.LogError($"An instance of this app is already running on this machine.");
                 return;
             }
 
@@ -584,6 +592,8 @@ namespace SleepLogger
         {
             terminateAcquisition = true;
             e.Cancel = true;
+
+            mutex.ReleaseMutex();
         }
 
         private static string SimplifyNumber(double n, string format = "0.###")

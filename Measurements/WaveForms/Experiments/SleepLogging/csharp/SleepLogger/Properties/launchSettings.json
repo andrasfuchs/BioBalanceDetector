@@ -1,8 +1,11 @@
 {
   "profiles": {
     "SleepLogger": {
+      "commandName": "Project"
+    },
+    "SleepLogger - create video": {
       "commandName": "Project",
-      "commandLineArgs": "--video 2021-01-22"
+      "commandLineArgs": "--video 2021-01-23"
     }
   }
 }
