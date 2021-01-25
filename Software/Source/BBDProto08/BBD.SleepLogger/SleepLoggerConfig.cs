@@ -8,12 +8,14 @@ namespace BBD.SleepLogger
     public class SleepLoggerConfig
     {
         public string DataDirectory { get; }
+        public long MinimumAvailableFreeSpace { get; }
         public AD2Config AD2 { get; }
         public PostprocessingConfig Postprocessing { get; }
 
         public SleepLoggerConfig(IConfigurationRoot config)
         {
             DataDirectory = config["DataDirectory"];
+            MinimumAvailableFreeSpace = (long)ParseNumber(config["MinimumAvailableFreeSpace"]);
 
             AD2 = new AD2Config()
             {

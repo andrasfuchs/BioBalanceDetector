@@ -17,7 +17,25 @@ dotnet --version
 
 # https://docs.microsoft.com/en-us/dotnet/core/install/linux-debian
 
+x, Clone the repo on the Raspberry
+cd ~/Work/BioBalanceDetector
+git clone https://github.com/andrasfuchs/BioBalanceDetector.git
 
+x, Update the repo on the Raspberry
+cd ~/Work/BioBalanceDetector
+git pull
+
+x, Build the .NET source code on the Raspberry
+cd ~/Work/BioBalanceDetector/Software/Source/BBDProto08/BBD.SleepLogger
+dotnet build
+
+x, Publish the .NET app on the Raspberry
+cd ~/Work/BioBalanceDetector/Software/Source/BBDProto08/BBD.SleepLogger
+dotnet publish --configuration release --runtime linux-arm --self-contained true --output ~/Work/BBD.SleepLogger
+
+x, Run the .NET app on the Raspberry
+cd ~/Work/BBD.SleepLogger
+./BBD.SleepLogger
 
 x, Configure the .NET 5 app to run as background services
 sudo apt-get install supervisor
@@ -37,7 +55,7 @@ autostart=true
 autorestart=true
 stderr_logfile=/var/log/BBD.SleepLogger.err.log
 stdout_logfile=/var/log/BBD.SleepLogger.out.log
-user=bbd
+user=pi
 environment=HOME="/home/pi",USER="pi"
 stopsignal=INT
 stopasgroup=false

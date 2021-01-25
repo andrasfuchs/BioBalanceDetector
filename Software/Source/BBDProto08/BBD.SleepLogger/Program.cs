@@ -33,6 +33,7 @@ namespace BBD.SleepLogger
         static float inputAmplification = short.MaxValue / 1.0f;        // WAV file ranges from -1000 mV to +1000 mV
 
         static bool terminateAcquisition = false;
+        static DriveInfo spaceCheckDrive;
 
         static List<float> samples = new List<float>();
         static double[] voltData;
@@ -89,6 +90,15 @@ namespace BBD.SleepLogger
 
             Console.CancelKeyPress += Console_CancelKeyPress;
 
+            foreach (var d in DriveInfo.GetDrives())
+            {
+                logger.LogInformation($"drive '{d.Name}'");
+            }
+            logger.LogInformation($"path '{Path.GetFullPath(AppendDataDir(""))}'");
+
+            spaceCheckDrive = DriveInfo.GetDrives().FirstOrDefault(d => Path.GetFullPath(AppendDataDir("")).ToLower().StartsWith(d.RootDirectory.FullName.ToLower()));
+            logger.LogInformation($"The drive {spaceCheckDrive.Name} must have at least {config.MinimumAvailableFreeSpace} bytes of free space at all times.");
+
             if (args.Length > 1)
             {
                 if (args[0] == "--video")
@@ -115,6 +125,12 @@ namespace BBD.SleepLogger
 
             while (!terminateAcquisition)
             {
+                if ((spaceCheckDrive != null) && (spaceCheckDrive.AvailableFreeSpace < config.MinimumAvailableFreeSpace))
+                {
+                    logger.LogError($"There is not enough space on drive {spaceCheckDrive.Name} to continue.");
+                    break;
+                }
+
                 while (true)
                 {
                     logger.LogTrace($"FDwfAnalogInStatus begin | dwfHandle:{dwfHandle}");
