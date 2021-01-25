@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SleepLogger
+namespace BBD.SleepLogger
 {
     public class SleepLoggerConfig
     {

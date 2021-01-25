@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Drawing;
 
-namespace SleepLogger
+namespace BBD.SleepLogger
 {
     // Interpolate between 2 colors in C#
     // Taken from answer by user Jason

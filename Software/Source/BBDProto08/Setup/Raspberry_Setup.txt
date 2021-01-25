@@ -1,0 +1,50 @@
+# https://darryldias.me/2021/install-and-setup-net-5-on-raspberry-pi/
+
+wget https://download.visualstudio.microsoft.com/download/pr/567a64a8-810b-4c3f-85e3-bc9f9e06311b/02664afe4f3992a4d558ed066d906745/dotnet-sdk-5.0.101-linux-arm.tar.gz
+wget https://download.visualstudio.microsoft.com/download/pr/11977d43-d937-4fdb-a1fb-a20d56f1877d/73aa09b745586ac657110fd8b11c0275/aspnetcore-runtime-5.0.1-linux-arm.tar.gz
+
+mkdir ~/.dotnet
+
+tar -xvf dotnet-sdk-5.0.101-linux-arm.tar.gz -C ~/.dotnet
+tar -xvf aspnetcore-runtime-5.0.1-linux-arm.tar.gz -C ~/.dotnet
+
+nano ~/.bashrc
+
+export DOTNET_ROOT=$HOME/.dotnet 
+export PATH=$PATH:$HOME/.dotnet
+
+dotnet --version
+
+# https://docs.microsoft.com/en-us/dotnet/core/install/linux-debian
+
+
+
+x, Configure the .NET 5 app to run as background services
+sudo apt-get install supervisor
+
+sudo nano /etc/supervisor/supervisord.conf
+# change chmod=0700 to chmod=0766 @ line 5
+
+sudo nano /etc/supervisor/conf.d/bbd.conf
+
+[group:bbd]
+programs=SleepLogger
+
+[program:SleepLogger]
+directory=/home/pi/Work/BBD.SleepLogger
+command=/home/pi/Work/BBD.SleepLogger/BBD.SleepLogger
+autostart=true
+autorestart=true
+stderr_logfile=/var/log/BBD.SleepLogger.err.log
+stdout_logfile=/var/log/BBD.SleepLogger.out.log
+user=bbd
+environment=HOME="/home/pi",USER="pi"
+stopsignal=INT
+stopasgroup=false
+
+
+sudo service supervisor restart
+
+supervisorctl status all
+supervisorctl stop bbd:
+supervisorctl start bbd:

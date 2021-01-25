@@ -17,7 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Xabe.FFmpeg;
 
-namespace SleepLogger
+namespace BBD.SleepLogger
 {
     class Program
     {
