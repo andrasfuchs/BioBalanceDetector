@@ -90,16 +90,19 @@ namespace BBD.SleepLogger
 
             Console.CancelKeyPress += Console_CancelKeyPress;
 
+            
             foreach (var d in DriveInfo.GetDrives())
             {
                 if (Path.GetFullPath(AppendDataDir("")).ToLower().StartsWith(d.RootDirectory.FullName.ToLower()) && ((spaceCheckDrive == null) || (d.Name.Length > spaceCheckDrive.Name.Length)))
                 {
                     spaceCheckDrive = d;
                 }
-                logger.LogInformation($"drive '{d.Name}', free {d.AvailableFreeSpace:N0} bytes");
+                //logger.LogInformation($"drive '{d.Name}', free {d.AvailableFreeSpace:N0} bytes");
             }
-            logger.LogInformation($"path '{Path.GetFullPath(AppendDataDir(""))}', drive '{spaceCheckDrive?.Name}'");
+            //logger.LogInformation($"path '{Path.GetFullPath(AppendDataDir(""))}', drive '{spaceCheckDrive?.Name}'");
 
+            
+            
             if (args.Length > 1)
             {
                 if (args[0] == "--video")
