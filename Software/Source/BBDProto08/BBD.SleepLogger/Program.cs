@@ -92,12 +92,13 @@ namespace BBD.SleepLogger
 
             foreach (var d in DriveInfo.GetDrives())
             {
-                logger.LogInformation($"drive '{d.Name}'");
+                if (Path.GetFullPath(AppendDataDir("")).ToLower().StartsWith(d.RootDirectory.FullName.ToLower()) && ((spaceCheckDrive == null) || (d.Name.Length > spaceCheckDrive.Name.Length)))
+                {
+                    spaceCheckDrive = d;
+                }
+                logger.LogInformation($"drive '{d.Name}', free {d.AvailableFreeSpace:N0} bytes");
             }
-            logger.LogInformation($"path '{Path.GetFullPath(AppendDataDir(""))}'");
-
-            spaceCheckDrive = DriveInfo.GetDrives().FirstOrDefault(d => Path.GetFullPath(AppendDataDir("")).ToLower().StartsWith(d.RootDirectory.FullName.ToLower()));
-            logger.LogInformation($"The drive {spaceCheckDrive.Name} must have at least {config.MinimumAvailableFreeSpace} bytes of free space at all times.");
+            logger.LogInformation($"path '{Path.GetFullPath(AppendDataDir(""))}', drive '{spaceCheckDrive?.Name}'");
 
             if (args.Length > 1)
             {
@@ -127,7 +128,7 @@ namespace BBD.SleepLogger
             {
                 if ((spaceCheckDrive != null) && (spaceCheckDrive.AvailableFreeSpace < config.MinimumAvailableFreeSpace))
                 {
-                    logger.LogError($"There is not enough space on drive {spaceCheckDrive.Name} to continue.");
+                    logger.LogError($"There is not enough space on drive {spaceCheckDrive.Name}.  to continue. There must be at least {config.MinimumAvailableFreeSpace:N0} bytes of available free space at all times.");
                     break;
                 }
 
