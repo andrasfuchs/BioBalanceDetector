@@ -11,6 +11,7 @@ namespace BBD.SleepLogger
         public long MinimumAvailableFreeSpace { get; }
         public AD2Config AD2 { get; }
         public PostprocessingConfig Postprocessing { get; }
+        public AudioRecordingConfig AudioRecording { get; }
 
         public SleepLoggerConfig(IConfigurationRoot config)
         {
@@ -48,6 +49,14 @@ namespace BBD.SleepLogger
                     RowWidthStepsSamples = (int)ParseNumber(config["Postprocessing:SaveAsPNG:RowWidthStepsSamples"]),
                     RowHeightPixels = Int32.Parse(config["Postprocessing:SaveAsPNG:RowHeightPixels"]),
                 },
+            };
+
+            AudioRecording = new AudioRecordingConfig()
+            {
+                Enabled = Boolean.Parse(config["AudioRecording:Enabled"]),
+                PreferredDevice = config["AudioRecording:PreferredDevice"],
+                OutputFormat = config["AudioRecording:OutputFormat"],
+                SilenceThreshold = config["AudioRecording:SilenceThreshold"]
             };
         }
 
@@ -141,6 +150,14 @@ namespace BBD.SleepLogger
         public int RangeX { get; set; }
         public int RowWidthStepsSamples { get; set; }
         public int RowHeightPixels { get; set; }      
+    }
+
+    public class AudioRecordingConfig
+    {
+        public bool Enabled { get; set; }
+        public string PreferredDevice { get; set; }
+        public string OutputFormat { get; set; }
+        public string SilenceThreshold { get; set; }
     }
 
 }
