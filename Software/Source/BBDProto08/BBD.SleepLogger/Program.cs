@@ -21,9 +21,17 @@ namespace BBD.SleepLogger
 {
     class Program
     {
-        static string versionString = "v0.5 (2021-01-22)";
+        static string versionString = "v0.6 (2021-01-30)";
 
         static Mutex mutex = new Mutex(true, "{79bb7f72-37bc-41ff-9014-ed8662659b52}");
+
+        static string[] audioFrameworks = { "dshow", "alsa" };
+
+        static string ffmpegAudioFramework;
+        static string ffmpegAudioDevice;
+        static string ffmpegAudioRecordingParameters = "-c:a aac -ac 1 -ar 44100 -ab 32k";
+        static string ffmpegAudioProcessingSilenceRemove = "-af silenceremove=1:0:{SilenceThreshold}";
+        static string ffmpegAudioProcessingNormalize = "-af loudnorm=I=-24.0:LRA=+11.0:tp=-2.0";
 
         /// <summary>
         /// Number of samples per buffer
@@ -97,12 +105,34 @@ namespace BBD.SleepLogger
                 {
                     spaceCheckDrive = d;
                 }
-                //logger.LogInformation($"drive '{d.Name}', free {d.AvailableFreeSpace:N0} bytes");
             }
-            //logger.LogInformation($"path '{Path.GetFullPath(AppendDataDir(""))}', drive '{spaceCheckDrive?.Name}'");
 
-            
-            
+
+            foreach (string audioFramework in audioFrameworks)
+            {
+                try
+                {
+                    var listDevices = FFmpeg.Conversions.New().Start($"-list_devices true -f {audioFramework} -i dummy").Result;
+                }
+                catch (Exception e)
+                {
+                    // this is expected
+                    string audioDeviceDetails = e.Message.Split(Environment.NewLine).FirstOrDefault(ol => ol.StartsWith("[") && ol.Contains(config.AudioRecording.PreferredDevice));
+
+                    if (!String.IsNullOrWhiteSpace(audioDeviceDetails))
+                    {
+                        ffmpegAudioFramework = audioDeviceDetails.Split(new char[] { '[', '@' }, StringSplitOptions.RemoveEmptyEntries)[0].Trim();
+                        ffmpegAudioDevice = audioDeviceDetails.Split(new char[] { ']', '\"' }, StringSplitOptions.RemoveEmptyEntries)[^1].Trim();
+                    }
+                }
+            }
+
+            if (config.AudioRecording.Enabled && String.IsNullOrWhiteSpace(ffmpegAudioFramework) || String.IsNullOrWhiteSpace(ffmpegAudioDevice))
+            {
+                logger.LogWarning($"There is no valid device to record audio with.");
+                config.AudioRecording.Enabled = false;
+            }
+
             if (args.Length > 1)
             {
                 if (args[0] == "--video")
@@ -173,87 +203,92 @@ namespace BBD.SleepLogger
 
                 cSamples += cAvailable;
 
-                if (config.Postprocessing.Enabled)
+                if ((config.Postprocessing.Enabled) || (config.AudioRecording.Enabled))
                 {
                     samples.AddRange(voltData.Take(cAvailable).Select(vd => (float)vd));
 
                     if (samples.Count >= config.AD2.Samplerate * config.Postprocessing.IntervalSeconds)
                     {
-                        //generate a signal
-                        int sampleCount = samples.Count;
-                        if (sampleCount < config.Postprocessing.FFTSize)
+                        DateTime captureTime = DateTime.Now;
+                        string foldername = $"{captureTime.ToString("yyyy-MM-dd")}";
+                        string filename = $"AD2_{captureTime.ToString("yyyyMMdd_HHmmss")}";
+                        string pathToFile = Path.Combine(foldername, filename);
+                        if (!Directory.Exists(AppendDataDir(captureTime.ToString("yyyy-MM-dd"))))
                         {
-                            samples.AddRange(Enumerable.Repeat(0.0f, config.Postprocessing.FFTSize - sampleCount));
-                        }                 
-                        var signal = new DiscreteSignal(config.AD2.Samplerate, samples.ToArray(), true);
-                        samples.Clear();
+                            Directory.CreateDirectory(AppendDataDir(captureTime.ToString("yyyy-MM-dd")));
+                        }
 
-                        bufferIndex++;
-                        if (!skipBuffer)
+                        if (config.Postprocessing.Enabled)
                         {
-                            Task.Run(() =>
+
+                            //generate a signal
+                            int sampleCount = samples.Count;
+                            if (sampleCount < config.Postprocessing.FFTSize)
                             {
-                                int bi = bufferIndex;
+                                samples.AddRange(Enumerable.Repeat(0.0f, config.Postprocessing.FFTSize - sampleCount));
+                            }
+                            var signal = new DiscreteSignal(config.AD2.Samplerate, samples.ToArray(), true);
+                            samples.Clear();
 
-                                logger.LogTrace($"Postprocessing thread #{bi:N0} begin");
-
-                                var fftData = new FftData()
+                            bufferIndex++;
+                            if (!skipBuffer)
+                            {
+                                Task.Run(() =>
                                 {
-                                    CaptureTime = DateTime.Now,
-                                    Duration = config.Postprocessing.IntervalSeconds,
-                                    FirstFrequency = 0,
-                                    LastFrequency = config.AD2.Samplerate / 2,
-                                    FftSize = config.Postprocessing.FFTSize,
-                                };
+                                    int bi = bufferIndex;
 
-                                Stopwatch sw = Stopwatch.StartNew();
-                                string foldername = $"{fftData.CaptureTime.ToString("yyyy-MM-dd")}";
-                                string filename = $"AD2_{fftData.CaptureTime.ToString("yyyyMMdd_HHmmss")}";
-                                string pathToFile = Path.Combine(foldername, filename);
-                                if (!Directory.Exists(AppendDataDir(fftData.CaptureTime.ToString("yyyy-MM-dd"))))
-                                {
-                                    Directory.CreateDirectory(AppendDataDir(fftData.CaptureTime.ToString("yyyy-MM-dd")));
-                                }
+                                    logger.LogTrace($"Postprocessing thread #{bi:N0} begin");
 
-                                if (config.Postprocessing.SaveAsWAV)
-                                {
-                                    sw.Restart();
+                                    var fftData = new FftData()
+                                    {
+                                        CaptureTime = captureTime,
+                                        Duration = config.Postprocessing.IntervalSeconds,
+                                        FirstFrequency = 0,
+                                        LastFrequency = config.AD2.Samplerate / 2,
+                                        FftSize = config.Postprocessing.FFTSize,
+                                    };
+
+                                    Stopwatch sw = Stopwatch.StartNew();
+
+                                    if (config.Postprocessing.SaveAsWAV)
+                                    {
+                                        sw.Restart();
                                     //and save samples to a WAV file
                                     FileStream waveFileStream = new FileStream(AppendDataDir($"{pathToFile}.wav"), FileMode.Create);
-                                    DiscreteSignal signalToSave = new DiscreteSignal(signal.SamplingRate, signal.Samples.Take(sampleCount).ToArray(), true);
-                                    signalToSave.Amplify(inputAmplification);
-                                    WaveFile waveFile = new WaveFile(signalToSave, 16);
-                                    waveFile.SaveTo(waveFileStream, false);
+                                        DiscreteSignal signalToSave = new DiscreteSignal(signal.SamplingRate, signal.Samples.Take(sampleCount).ToArray(), true);
+                                        signalToSave.Amplify(inputAmplification);
+                                        WaveFile waveFile = new WaveFile(signalToSave, 16);
+                                        waveFile.SaveTo(waveFileStream, false);
 
-                                    waveFileStream.Close();
+                                        waveFileStream.Close();
 
-                                    sw.Stop();
-                                    logger.LogInformation($"#{bi.ToString("0000")} Save as WAV completed in {sw.ElapsedMilliseconds:N0} ms.");
-                                }
+                                        sw.Stop();
+                                        logger.LogInformation($"#{bi.ToString("0000")} Save as WAV completed in {sw.ElapsedMilliseconds:N0} ms.");
+                                    }
 
-                                sw.Restart();
-                                var fft = new RealFft(config.Postprocessing.FFTSize);
-                                try
-                                {
+                                    sw.Restart();
+                                    var fft = new RealFft(config.Postprocessing.FFTSize);
+                                    try
+                                    {
                                     //logger.LogInformation($"#{bi.ToString("0000")} signal.Samples.Length: {sampleCount:N0} | FFT size: {config.Postprocessing.FFTSize:N0}");
                                     fftData.MagnitudeData = fft.MagnitudeSpectrum(signal, normalize: true).Samples;
-                                }
-                                catch (IndexOutOfRangeException)
-                                {
-                                    logger.LogError($"The FFT size of {config.Postprocessing.FFTSize:N0} is too high for the sample rate of {config.AD2.Samplerate:N0}. Decrease the FFT size or increase the sampling rate.");
-                                    terminateAcquisition = true;
-                                    return;
-                                }
+                                    }
+                                    catch (IndexOutOfRangeException)
+                                    {
+                                        logger.LogError($"The FFT size of {config.Postprocessing.FFTSize:N0} is too high for the sample rate of {config.AD2.Samplerate:N0}. Decrease the FFT size or increase the sampling rate.");
+                                        terminateAcquisition = true;
+                                        return;
+                                    }
                                 // clear the 0th coefficient (DC component)
                                 fftData.MagnitudeData[0] = 0;
-                                sw.Stop();
-                                logger.LogInformation($"#{bi.ToString("0000")} Signal processing completed in {sw.ElapsedMilliseconds:N0} ms.");
+                                    sw.Stop();
+                                    logger.LogInformation($"#{bi.ToString("0000")} Signal processing completed in {sw.ElapsedMilliseconds:N0} ms.");
 
-                                fftData.FrequencyStep = ((float)fftData.LastFrequency) / (fftData.MagnitudeData.Length - 1);
+                                    fftData.FrequencyStep = ((float)fftData.LastFrequency) / (fftData.MagnitudeData.Length - 1);
 
-                                maxValues.Add(fftData.MagnitudeData.Max());
-                                int maxIndex = Array.FindIndex(fftData.MagnitudeData, d => d == maxValues[maxValues.Count - 1]);
-                                logger.LogInformation($"#{bi.ToString("0000")} The maximum magnitude is {maxValues[maxValues.Count - 1] * 1000 * 1000:N} µV at the index of #{maxIndex:N0} ({maxIndex * fftData.FrequencyStep:N} Hz).");
+                                    maxValues.Add(fftData.MagnitudeData.Max());
+                                    int maxIndex = Array.FindIndex(fftData.MagnitudeData, d => d == maxValues[maxValues.Count - 1]);
+                                    logger.LogInformation($"#{bi.ToString("0000")} The maximum magnitude is {maxValues[maxValues.Count - 1] * 1000 * 1000:N} µV at the index of #{maxIndex:N0} ({maxIndex * fftData.FrequencyStep:N} Hz).");
                                 //if (config.AD2.SignalGenerator.Enabled)
                                 //{
                                 //    logger.LogInformation($"#{bi.ToString("0000")} The magnitude at {config.AD2.SignalGenerator.Frequency} Hz is {fftData.MagnitudesPer1p0Hz[(int)config.AD2.SignalGenerator.Frequency] * 1000 * 1000:N} µV.");
@@ -270,54 +305,91 @@ namespace BBD.SleepLogger
                                 //}
 
                                 if (config.Postprocessing.SaveAsFFT)
-                                {
-                                    Task.Run(() =>
                                     {
-                                        Stopwatch sw = Stopwatch.StartNew();
+                                        Task.Run(() =>
+                                        {
+                                            Stopwatch sw = Stopwatch.StartNew();
 
                                         //save it the FFT to a JSON file
                                         sw.Restart();
-                                        FftData.SaveAs(fftData.Resample(0.1f), AppendDataDir($"{pathToFile}.fft"), false);
-                                        sw.Stop();
-                                        logger.LogInformation($"#{bi.ToString("0000")} Save as FFT completed in {sw.ElapsedMilliseconds:N0} ms.");
-                                    });
-                                }
+                                            FftData.SaveAs(fftData.Resample(0.1f), AppendDataDir($"{pathToFile}.fft"), false);
+                                            sw.Stop();
+                                            logger.LogInformation($"#{bi.ToString("0000")} Save as FFT completed in {sw.ElapsedMilliseconds:N0} ms.");
+                                        });
+                                    }
 
-                                if (config.Postprocessing.SaveAsCompressedFFT)
-                                {
-                                    Task.Run(() =>
+                                    if (config.Postprocessing.SaveAsCompressedFFT)
                                     {
-                                        Stopwatch sw = Stopwatch.StartNew();
+                                        Task.Run(() =>
+                                        {
+                                            Stopwatch sw = Stopwatch.StartNew();
 
                                         //save it the FFT to a zipped JSON file
                                         sw.Restart();
-                                        FftData.SaveAs(fftData.Resample(0.1f), AppendDataDir($"{pathToFile}.zip"), true);
-                                        sw.Stop();
-                                        logger.LogInformation($"#{bi.ToString("0000")} Save as compressed FFT completed in {sw.ElapsedMilliseconds:N0} ms.");
-                                    });
-                                }
+                                            FftData.SaveAs(fftData.Resample(0.1f), AppendDataDir($"{pathToFile}.zip"), true);
+                                            sw.Stop();
+                                            logger.LogInformation($"#{bi.ToString("0000")} Save as compressed FFT completed in {sw.ElapsedMilliseconds:N0} ms.");
+                                        });
+                                    }
 
-                                if (config.Postprocessing.SaveAsPNG.Enabled)
-                                {
-                                    Task.Run(() =>
+                                    if (config.Postprocessing.SaveAsPNG.Enabled)
                                     {
-                                        Stopwatch sw = Stopwatch.StartNew();
+                                        Task.Run(() =>
+                                        {
+                                            Stopwatch sw = Stopwatch.StartNew();
 
                                         //save a PNG with the values
                                         sw.Restart();
-                                        string filenameComplete = $"{pathToFile}_{SimplifyNumber(config.Postprocessing.SaveAsPNG.RangeX)}Hz_{SimplifyNumber(config.Postprocessing.SaveAsPNG.RangeY)}V.png";
-                                        SaveSignalAsPng(AppendDataDir(filenameComplete), fftData, config.Postprocessing.SaveAsPNG);
+                                            string filenameComplete = $"{pathToFile}_{SimplifyNumber(config.Postprocessing.SaveAsPNG.RangeX)}Hz_{SimplifyNumber(config.Postprocessing.SaveAsPNG.RangeY)}V.png";
+                                            SaveSignalAsPng(AppendDataDir(filenameComplete), fftData, config.Postprocessing.SaveAsPNG);
                                         //SaveSignalAsPng($"{filename}_1kHz.png", fftData, 1000, 1, 1080, 1);
                                         sw.Stop();
-                                        logger.LogInformation($"#{bi.ToString("0000")} Save as PNG completed in {sw.ElapsedMilliseconds:N0} ms.");
-                                    });
-                                }
+                                            logger.LogInformation($"#{bi.ToString("0000")} Save as PNG completed in {sw.ElapsedMilliseconds:N0} ms.");
+                                        });
+                                    }
 
-                                logger.LogTrace($"Postprocessing thread #{bi:N0} end");
+                                    logger.LogTrace($"Postprocessing thread #{bi:N0} end");
+                                }
+                                );
                             }
-                            );
+                            skipBuffer = false;
                         }
-                        skipBuffer = false;
+
+                        if (config.AudioRecording.Enabled)
+                        {
+                            Task.Run(() =>
+                            {
+                                TimeSpan tp = new TimeSpan(0, 0, (int)config.Postprocessing.IntervalSeconds);
+
+                                string recFilename = AppendDataDir($"{pathToFile}_rec.{config.AudioRecording.OutputFormat}");
+                                string silentFilename = AppendDataDir($"{pathToFile}_sr.{config.AudioRecording.OutputFormat}");
+                                string finalFilename = AppendDataDir($"{pathToFile}.{config.AudioRecording.OutputFormat}");
+
+                                string audioRecordingCommandLine = $"-f {ffmpegAudioFramework} -i audio=\"{ffmpegAudioDevice}\" {ffmpegAudioRecordingParameters} -t {tp} \"{recFilename}\"";
+                                FFmpeg.Conversions.New().Start(audioRecordingCommandLine)
+                                    .ContinueWith((Task<IConversionResult> cr) =>
+                                    {
+                                        Stopwatch sw = Stopwatch.StartNew();
+                                        sw.Restart();
+
+                                        string silenceRemoveCommandLine = $"-i {recFilename} {ffmpegAudioProcessingSilenceRemove.Replace("{SilenceThreshold}", config.AudioRecording.SilenceThreshold)} {ffmpegAudioRecordingParameters} {silentFilename}";
+                                        FFmpeg.Conversions.New().Start(silenceRemoveCommandLine).Wait();
+
+                                        File.Delete(recFilename);
+
+                                        if (new FileInfo(silentFilename).Length > 0)
+                                        {
+                                            string normalizeCommandLine = $"-i {silentFilename} {ffmpegAudioProcessingNormalize} {ffmpegAudioRecordingParameters} {finalFilename}";
+                                            FFmpeg.Conversions.New().Start(normalizeCommandLine).Wait();
+
+                                            sw.Stop();
+                                            logger.LogInformation($"Processed audio recording saved as '{pathToFile}.{config.AudioRecording.OutputFormat}' in {sw.ElapsedMilliseconds:N0} ms.");
+                                        }
+
+                                        File.Delete(silentFilename);
+                                    });
+                            });
+                        }
                     }
                 }
             }
