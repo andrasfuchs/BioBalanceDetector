@@ -108,6 +108,7 @@ namespace BBD.SleepLogger
             }
 
 
+            List<string> ffmpegAudioNames = new List<string>();
             foreach (string audioFramework in audioFrameworks)
             {
                 try
@@ -117,19 +118,27 @@ namespace BBD.SleepLogger
                 catch (Exception e)
                 {
                     // this is expected
-                    string audioDeviceDetails = e.Message.Split(Environment.NewLine).FirstOrDefault(ol => ol.StartsWith("[") && ol.Contains(config.AudioRecording.PreferredDevice));
-
-                    if (!String.IsNullOrWhiteSpace(audioDeviceDetails))
+                    foreach (string audioDeviceDetails in e.Message.Split(Environment.NewLine).Where(ol => ol.StartsWith("[")))
                     {
-                        ffmpegAudioFramework = audioDeviceDetails.Split(new char[] { '[', '@' }, StringSplitOptions.RemoveEmptyEntries)[0].Trim();
-                        ffmpegAudioDevice = audioDeviceDetails.Split(new char[] { ']', '\"' }, StringSplitOptions.RemoveEmptyEntries)[^1].Trim();
+                        string listedAudioFramework = audioDeviceDetails.Split(new char[] { '[', '@' }, StringSplitOptions.RemoveEmptyEntries)[0].Trim();
+                        string listedAudioDevice = audioDeviceDetails.Split(new char[] { ']', '\"' }, StringSplitOptions.RemoveEmptyEntries)[^1].Trim();
+
+                        if (audioDeviceDetails.Contains("Alternative name") || !audioDeviceDetails.Contains("\"")) continue;
+
+                        ffmpegAudioNames.Add($"{listedAudioFramework}/{listedAudioDevice}");
+
+                        if (audioDeviceDetails.Contains(config.AudioRecording.PreferredDevice))
+                        {
+                            ffmpegAudioFramework = listedAudioFramework;
+                            ffmpegAudioDevice = listedAudioDevice;
+                        }
                     }
                 }
             }
 
             if (config.AudioRecording.Enabled && String.IsNullOrWhiteSpace(ffmpegAudioFramework) || String.IsNullOrWhiteSpace(ffmpegAudioDevice))
             {
-                logger.LogWarning($"There is no valid device to record audio with.");
+                logger.LogWarning($"There is no valid device to record audio with. The selectable audio inputs are: {String.Join(", ", ffmpegAudioNames)}.");
                 config.AudioRecording.Enabled = false;
             }
 
@@ -514,7 +523,7 @@ namespace BBD.SleepLogger
             }
             else
             {
-                return filename;
+                return Path.Combine(Directory.GetCurrentDirectory(), filename);
             }
         }
 
