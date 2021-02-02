@@ -77,6 +77,7 @@ namespace BBD.SleepLogger
             Console.WriteLine();
 
             logger.LogInformation($"Bio Balance Detector Sleep Logger {versionString}");
+            logger.LogInformation($"(The current time is {DateTime.Now:yyyy-MM-dd HH:mm:ss})");
             try
             {
                 configuration.Reload();
@@ -377,24 +378,31 @@ namespace BBD.SleepLogger
                                 FFmpeg.Conversions.New().Start(audioRecordingCommandLine)
                                     .ContinueWith((Task<IConversionResult> cr) =>
                                     {
-                                        Stopwatch sw = Stopwatch.StartNew();
-                                        sw.Restart();
-
-                                        string silenceRemoveCommandLine = $"-i {recFilename} {ffmpegAudioProcessingSilenceRemove.Replace("{SilenceThreshold}", config.AudioRecording.SilenceThreshold)} {ffmpegAudioRecordingParameters} {silentFilename}";
-                                        FFmpeg.Conversions.New().Start(silenceRemoveCommandLine).Wait();
-
-                                        File.Delete(recFilename);
-
-                                        if (new FileInfo(silentFilename).Length > 0)
+                                        try
                                         {
-                                            string normalizeCommandLine = $"-i {silentFilename} {ffmpegAudioProcessingNormalize} {ffmpegAudioRecordingParameters} {finalFilename}";
-                                            FFmpeg.Conversions.New().Start(normalizeCommandLine).Wait();
+                                            Stopwatch sw = Stopwatch.StartNew();
+                                            sw.Restart();
 
-                                            sw.Stop();
-                                            logger.LogInformation($"Processed audio recording saved as '{pathToFile}.{config.AudioRecording.OutputFormat}' in {sw.ElapsedMilliseconds:N0} ms.");
+                                            string silenceRemoveCommandLine = $"-i {recFilename} {ffmpegAudioProcessingSilenceRemove.Replace("{SilenceThreshold}", config.AudioRecording.SilenceThreshold)} {ffmpegAudioRecordingParameters} {silentFilename}";
+                                            FFmpeg.Conversions.New().Start(silenceRemoveCommandLine).Wait();
+
+                                            File.Delete(recFilename);
+
+                                            if (new FileInfo(silentFilename).Length > 0)
+                                            {
+                                                string normalizeCommandLine = $"-i {silentFilename} {ffmpegAudioProcessingNormalize} {ffmpegAudioRecordingParameters} {finalFilename}";
+                                                FFmpeg.Conversions.New().Start(normalizeCommandLine).Wait();
+
+                                                sw.Stop();
+                                                logger.LogInformation($"Processed audio recording saved as '{pathToFile}.{config.AudioRecording.OutputFormat}' in {sw.ElapsedMilliseconds:N0} ms.");
+                                            }
+
+                                            File.Delete(silentFilename);
                                         }
-
-                                        File.Delete(silentFilename);
+                                        catch (Exception ex)
+                                        {
+                                            logger.LogWarning($"There was an error while recording and/or processing audio: {ex.Message.Substring(0, 50)}");
+                                        }
                                     });
                             });
                         }
