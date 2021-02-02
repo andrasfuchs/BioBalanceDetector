@@ -25,10 +25,8 @@ namespace BBD.SleepLogger
 
         static Mutex mutex = new Mutex(true, "{79bb7f72-37bc-41ff-9014-ed8662659b52}");
 
-        static string[] audioFrameworks = { "dshow", "alsa" };
+        static string[] audioFrameworks = { "dshow", "alsa", "openal", "oss" };
 
-        static string ffmpegAudioFramework;
-        static string ffmpegAudioDevice;
         static string ffmpegAudioRecordingParameters = "-c:a aac -ac 1 -ar 44100 -ab 32k";
         static string ffmpegAudioProcessingSilenceRemove = "-af silenceremove=1:0:{SilenceThreshold}";
         static string ffmpegAudioProcessingNormalize = "-af loudnorm=I=-24.0:LRA=+11.0:tp=-2.0";
@@ -126,20 +124,19 @@ namespace BBD.SleepLogger
                         if (audioDeviceDetails.Contains("Alternative name") || !audioDeviceDetails.Contains("\"")) continue;
 
                         ffmpegAudioNames.Add($"{listedAudioFramework}/{listedAudioDevice}");
-
-                        if (audioDeviceDetails.Contains(config.AudioRecording.PreferredDevice))
-                        {
-                            ffmpegAudioFramework = listedAudioFramework;
-                            ffmpegAudioDevice = listedAudioDevice;
-                        }
                     }
                 }
             }
 
-            if (config.AudioRecording.Enabled && String.IsNullOrWhiteSpace(ffmpegAudioFramework) || String.IsNullOrWhiteSpace(ffmpegAudioDevice))
+            if (config.AudioRecording.PreferredDevice.Split("/").Length != 2)
             {
-                logger.LogWarning($"There is no valid device to record audio with. The selectable audio inputs are: {String.Join(", ", ffmpegAudioNames)}.");
+                logger.LogWarning($"The preferred audio input device in the config file is not in the correct format. It should be in the '<ffmpeg audio framework>/<ffmpeg audio device>' format. Audio will not be recorded.");
                 config.AudioRecording.Enabled = false;
+            }
+
+            if (config.AudioRecording.Enabled && !ffmpegAudioNames.Contains(config.AudioRecording.PreferredDevice))
+            {
+                logger.LogWarning($"The preferred audio input device was not listed by the operating system as a valid audio source. The listed audio inputs are: {String.Join(", ", ffmpegAudioNames)}.");
             }
 
             if (args.Length > 1)
@@ -374,6 +371,8 @@ namespace BBD.SleepLogger
                                 string silentFilename = AppendDataDir($"{pathToFile}_sr.{config.AudioRecording.OutputFormat}");
                                 string finalFilename = AppendDataDir($"{pathToFile}.{config.AudioRecording.OutputFormat}");
 
+                                string ffmpegAudioFramework = config.AudioRecording.PreferredDevice.Split("/")[0];
+                                string ffmpegAudioDevice = config.AudioRecording.PreferredDevice.Split("/")[1];
                                 string audioRecordingCommandLine = $"-f {ffmpegAudioFramework} -i audio=\"{ffmpegAudioDevice}\" {ffmpegAudioRecordingParameters} -t {tp} \"{recFilename}\"";
                                 FFmpeg.Conversions.New().Start(audioRecordingCommandLine)
                                     .ContinueWith((Task<IConversionResult> cr) =>
