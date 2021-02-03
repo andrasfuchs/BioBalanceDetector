@@ -53,10 +53,10 @@ namespace BBD.SleepLogger
         static void Main(string[] args)
         {
             // Build configuration
-                configuration = new ConfigurationBuilder()
-                .SetBasePath(AppContext.BaseDirectory)
-                .AddJsonFile("appsettings.json", false)
-                .Build();
+            configuration = new ConfigurationBuilder()
+            .SetBasePath(AppContext.BaseDirectory)
+            .AddJsonFile("appsettings.json", false)
+            .Build();
 
             using var loggerFactory = LoggerFactory.Create(builder =>
             {
@@ -72,7 +72,7 @@ namespace BBD.SleepLogger
                         options.TimestampFormat = "HH:mm:ss.ffff ";
                         options.UseUtcTimestamp = false;
                     });
-        });
+            });
             ILogger logger = loggerFactory.CreateLogger<Program>();
 
             Console.WriteLine($"Bio Balance Detector Sleep Logger {versionString}");
@@ -103,7 +103,7 @@ namespace BBD.SleepLogger
 
             Console.CancelKeyPress += Console_CancelKeyPress;
 
-            
+
             foreach (var d in DriveInfo.GetDrives())
             {
                 if (Path.GetFullPath(AppendDataDir("")).ToLower().StartsWith(d.RootDirectory.FullName.ToLower()) && ((spaceCheckDrive == null) || (d.Name.Length > spaceCheckDrive.Name.Length)))
@@ -268,8 +268,8 @@ namespace BBD.SleepLogger
                                     if (config.Postprocessing.SaveAsWAV)
                                     {
                                         sw.Restart();
-                                    //and save samples to a WAV file
-                                    FileStream waveFileStream = new FileStream(AppendDataDir($"{pathToFile}.wav"), FileMode.Create);
+                                        //and save samples to a WAV file
+                                        FileStream waveFileStream = new FileStream(AppendDataDir($"{pathToFile}.wav"), FileMode.Create);
                                         DiscreteSignal signalToSave = new DiscreteSignal(signal.SamplingRate, signal.Samples.Take(sampleCount).ToArray(), true);
                                         signalToSave.Amplify(inputAmplification);
                                         WaveFile waveFile = new WaveFile(signalToSave, 16);
@@ -285,8 +285,8 @@ namespace BBD.SleepLogger
                                     var fft = new RealFft(config.Postprocessing.FFTSize);
                                     try
                                     {
-                                    //logger.LogInformation($"#{bi.ToString("0000")} signal.Samples.Length: {sampleCount:N0} | FFT size: {config.Postprocessing.FFTSize:N0}");
-                                    fftData.MagnitudeData = fft.MagnitudeSpectrum(signal, normalize: true).Samples;
+                                        //logger.LogInformation($"#{bi.ToString("0000")} signal.Samples.Length: {sampleCount:N0} | FFT size: {config.Postprocessing.FFTSize:N0}");
+                                        fftData.MagnitudeData = fft.MagnitudeSpectrum(signal, normalize: true).Samples;
                                     }
                                     catch (IndexOutOfRangeException)
                                     {
@@ -294,8 +294,8 @@ namespace BBD.SleepLogger
                                         terminateAcquisition = true;
                                         return;
                                     }
-                                // clear the 0th coefficient (DC component)
-                                fftData.MagnitudeData[0] = 0;
+                                    // clear the 0th coefficient (DC component)
+                                    fftData.MagnitudeData[0] = 0;
                                     sw.Stop();
                                     logger.LogInformation($"#{bi.ToString("0000")} Signal processing completed in {sw.ElapsedMilliseconds:N0} ms.");
 
@@ -304,29 +304,29 @@ namespace BBD.SleepLogger
                                     maxValues.Add(fftData.MagnitudeData.Max());
                                     int maxIndex = Array.FindIndex(fftData.MagnitudeData, d => d == maxValues[maxValues.Count - 1]);
                                     logger.LogInformation($"#{bi.ToString("0000")} The maximum magnitude is {maxValues[maxValues.Count - 1] * 1000 * 1000:N} µV at the index of #{maxIndex:N0} ({maxIndex * fftData.FrequencyStep:N} Hz).");
-                                //if (config.AD2.SignalGenerator.Enabled)
-                                //{
-                                //    logger.LogInformation($"#{bi.ToString("0000")} The magnitude at {config.AD2.SignalGenerator.Frequency} Hz is {fftData.MagnitudesPer1p0Hz[(int)config.AD2.SignalGenerator.Frequency] * 1000 * 1000:N} µV.");
-                                //}
+                                    //if (config.AD2.SignalGenerator.Enabled)
+                                    //{
+                                    //    logger.LogInformation($"#{bi.ToString("0000")} The magnitude at {config.AD2.SignalGenerator.Frequency} Hz is {fftData.MagnitudesPer1p0Hz[(int)config.AD2.SignalGenerator.Frequency] * 1000 * 1000:N} µV.");
+                                    //}
 
-                                //if (config.Postprocessing.MagnitudeThreshold > 0)
-                                //{
-                                //    float averageMagnitude = fftData.MagnitudesPer1p0Hz[100..1000].Average();
-                                //    if (averageMagnitude < config.Postprocessing.MagnitudeThreshold)
-                                //    {
-                                //        logger.LogWarning($"#{bi.ToString("0000")} The average magnitude in the 100-1000 Hz range is too low: {averageMagnitude * 1000 * 1000:N0} µV. The threashold is {config.Postprocessing.MagnitudeThreshold * 1000 * 1000:N0} µV.");
-                                //        return;
-                                //    }
-                                //}
+                                    //if (config.Postprocessing.MagnitudeThreshold > 0)
+                                    //{
+                                    //    float averageMagnitude = fftData.MagnitudesPer1p0Hz[100..1000].Average();
+                                    //    if (averageMagnitude < config.Postprocessing.MagnitudeThreshold)
+                                    //    {
+                                    //        logger.LogWarning($"#{bi.ToString("0000")} The average magnitude in the 100-1000 Hz range is too low: {averageMagnitude * 1000 * 1000:N0} µV. The threashold is {config.Postprocessing.MagnitudeThreshold * 1000 * 1000:N0} µV.");
+                                    //        return;
+                                    //    }
+                                    //}
 
-                                if (config.Postprocessing.SaveAsFFT)
+                                    if (config.Postprocessing.SaveAsFFT)
                                     {
                                         Task.Run(() =>
                                         {
                                             Stopwatch sw = Stopwatch.StartNew();
 
-                                        //save it the FFT to a JSON file
-                                        sw.Restart();
+                                            //save it the FFT to a JSON file
+                                            sw.Restart();
                                             FftData.SaveAs(fftData.Resample(0.1f), AppendDataDir($"{pathToFile}.fft"), false);
                                             sw.Stop();
                                             logger.LogInformation($"#{bi.ToString("0000")} Save as FFT completed in {sw.ElapsedMilliseconds:N0} ms.");
@@ -339,8 +339,8 @@ namespace BBD.SleepLogger
                                         {
                                             Stopwatch sw = Stopwatch.StartNew();
 
-                                        //save it the FFT to a zipped JSON file
-                                        sw.Restart();
+                                            //save it the FFT to a zipped JSON file
+                                            sw.Restart();
                                             FftData.SaveAs(fftData.Resample(0.1f), AppendDataDir($"{pathToFile}.zip"), true);
                                             sw.Stop();
                                             logger.LogInformation($"#{bi.ToString("0000")} Save as compressed FFT completed in {sw.ElapsedMilliseconds:N0} ms.");
@@ -353,12 +353,12 @@ namespace BBD.SleepLogger
                                         {
                                             Stopwatch sw = Stopwatch.StartNew();
 
-                                        //save a PNG with the values
-                                        sw.Restart();
+                                            //save a PNG with the values
+                                            sw.Restart();
                                             string filenameComplete = $"{pathToFile}_{SimplifyNumber(config.Postprocessing.SaveAsPNG.RangeX)}Hz_{SimplifyNumber(config.Postprocessing.SaveAsPNG.RangeY)}V.png";
                                             SaveSignalAsPng(AppendDataDir(filenameComplete), fftData, config.Postprocessing.SaveAsPNG);
-                                        //SaveSignalAsPng($"{filename}_1kHz.png", fftData, 1000, 1, 1080, 1);
-                                        sw.Stop();
+                                            //SaveSignalAsPng($"{filename}_1kHz.png", fftData, 1000, 1, 1080, 1);
+                                            sw.Stop();
                                             logger.LogInformation($"#{bi.ToString("0000")} Save as PNG completed in {sw.ElapsedMilliseconds:N0} ms.");
                                         });
                                     }
@@ -384,37 +384,47 @@ namespace BBD.SleepLogger
                                 string ffmpegAudioDevice = config.AudioRecording.PreferredDevice.Split("/")[1];
                                 string audioRecordingCommandLine = $"-f {ffmpegAudioFramework} -ac 1 -i {ffmpegAudioDevice} {ffmpegAudioRecordingParameters} -t {tp} \"{recFilename}\"";
                                 logger.LogDebug($"ffmpeg {audioRecordingCommandLine}");
-                                FFmpeg.Conversions.New().Start(audioRecordingCommandLine)
-                                    .ContinueWith((Task<IConversionResult> cr) =>
-                                    {
-                                        try
+
+                                try
+                                {
+                                    FFmpeg.Conversions.New().Start(audioRecordingCommandLine)
+                                        .ContinueWith((Task<IConversionResult> cr) =>
                                         {
-                                            Stopwatch sw = Stopwatch.StartNew();
-                                            sw.Restart();
-
-                                            string silenceRemoveCommandLine = $"-i {recFilename} {ffmpegAudioProcessingSilenceRemove.Replace("{SilenceThreshold}", config.AudioRecording.SilenceThreshold)} {ffmpegAudioRecordingParameters} {silentFilename}";
-                                            logger.LogDebug($"ffmpeg {silenceRemoveCommandLine}");
-                                            FFmpeg.Conversions.New().Start(silenceRemoveCommandLine).Wait();
-
-                                            File.Delete(recFilename);
-
-                                            if (new FileInfo(silentFilename).Length > 0)
+                                            try
                                             {
-                                                string normalizeCommandLine = $"-i {silentFilename} {ffmpegAudioProcessingNormalize} {ffmpegAudioRecordingParameters} {finalFilename}";
-                                                logger.LogDebug($"ffmpeg {normalizeCommandLine}");
-                                                FFmpeg.Conversions.New().Start(normalizeCommandLine).Wait();
+                                                Stopwatch sw = Stopwatch.StartNew();
+                                                sw.Restart();
 
-                                                sw.Stop();
-                                                logger.LogInformation($"Processed audio recording saved as '{pathToFile}.{config.AudioRecording.OutputFormat}' in {sw.ElapsedMilliseconds:N0} ms.");
+                                                string silenceRemoveCommandLine = $"-i {recFilename} {ffmpegAudioProcessingSilenceRemove.Replace("{SilenceThreshold}", config.AudioRecording.SilenceThreshold)} {ffmpegAudioRecordingParameters} {silentFilename}";
+                                                logger.LogDebug($"ffmpeg {silenceRemoveCommandLine}");
+                                                FFmpeg.Conversions.New().Start(silenceRemoveCommandLine).Wait();
+
+                                                File.Delete(recFilename);
+
+                                                if (new FileInfo(silentFilename).Length > 0)
+                                                {
+                                                    string normalizeCommandLine = $"-i {silentFilename} {ffmpegAudioProcessingNormalize} {ffmpegAudioRecordingParameters} {finalFilename}";
+                                                    logger.LogDebug($"ffmpeg {normalizeCommandLine}");
+                                                    FFmpeg.Conversions.New().Start(normalizeCommandLine).Wait();
+
+                                                    sw.Stop();
+                                                    logger.LogInformation($"Processed audio recording saved as '{pathToFile}.{config.AudioRecording.OutputFormat}' in {sw.ElapsedMilliseconds:N0} ms.");
+                                                }
+
+                                                File.Delete(silentFilename);
                                             }
-
-                                            File.Delete(silentFilename);
-                                        }
-                                        catch (Exception ex)
-                                        {
-                                            logger.LogWarning($"There was an error while recording and/or processing audio. Error: '{ex.Message.Substring(0, 500)}'");
-                                        }
-                                    });
+                                            catch (Exception ex)
+                                            {
+                                                logger.LogWarning($"There was an error while processing audio.");
+                                                logger.LogDebug($"{ex.Message.Split(Environment.NewLine)[^1]}");
+                                            }
+                                        });
+                                }
+                                catch (Exception ex)
+                                {
+                                    logger.LogWarning($"There was an error while recording audio.");
+                                    logger.LogDebug($"{ex.Message.Split(Environment.NewLine)[^1]}");
+                                }
                             });
                         }
                     }
@@ -430,8 +440,8 @@ namespace BBD.SleepLogger
         {
             foreach (FftData fftData in EnumerateFFTDataInFolder(foldername))
             {
-                try 
-                { 
+                try
+                {
                     string filenameComplete = Path.Combine(foldername, $"{fftData.Filename}_{SimplifyNumber(config.Postprocessing.SaveAsPNG.RangeX)}Hz_{SimplifyNumber(config.Postprocessing.SaveAsPNG.RangeY)}V.png");
 
                     if (File.Exists(AppendDataDir(filenameComplete)))
@@ -619,7 +629,7 @@ namespace BBD.SleepLogger
             // convert samples into log scale (dBm)
             //var samples = signal.Samples.Select(s => Scale.ToDecibel(s)).ToArray();
             var samples = fftData.MagnitudeData.Take(config.RangeX).ToArray();
-            
+
             int width = 0;
             float currentAspectRatio;
             int rowCount;
