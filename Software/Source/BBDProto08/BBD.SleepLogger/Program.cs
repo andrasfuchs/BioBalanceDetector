@@ -63,10 +63,16 @@ namespace BBD.SleepLogger
                 builder
                     .AddFilter("Microsoft", Enum.Parse<LogLevel>(configuration["Logging:LogLevel:Default"]))
                     .AddFilter("System", Enum.Parse<LogLevel>(configuration["Logging:LogLevel:Default"]))
-                    .AddFilter("SleepLogger.Program", Enum.Parse<LogLevel>(configuration["Logging:LogLevel:SleepLogger.Program"]))
+                    .AddFilter("BBD.SleepLogger.Program", Enum.Parse<LogLevel>(configuration["Logging:LogLevel:BBD.SleepLogger.Program"]))
                     .AddConfiguration(configuration)
-                    .AddConsole();
-            });
+                    .AddSimpleConsole(options =>
+                    {
+                        options.IncludeScopes = false;
+                        options.SingleLine = true;
+                        options.TimestampFormat = "HH:mm:ss.ffff ";
+                        options.UseUtcTimestamp = false;
+                    });
+        });
             ILogger logger = loggerFactory.CreateLogger<Program>();
 
             Console.WriteLine($"Bio Balance Detector Sleep Logger {versionString}");
@@ -112,7 +118,9 @@ namespace BBD.SleepLogger
             {
                 try
                 {
-                    var listDevices = FFmpeg.Conversions.New().Start($"-list_devices true -f {audioFramework} -i dummy").Result;
+                    string listDevicesCommandLine = $"-list_devices true -f {audioFramework} -i dummy";
+                    logger.LogTrace($"ffmpeg {listDevicesCommandLine}");
+                    var listDevices = FFmpeg.Conversions.New().Start(listDevicesCommandLine).Result;
                 }
                 catch (Exception e)
                 {
@@ -375,6 +383,7 @@ namespace BBD.SleepLogger
                                 string ffmpegAudioFramework = config.AudioRecording.PreferredDevice.Split("/")[0];
                                 string ffmpegAudioDevice = config.AudioRecording.PreferredDevice.Split("/")[1];
                                 string audioRecordingCommandLine = $"-f {ffmpegAudioFramework} -i audio=\"{ffmpegAudioDevice}\" {ffmpegAudioRecordingParameters} -t {tp} \"{recFilename}\"";
+                                logger.LogTrace($"ffmpeg {audioRecordingCommandLine}");
                                 FFmpeg.Conversions.New().Start(audioRecordingCommandLine)
                                     .ContinueWith((Task<IConversionResult> cr) =>
                                     {
@@ -384,6 +393,7 @@ namespace BBD.SleepLogger
                                             sw.Restart();
 
                                             string silenceRemoveCommandLine = $"-i {recFilename} {ffmpegAudioProcessingSilenceRemove.Replace("{SilenceThreshold}", config.AudioRecording.SilenceThreshold)} {ffmpegAudioRecordingParameters} {silentFilename}";
+                                            logger.LogTrace($"ffmpeg {silenceRemoveCommandLine}");
                                             FFmpeg.Conversions.New().Start(silenceRemoveCommandLine).Wait();
 
                                             File.Delete(recFilename);
@@ -391,6 +401,7 @@ namespace BBD.SleepLogger
                                             if (new FileInfo(silentFilename).Length > 0)
                                             {
                                                 string normalizeCommandLine = $"-i {silentFilename} {ffmpegAudioProcessingNormalize} {ffmpegAudioRecordingParameters} {finalFilename}";
+                                                logger.LogTrace($"ffmpeg {normalizeCommandLine}");
                                                 FFmpeg.Conversions.New().Start(normalizeCommandLine).Wait();
 
                                                 sw.Stop();
@@ -401,7 +412,7 @@ namespace BBD.SleepLogger
                                         }
                                         catch (Exception ex)
                                         {
-                                            logger.LogWarning($"There was an error while recording and/or processing audio: {ex.Message.Substring(0, 50)}");
+                                            logger.LogWarning($"There was an error while recording and/or processing audio. Error: '{ex.Message.Substring(0, 500)}'");
                                         }
                                     });
                             });
