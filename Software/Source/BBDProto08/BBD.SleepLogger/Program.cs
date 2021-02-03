@@ -374,7 +374,7 @@ namespace BBD.SleepLogger
                         {
                             Task.Run(() =>
                             {
-                                TimeSpan tp = new TimeSpan(0, 0, (int)config.Postprocessing.IntervalSeconds);
+                                TimeSpan tp = captureTime.Add(new TimeSpan(0, 0, (int)config.Postprocessing.IntervalSeconds)) - DateTime.Now;
 
                                 string recFilename = AppendDataDir($"{pathToFile}_rec.{config.AudioRecording.OutputFormat}");
                                 string silentFilename = AppendDataDir($"{pathToFile}_sr.{config.AudioRecording.OutputFormat}");
@@ -382,7 +382,7 @@ namespace BBD.SleepLogger
 
                                 string ffmpegAudioFramework = config.AudioRecording.PreferredDevice.Split("/")[0];
                                 string ffmpegAudioDevice = config.AudioRecording.PreferredDevice.Split("/")[1];
-                                string audioRecordingCommandLine = $"-f {ffmpegAudioFramework} -ac 1 -i {ffmpegAudioDevice} {ffmpegAudioRecordingParameters} -t {tp} \"{recFilename}\"";
+                                string audioRecordingCommandLine = $"-f {ffmpegAudioFramework} -ac 1 -i {ffmpegAudioDevice} {ffmpegAudioRecordingParameters} -t {tp:mm':'ss'.'fff} \"{recFilename}\"";
                                 logger.LogDebug($"ffmpeg {audioRecordingCommandLine}");
 
                                 try
