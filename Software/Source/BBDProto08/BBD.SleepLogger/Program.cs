@@ -119,7 +119,7 @@ namespace BBD.SleepLogger
                 try
                 {
                     string listDevicesCommandLine = $"-list_devices true -f {audioFramework} -i dummy";
-                    logger.LogTrace($"ffmpeg {listDevicesCommandLine}");
+                    logger.LogDebug($"ffmpeg {listDevicesCommandLine}");
                     var listDevices = FFmpeg.Conversions.New().Start(listDevicesCommandLine).Result;
                 }
                 catch (Exception e)
@@ -382,8 +382,8 @@ namespace BBD.SleepLogger
 
                                 string ffmpegAudioFramework = config.AudioRecording.PreferredDevice.Split("/")[0];
                                 string ffmpegAudioDevice = config.AudioRecording.PreferredDevice.Split("/")[1];
-                                string audioRecordingCommandLine = $"-f {ffmpegAudioFramework} -i audio=\"{ffmpegAudioDevice}\" {ffmpegAudioRecordingParameters} -t {tp} \"{recFilename}\"";
-                                logger.LogTrace($"ffmpeg {audioRecordingCommandLine}");
+                                string audioRecordingCommandLine = $"-f {ffmpegAudioFramework} -ac 1 -i {ffmpegAudioDevice} {ffmpegAudioRecordingParameters} -t {tp} \"{recFilename}\"";
+                                logger.LogDebug($"ffmpeg {audioRecordingCommandLine}");
                                 FFmpeg.Conversions.New().Start(audioRecordingCommandLine)
                                     .ContinueWith((Task<IConversionResult> cr) =>
                                     {
@@ -393,7 +393,7 @@ namespace BBD.SleepLogger
                                             sw.Restart();
 
                                             string silenceRemoveCommandLine = $"-i {recFilename} {ffmpegAudioProcessingSilenceRemove.Replace("{SilenceThreshold}", config.AudioRecording.SilenceThreshold)} {ffmpegAudioRecordingParameters} {silentFilename}";
-                                            logger.LogTrace($"ffmpeg {silenceRemoveCommandLine}");
+                                            logger.LogDebug($"ffmpeg {silenceRemoveCommandLine}");
                                             FFmpeg.Conversions.New().Start(silenceRemoveCommandLine).Wait();
 
                                             File.Delete(recFilename);
@@ -401,7 +401,7 @@ namespace BBD.SleepLogger
                                             if (new FileInfo(silentFilename).Length > 0)
                                             {
                                                 string normalizeCommandLine = $"-i {silentFilename} {ffmpegAudioProcessingNormalize} {ffmpegAudioRecordingParameters} {finalFilename}";
-                                                logger.LogTrace($"ffmpeg {normalizeCommandLine}");
+                                                logger.LogDebug($"ffmpeg {normalizeCommandLine}");
                                                 FFmpeg.Conversions.New().Start(normalizeCommandLine).Wait();
 
                                                 sw.Stop();
