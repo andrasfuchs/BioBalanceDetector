@@ -224,14 +224,8 @@ namespace BBD.SleepLogger
 
                     if (samples.Count >= config.AD2.Samplerate * config.Postprocessing.IntervalSeconds)
                     {
-                        DateTime captureTime = DateTime.Now;
-                        string foldername = $"{captureTime.ToString("yyyy-MM-dd")}";
-                        string filename = $"AD2_{captureTime.ToString("yyyyMMdd_HHmmss")}";
-                        string pathToFile = Path.Combine(foldername, filename);
-                        if (!Directory.Exists(AppendDataDir(captureTime.ToString("yyyy-MM-dd"))))
-                        {
-                            Directory.CreateDirectory(AppendDataDir(captureTime.ToString("yyyy-MM-dd")));
-                        }
+                        DateTime captureTime = DateTime.Now.AddSeconds(-config.Postprocessing.IntervalSeconds);
+                        string pathToFile = GeneratePathToFile(captureTime);
 
                         if (config.Postprocessing.Enabled)
                         {
@@ -374,11 +368,13 @@ namespace BBD.SleepLogger
                         {
                             Task.Run(() =>
                             {
-                                TimeSpan tp = captureTime.Add(new TimeSpan(0, 0, (int)config.Postprocessing.IntervalSeconds)) - DateTime.Now;
+                                TimeSpan tp = captureTime.Add(new TimeSpan(0, 0, (int)config.Postprocessing.IntervalSeconds * 2)) - DateTime.Now;
 
-                                string recFilename = AppendDataDir($"{pathToFile}_rec.{config.AudioRecording.OutputFormat}");
-                                string silentFilename = AppendDataDir($"{pathToFile}_sr.{config.AudioRecording.OutputFormat}");
-                                string finalFilename = AppendDataDir($"{pathToFile}.{config.AudioRecording.OutputFormat}");
+                                string pathToAudioFile = GeneratePathToFile(DateTime.Now);
+
+                                string recFilename = AppendDataDir($"{pathToAudioFile}_rec.{config.AudioRecording.OutputFormat}");
+                                string silentFilename = AppendDataDir($"{pathToAudioFile}_sr.{config.AudioRecording.OutputFormat}");
+                                string finalFilename = AppendDataDir($"{pathToAudioFile}.{config.AudioRecording.OutputFormat}");
 
                                 string ffmpegAudioFramework = config.AudioRecording.PreferredDevice.Split("/")[0];
                                 string ffmpegAudioDevice = config.AudioRecording.PreferredDevice.Split("/")[1];
@@ -408,7 +404,7 @@ namespace BBD.SleepLogger
                                                     FFmpeg.Conversions.New().Start(normalizeCommandLine).Wait();
 
                                                     sw.Stop();
-                                                    logger.LogInformation($"Processed audio recording saved as '{pathToFile}.{config.AudioRecording.OutputFormat}' in {sw.ElapsedMilliseconds:N0} ms.");
+                                                    logger.LogInformation($"Processed audio recording saved as '{pathToAudioFile}.{config.AudioRecording.OutputFormat}' in {sw.ElapsedMilliseconds:N0} ms.");
                                                 }
 
                                                 File.Delete(silentFilename);
@@ -434,6 +430,18 @@ namespace BBD.SleepLogger
             logger.LogInformation("Acquisition done");
 
             dwf.FDwfDeviceCloseAll();
+        }
+
+        private static string GeneratePathToFile(DateTime captureTime)
+        {
+            if (!Directory.Exists(AppendDataDir(captureTime.ToString("yyyy-MM-dd"))))
+            {
+                Directory.CreateDirectory(AppendDataDir(captureTime.ToString("yyyy-MM-dd")));
+            }
+
+            string foldername = $"{captureTime.ToString("yyyy-MM-dd")}";
+            string filename = $"AD2_{captureTime.ToString("yyyyMMdd_HHmmss")}";
+            return Path.Combine(foldername, filename);
         }
 
         private static void GenerateVideo(string foldername, ILogger logger)
