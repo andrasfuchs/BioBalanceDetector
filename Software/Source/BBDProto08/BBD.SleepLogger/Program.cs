@@ -27,7 +27,7 @@ namespace BBD.SleepLogger
 
         static string[] audioFrameworks = { "dshow", "alsa", "openal", "oss" };
 
-        static string ffmpegAudioRecordingParameters = "-c:a aac -ac 1 -ar 44100 -ab 32k";
+        static string ffmpegAudioRecordingParameters = "-c:a mp3 -ac 1 -ar 44100 -q:a 9";
         static string ffmpegAudioProcessingSilenceRemove = "-af silenceremove=1:0:{SilenceThreshold}";
         static string ffmpegAudioProcessingNormalize = "-af loudnorm=I=-24.0:LRA=+11.0:tp=-2.0";
 
@@ -397,7 +397,7 @@ namespace BBD.SleepLogger
 
                                                 File.Delete(recFilename);
 
-                                                if (new FileInfo(silentFilename).Length > 0)
+                                                if (new FileInfo(silentFilename).Length > 1024)
                                                 {
                                                     string normalizeCommandLine = $"-i {silentFilename} {ffmpegAudioProcessingNormalize} {ffmpegAudioRecordingParameters} {finalFilename}";
                                                     logger.LogDebug($"ffmpeg {normalizeCommandLine}");
