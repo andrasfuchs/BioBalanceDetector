@@ -27,9 +27,10 @@ namespace BBD.SleepLogger
 
         static string[] audioFrameworks = { "dshow", "alsa", "openal", "oss" };
 
-        static string ffmpegAudioRecordingParameters = "-c:a mp3 -ac 1 -ar 44100 -q:a 9";
-        static string ffmpegAudioProcessingSilenceRemove = "-af silenceremove=1:0:{SilenceThreshold}";
-        static string ffmpegAudioProcessingNormalize = "-af loudnorm=I=-24.0:LRA=+11.0:tp=-2.0";
+        static string ffmpegAudioRecordingExtension = "wav";
+        static string ffmpegAudioRecordingParameters = "-c:a pcm_s16le -ac 1 -ar 44100";
+        static string ffmpegAudioEncodingExtension = "mp3";
+        static string ffmpegAudioEncodingParameters = "-c:a mp3 -ac 1 -ar 44100 -q:a 9";
 
         /// <summary>
         /// Number of samples per buffer
@@ -158,7 +159,7 @@ namespace BBD.SleepLogger
 
                 if (args[0] == "--mlcsv")
                 {
-                    GenerateMLCSV(args[1], 1.0f, 45, logger);
+                    GenerateMLCSV(args[1], 0.1f, 450, true, logger);
                     return;
                 }
             }
@@ -372,9 +373,7 @@ namespace BBD.SleepLogger
 
                                 string pathToAudioFile = GeneratePathToFile(DateTime.Now);
 
-                                string recFilename = AppendDataDir($"{pathToAudioFile}_rec.{config.AudioRecording.OutputFormat}");
-                                string silentFilename = AppendDataDir($"{pathToAudioFile}_sr.{config.AudioRecording.OutputFormat}");
-                                string finalFilename = AppendDataDir($"{pathToAudioFile}.{config.AudioRecording.OutputFormat}");
+                                string recFilename = AppendDataDir($"{pathToAudioFile}.{ffmpegAudioRecordingExtension}");
 
                                 string ffmpegAudioFramework = config.AudioRecording.PreferredDevice.Split("/")[0];
                                 string ffmpegAudioDevice = config.AudioRecording.PreferredDevice.Split("/")[1];
@@ -391,27 +390,23 @@ namespace BBD.SleepLogger
                                                 Stopwatch sw = Stopwatch.StartNew();
                                                 sw.Restart();
 
-                                                string silenceRemoveCommandLine = $"-i {recFilename} {ffmpegAudioProcessingSilenceRemove.Replace("{SilenceThreshold}", config.AudioRecording.SilenceThreshold)} {ffmpegAudioRecordingParameters} {silentFilename}";
-                                                logger.LogDebug($"ffmpeg {silenceRemoveCommandLine}");
-                                                FFmpeg.Conversions.New().Start(silenceRemoveCommandLine).Wait();
-
-                                                File.Delete(recFilename);
-
-                                                if (new FileInfo(silentFilename).Length > 1024)
+                                                float waveRms = 0;
+                                                using (var waveStream = new FileStream(recFilename, FileMode.Open))
                                                 {
-                                                    string normalizeCommandLine = $"-i {silentFilename} {ffmpegAudioProcessingNormalize} {ffmpegAudioRecordingParameters} {finalFilename}";
-                                                    logger.LogDebug($"ffmpeg {normalizeCommandLine}");
-                                                    FFmpeg.Conversions.New().Start(normalizeCommandLine).Wait();
-
-                                                    sw.Stop();
-                                                    logger.LogInformation($"Processed audio recording saved as '{pathToAudioFile}.{config.AudioRecording.OutputFormat}' in {sw.ElapsedMilliseconds:N0} ms.");
+                                                    waveRms = new WaveFile(waveStream).Signals[0].Rms();
                                                 }
 
-                                                File.Delete(silentFilename);
+                                                string finalFilename = AppendDataDir($"{pathToAudioFile}_{waveRms.ToString("0.00")}dB.{ffmpegAudioEncodingExtension}");
+                                                string audioEncodingCommandLine = $"-i {recFilename} {ffmpegAudioEncodingParameters} \"{finalFilename}\"";
+
+                                                logger.LogDebug($"ffmpeg {audioEncodingCommandLine}");
+                                                FFmpeg.Conversions.New().Start(audioEncodingCommandLine).Wait();
+
+                                                File.Delete(recFilename);
                                             }
                                             catch (Exception ex)
                                             {
-                                                logger.LogWarning($"There was an error while processing audio.");
+                                                logger.LogWarning($"There was an error while encoding audio.");
                                                 logger.LogDebug($"{ex.Message.Split(Environment.NewLine)[^1]}");
                                             }
                                         });
@@ -486,20 +481,46 @@ namespace BBD.SleepLogger
             }
         }
 
-        private static void GenerateMLCSV(string foldername, float fftStep, int fftCount, ILogger logger)
+        private static void GenerateMLCSV(string foldername, float fftStep, int fftCount, bool includeHeaders, ILogger logger)
         {
+            HashSet<string> validTags = new HashSet<string>();
             StringBuilder sb = new StringBuilder();
 
-            if (Directory.Exists(AppendDataDir(foldername)))
+            foldername = AppendDataDir(foldername);
+
+            if (Directory.Exists(foldername))
             {
                 foreach (FftData fftData in EnumerateFFTDataInFolder(foldername))
                 {
-                    logger.LogInformation($"Adding {fftData.Filename} to the machine learning CSV file.");
-                    sb.Append(String.Join(",", fftData.Resample(fftStep).MagnitudeData.Take(fftCount)));
-                    sb.AppendLine("," + String.Join("+", fftData.Tags));
+                    logger.LogInformation($"Scanning {fftData.Filename} for the machine learning tags.");
+                    foreach (string tag in fftData.Tags)
+                    {
+                        validTags.Add(tag);
+                    }
                 }
 
-                string csvFilename = $"{foldername}.csv";
+                logger.LogDebug($"There were {validTags.Count} valid tags collected.");
+
+                if (includeHeaders)
+                {
+                    sb.Append(String.Join(",", Enumerable.Range(1, fftCount).Select(i => (i * fftStep).ToString("0.0#") + " Hz")));
+                    sb.AppendLine(",#" + String.Join(",#", validTags));
+                }
+
+                foreach (FftData fftData in EnumerateFFTDataInFolder(foldername))
+                {
+                    if (fftData.FrequencyStep != fftStep) continue;
+
+                    logger.LogInformation($"Adding {fftData.Filename} to the machine learning CSV file.");
+                    sb.Append(String.Join(",", fftData.MagnitudeData.Take(fftCount).Select(md => md.ToString("0.0000000000"))));
+                    foreach (string validTag in validTags)
+                    {
+                        sb.Append("," + (fftData.Tags.Contains(validTag) ? "100" : "0"));
+                    }
+                    sb.AppendLine();
+                }
+
+                string csvFilename = $"{Path.GetFileName(Path.GetDirectoryName(foldername))}.csv";
                 logger.LogInformation($"Generating machine learning CSV file '{csvFilename}'");
                 try
                 {
@@ -527,11 +548,21 @@ namespace BBD.SleepLogger
                         continue;
                     }
 
-                    var fftData = FftData.LoadFrom($"{pathToFile}");
-                    fftData.Filename = Path.GetFileNameWithoutExtension(pathToFile);
-                    fftData.Tags = applyTags;
+                    FftData fftData = null;
+                    try
+                    {
+                        fftData = FftData.LoadFrom($"{pathToFile}");
+                        fftData.Filename = Path.GetFileNameWithoutExtension(pathToFile);
+                        fftData.Tags = applyTags;
+                    }
+                    catch
+                    {
+                    }
 
-                    yield return fftData;
+                    if (fftData != null)
+                    {
+                        yield return fftData;
+                    }
                 }
 
                 foreach (string directoryName in Directory.GetDirectories(AppendDataDir(foldername)).OrderBy(n => n))

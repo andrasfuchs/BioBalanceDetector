@@ -55,7 +55,6 @@ namespace BBD.SleepLogger
             {
                 Enabled = Boolean.Parse(config["AudioRecording:Enabled"]),
                 PreferredDevice = config["AudioRecording:PreferredDevice"],
-                OutputFormat = config["AudioRecording:OutputFormat"],
                 SilenceThreshold = config["AudioRecording:SilenceThreshold"]
             };
         }
@@ -156,7 +155,6 @@ namespace BBD.SleepLogger
     {
         public bool Enabled { get; set; }
         public string PreferredDevice { get; set; }
-        public string OutputFormat { get; set; }
         public string SilenceThreshold { get; set; }
     }
 

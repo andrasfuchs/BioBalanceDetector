@@ -6,6 +6,10 @@
     "SleepLogger - create video": {
       "commandName": "Project",
       "commandLineArgs": "--video 2021-01-23"
+    },
+    "SleepLogger - create ML CSV": {
+      "commandName": "Project",
+      "commandLineArgs": "--mlcsv n:\\Work\\SleepLogger\\2021-02-03\\"
     }
   }
 }
