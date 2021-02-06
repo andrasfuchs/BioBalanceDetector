@@ -396,7 +396,7 @@ namespace BBD.SleepLogger
                                                     waveRms = new WaveFile(waveStream).Signals[0].Rms();
                                                 }
 
-                                                string finalFilename = AppendDataDir($"{pathToAudioFile}_{waveRms.ToString("0.00")}dB.{ffmpegAudioEncodingExtension}");
+                                                string finalFilename = AppendDataDir($"{pathToAudioFile}_{waveRms.ToString("0.000")}dB.{ffmpegAudioEncodingExtension}");
                                                 string audioEncodingCommandLine = $"-i {recFilename} {ffmpegAudioEncodingParameters} \"{finalFilename}\"";
 
                                                 logger.LogDebug($"ffmpeg {audioEncodingCommandLine}");
