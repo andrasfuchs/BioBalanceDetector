@@ -5,6 +5,10 @@ VisualStudioVersion = 16.0.30804.86
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BBD.SleepLogger", "BBD.SleepLogger.csproj", "{07C36CE1-600C-49AC-8F38-F8E0D94A201E}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BBD.SleepLoggerML.Model", "..\BBD.SleepLoggerML.Model\BBD.SleepLoggerML.Model.csproj", "{56F441E9-9D91-4673-95DF-6A502A5EC35E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BBD.SleepLoggerML.ConsoleApp", "..\BBD.SleepLoggerML.ConsoleApp\BBD.SleepLoggerML.ConsoleApp.csproj", "{6ECB34EE-70AB-4D2C-8CE7-51FD18795D3A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{07C36CE1-600C-49AC-8F38-F8E0D94A201E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{07C36CE1-600C-49AC-8F38-F8E0D94A201E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{07C36CE1-600C-49AC-8F38-F8E0D94A201E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{56F441E9-9D91-4673-95DF-6A502A5EC35E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{56F441E9-9D91-4673-95DF-6A502A5EC35E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56F441E9-9D91-4673-95DF-6A502A5EC35E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56F441E9-9D91-4673-95DF-6A502A5EC35E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6ECB34EE-70AB-4D2C-8CE7-51FD18795D3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6ECB34EE-70AB-4D2C-8CE7-51FD18795D3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6ECB34EE-70AB-4D2C-8CE7-51FD18795D3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6ECB34EE-70AB-4D2C-8CE7-51FD18795D3A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
