@@ -1,2 +1,2 @@
-ncu –u
+ncu -u
 npm install
